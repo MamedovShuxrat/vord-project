@@ -1,0 +1,29 @@
+.login__input {
+    border: 1px solid rgb(135, 132, 146);
+    border-radius: 5px;
+    padding: 14px 20px;
+    margin-bottom: 25px;
+    width: 100%;
+
+    background: rgb(255, 255, 255);
+
+    &::placeholder {
+        color: rgb(135, 132, 146);
+        font-family: 'Open Sans';
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        letter-spacing: 0%;
+    }
+}
+
+.password__input {
+    position: relative;
+
+    .login__eyes {
+        position: absolute;
+        top: 13px;
+        right: 10px;
+        cursor: pointer;
+    }
+}

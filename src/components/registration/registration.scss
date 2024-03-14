@@ -1,0 +1,115 @@
+.register {
+    margin: 200px auto;
+    padding: 12px 30px 18px;
+    border-radius: 10px;
+
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+    background: rgb(255, 255, 255);
+    width: 400px;
+}
+
+.register__title-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 1px dashed #e5e5e5;
+}
+
+.login__privacy {
+    display: flex;
+    column-gap: 3px;
+    margin-bottom: 25px;
+}
+
+.login__privacy-text {
+    color: rgb(0, 0, 0);
+    font-family: 'Open Sans';
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+}
+
+.login__privacy-link {
+    color: rgb(87, 170, 228);
+    font-family: 'Open Sans';
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+    letter-spacing: 0%;
+    text-decoration: none;
+}
+
+
+
+.login__btn {
+    border: none;
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 5px;
+    color: rgb(244, 241, 252);
+    font-family: ' Open Sans';
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+    min-width: 230px
+}
+
+.main {
+    background: rgb(87, 170, 228);
+    color: rgb(244, 241, 252);
+    transition: all .3s ease-in-out;
+    border: 1px solid rgb(87, 170, 228);
+
+
+    &:hover {
+        color: rgb(87, 170, 228);
+        background: rgb(244, 241, 252);
+        border: 1px solid rgb(135, 132, 146);
+
+    }
+}
+
+
+.login__or {
+    display: flex;
+    justify-content: center;
+    margin: 6px 0;
+    color: rgb(135, 132, 146);
+    font-family: 'Open Sans';
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+}
+
+.secondary {
+    color: rgb(135, 132, 146);
+    border: 1px solid rgb(135, 132, 146);
+    border-radius: 5px;
+
+    background: rgb(255, 255, 255);
+    transition: all .3s ease-in-out;
+
+    &:hover {
+        background: rgb(87, 170, 228);
+        color: rgb(244, 241, 252);
+        border: 1px solid rgb(87, 170, 228);
+
+    }
+}
+
+.sign-or {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.sing-or__links {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 88px;
+    width: 100%;
+}

@@ -1,0 +1,52 @@
+.header {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    background: rgb(255, 255, 255);
+
+    &__inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+    }
+
+    button {
+        border: none;
+        cursor: pointer;
+        background: inherit;
+
+    }
+
+    .user__menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user__avatar {
+        display: flex;
+        justify-content: center;
+        padding: 6px 8px;
+        background: rgb(87, 170, 228);
+        border-radius: 50px;
+    }
+
+    .user__setting {
+        margin: 0 20px 0 10px;
+    }
+
+    .user {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        column-gap: 6px;
+    }
+
+    .user__dnd {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px dashed #e5e5e5;
+        cursor: pointer;
+    }
+
+}
