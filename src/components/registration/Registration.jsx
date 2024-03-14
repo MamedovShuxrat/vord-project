@@ -18,11 +18,11 @@ const Registration = () => {
                 <PasswordInput placeholder='Password' />
                 <PasswordInput placeholder='Confirm password' />
                 <div className="login__privacy">
-                    <input type="checkbox" className="login__checkbox" />
+                    <input type="checkbox" className="login__checkbox" required />
                     <span className="login__privacy-text">I agree with</span>
-                    <a href="#" className="login__privacy-link">Terms of service</a>
+                    <a href="https://vard.tech/service" target="_blank" className="login__privacy-link">Terms of service</a>
                     <span className="login__privacy-text">and</span>
-                    <a href="#" className="login__privacy-link">Privacy policy</a>
+                    <a href="https://vard.tech/policy" target="_blank" className="login__privacy-link">Privacy policy</a>
                 </div>
                 <Button className='main' >Create account</Button>
                 <span className="login__or">or</span>

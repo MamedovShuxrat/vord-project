@@ -15,6 +15,7 @@ const PasswordInput = ({ placeholder }) => {
                 placeholder={placeholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
             />
             <img onClick={togglePasswordVisibility} className='login__eyes' width={18} height={18} src='./icons/eye.svg' alt='Show password' />
 
