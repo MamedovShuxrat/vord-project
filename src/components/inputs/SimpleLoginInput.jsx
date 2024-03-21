@@ -1,9 +1,10 @@
 import React from 'react'
-import './inputs.scss'
+import inputStyles from './inputs.module.scss'
+
 
 const SimpleLoginInput = ({ placeholder }) => {
     return (
-        <input type="text" className='login__input' placeholder={placeholder} required />
+        <input type="text" className={inputStyles.login__input} placeholder={placeholder} required />
     )
 }
 

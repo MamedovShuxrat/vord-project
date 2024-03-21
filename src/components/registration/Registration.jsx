@@ -1,41 +1,43 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './registration.scss'
+import styles from './registration.module.scss'
 import Button from '../button/Button'
 import SimpleLoginInput from '../inputs/SimpleLoginInput'
 import PasswordInput from '../inputs/PasswordInput'
 
 const Registration = () => {
     return (
-        <div className='register'>
-            <div className="register__title-wrapper">
-                <h2 className="register__title">Welcome to VARD  </h2>
-                <img width={32} height={32} src="./icons/main-logo.svg" alt="main logo" />
+        <div className={styles.register}>
+            <div className={styles.register__title_wrapper}>
+                <div className={styles.wrapper}>
+                    <h2 className={styles.register__title}>Welcome to VARD  </h2>
+                    <img width={32} height={32} src="./icons/main-logo.svg" alt="main logo" />
+                </div>
             </div>
             <form action="/get">
                 <SimpleLoginInput placeholder='Name' />
                 <SimpleLoginInput placeholder='Email' />
                 <PasswordInput placeholder='Password' />
                 <PasswordInput placeholder='Confirm password' />
-                <div className="login__privacy">
-                    <input type="checkbox" className="login__checkbox" required />
-                    <span className="login__privacy-text">I agree with</span>
-                    <a href="https://vard.tech/service" target="_blank" className="login__privacy-link">Terms of service</a>
-                    <span className="login__privacy-text">and</span>
-                    <a href="https://vard.tech/policy" target="_blank" className="login__privacy-link">Privacy policy</a>
+                <div className={styles.login__privacy}>
+                    <input type="checkbox" className={styles.login__checkbox} required />
+                    <span className={styles.login__privacy_text}>I agree with</span>
+                    <a href="https://vard.tech/service" target="_blank" className={styles.login__privacy_link}>Terms of service</a>
+                    <span className={styles.login__privacy_text}>and</span>
+                    <a href="https://vard.tech/policy" target="_blank" className={styles.login__privacy_link}>Privacy policy</a>
                 </div>
-                <Button className='main' >Create account</Button>
-                <span className="login__or">or</span>
+                <Button className={styles.main} >Create account</Button>
+                <span className={styles.login__or}>or</span>
                 <Link to='/login'>
-                    <Button className='secondary' >Log in</Button>
+                    <Button className={styles.secondary} >Log in</Button>
                 </Link>
-                <div className="sign-or">
-                    <p className="sing-or__title">or Sign up with</p>
-                    <div className="sing-or__links">
-                        <a href="https://www.google.ru/" className="sing-in__link">
+                <div className={styles.sign_or}>
+                    <p className={styles.sing_or__title}>or Sign up with</p>
+                    <div className={styles.sing_or__links}>
+                        <a href="https://www.google.ru/" className={styles.sing_in__link}>
                             <img width={52} height={52} src="./icons/google-logo.svg" alt="google logo" />
                         </a>
-                        <a href="https://www.google.ru/" className="sing-in__link">
+                        <a href="https://www.google.ru/" className={styles.sing_in__link}>
                             <img width={52} height={52} src="./icons/github-logo.svg" alt="github logo" />
                         </a>
                     </div>

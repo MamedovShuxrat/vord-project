@@ -1,0 +1,59 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 116px;
+    height: 100vh;
+    background: linear-gradient(270.00deg, rgba(0, 0, 0, 0.22) 0%, rgba(217, 217, 217, 0) 10.345%), rgb(255, 255, 255);
+}
+
+.sidebarTopMenu,
+.sidebarBottomMenu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebarVersion {
+    color: rgb(135, 132, 146);
+    font-family: 'Open Sans';
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 140%;
+}
+
+.sidebarItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px;
+    width: 100%;
+    align-items: center;
+    cursor: pointer;
+    transition: all .3s ease-in-out;
+
+    &.active {
+        background: linear-gradient(270.00deg, rgba(0, 0, 0, 0.22) 0%, rgba(217, 217, 217, 0) 10.345%), rgb(171, 213, 242);
+    }
+}
+
+
+
+.sidebarBottomMenu {
+    margin-top: auto;
+}
+
+.dashboardImg {
+    margin-bottom: 5px;
+    max-width: 100%;
+    width: 100%;
+}
+
+.dashboardName {
+    color: rgb(111, 95, 121);
+    font-family: 'Open Sans';
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 140%;
+    text-align: center;
+}

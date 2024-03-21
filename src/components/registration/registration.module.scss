@@ -8,12 +8,17 @@
     width: 400px;
 }
 
-.register__title-wrapper {
+.register__title_wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
     margin-bottom: 15px;
+}
+
+.wrapper {
     border: 1px dashed #e5e5e5;
+    display: inline-flex;
+    align-items: center;
+
 }
 
 .login__privacy {
@@ -22,7 +27,7 @@
     margin-bottom: 25px;
 }
 
-.login__privacy-text {
+.login__privacy_text {
     color: rgb(0, 0, 0);
     font-family: 'Open Sans';
     font-size: 14px;
@@ -30,7 +35,7 @@
     line-height: 19px;
 }
 
-.login__privacy-link {
+.login__privacy_link {
     color: rgb(87, 170, 228);
     font-family: 'Open Sans';
     font-size: 14px;
@@ -100,14 +105,14 @@
     }
 }
 
-.sign-or {
+.sign_or {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 25px;
 }
 
-.sing-or__links {
+.sing_or__links {
     display: flex;
     justify-content: space-between;
     padding: 0 88px;

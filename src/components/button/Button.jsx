@@ -1,9 +1,13 @@
 import React from 'react'
 import classNames from 'classnames'
+import styles from '../registration/registration.module.scss'
 
 const Button = ({ children, className }) => {
     return (
-        <button className={classNames('login__btn', className)}>
+        <button className={classNames(styles.login__btn, className, {
+            'secondary': styles.secondary,
+            'main': styles.main
+        })}>
             {children}
         </button>
     )
