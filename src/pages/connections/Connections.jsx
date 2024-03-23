@@ -67,7 +67,7 @@ const Connections = () => {
                                 </button>
                             </div>)}
                         </div>
-                        <button className={`${styles.tabsLeft} ${styles.tabsRight}`}>
+                        <button className={`${styles.tabsRight}`}>
                             <img src='./icons/connection/arrow.svg' alt='arrow-pic' />
                         </button>
                     </div>

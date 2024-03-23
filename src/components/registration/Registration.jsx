@@ -15,7 +15,7 @@ const Registration = () => {
                 </div>
             </div>
             <form action="/get">
-                <SimpleLoginInput placeholder='Name' />
+                <SimpleLoginInput className='w100' placeholder='Name' />
                 <SimpleLoginInput placeholder='Email' />
                 <PasswordInput placeholder='Password' />
                 <PasswordInput placeholder='Confirm password' />

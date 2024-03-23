@@ -18,37 +18,38 @@
 
     }
 
-    .user__menu {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
 
-    .user__avatar {
-        display: flex;
-        justify-content: center;
-        padding: 6px 8px;
-        background: rgb(87, 170, 228);
-        border-radius: 50px;
-    }
+}
 
-    .user__setting {
-        margin: 0 20px 0 10px;
-    }
+.user__menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    .user {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        column-gap: 6px;
-    }
+.user__avatar {
+    display: flex;
+    justify-content: center;
+    padding: 6px 8px;
+    background: rgb(87, 170, 228);
+    border-radius: 50px;
+}
 
-    .user__dnd {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px dashed #e5e5e5;
-        cursor: pointer;
-    }
+.user__setting {
+    margin: 0 20px 0 10px;
+}
 
+.user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 6px;
+}
+
+.user__dnd {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #e5e5e5;
+    cursor: pointer;
 }
