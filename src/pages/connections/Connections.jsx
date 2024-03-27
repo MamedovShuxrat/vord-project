@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import styles from './connection.module.scss'
-import SearchBlock from '../../components/searchBlock/SearchBlock';
-import Chat from '../../components/chat/Chat';
+import SearchBlock from '../../Components/SearchBlock/SearchBlock';
+import Chat from '../../Components/Chat/Chat';
+import CreateDataBaseCard from '../../Components/CreateDataBaseCard/CreateDataBaseCard';
 
 const Connections = () => {
     const [activeTab, setActiveTabs] = useState(null)
@@ -75,6 +76,7 @@ const Connections = () => {
                         <Chat />
                     </div>
                 </div>
+                <CreateDataBaseCard />
             </div>
         </div>
     )

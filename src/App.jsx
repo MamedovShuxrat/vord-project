@@ -1,18 +1,18 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Header from './components/header/Header';
-import Login from './components/login/Login';
-import Home from './pages/main/Home';
-import Registration from './components/registration/Registration';
-import Sidebar from './components/sidebar/Sidebar';
-import Dashboard from './pages/dashboard/Dashboard';
-import Connections from './pages/connections/Connections';
-import Files from './pages/files/Files';
-import Charts from './pages/charts/Charts';
-import Wiki from './pages/Wiki/Wiki';
-import BestPractices from './pages/best_practices/BestPractices';
-import Community from './pages/community/Community';
+import Header from './Components/Header/Header';
+import Login from './Components/Login/Login';
+import Home from './Pages/Main/Home';
+import Registration from './Components/Registration/Registration';
+import Sidebar from './Components/Sidebar/Sidebar';
+import Dashboard from './Pages/Dashboard/Dashboard';
+import Connections from './Pages/Connections/Connections';
+import Files from './Pages/Files/Files';
+import Charts from './Pages/Charts/Charts';
+import Wiki from './Pages/Wiki/Wiki';
+import BestPractices from './Pages/BestPractices/BestPractices';
+import Community from './Pages/Community/Community';
 
 function App() {
   return (

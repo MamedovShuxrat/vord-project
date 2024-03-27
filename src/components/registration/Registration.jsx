@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import styles from './registration.module.scss'
-import Button from '../button/Button'
-import SimpleLoginInput from '../inputs/SimpleLoginInput'
-import PasswordInput from '../inputs/PasswordInput'
+import Button from '../Button/Button'
+import SimpleInput from '../Inputs/SimpleInput'
+import AuthPasswordInput from '../Inputs/AuthPasswordInput'
 
 const Registration = () => {
     return (
@@ -15,10 +15,10 @@ const Registration = () => {
                 </div>
             </div>
             <form action="/get">
-                <SimpleLoginInput className='w100' placeholder='Name' />
-                <SimpleLoginInput placeholder='Email' />
-                <PasswordInput placeholder='Password' />
-                <PasswordInput placeholder='Confirm password' />
+                <SimpleInput placeholder='Name' className="loginInput" />
+                <SimpleInput placeholder='Email' className="loginInput" />
+                <AuthPasswordInput placeholder='Password' />
+                <AuthPasswordInput placeholder='Confirm password' />
                 <div className={styles.login__privacy}>
                     <input type="checkbox" className={styles.login__checkbox} required />
                     <span className={styles.login__privacy_text}>I agree with</span>

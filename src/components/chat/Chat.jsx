@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styles from './chat.module.scss'
-import HeaderStyles from '../header/header.module.scss'
+import HeaderStyles from '../Header/header.module.scss'
 
 const Chat = () => {
     const [isOpened, setIsOpened] = useState(false)

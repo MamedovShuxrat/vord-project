@@ -1,0 +1,23 @@
+.CardWrapper {
+    margin-left: 20px;
+    padding: 10px;
+}
+
+.connectMenu {
+    display: flex;
+    column-gap: 20px;
+    padding: 10px;
+}
+
+.connectTitle {
+    color: rgb(14, 8, 37);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.connectCheckBoxWrapper {
+    input {
+        margin-right: 5px;
+    }
+}

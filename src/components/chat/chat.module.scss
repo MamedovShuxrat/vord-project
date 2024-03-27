@@ -43,7 +43,7 @@
 
 .chatContent {
     width: 340px;
-    min-height: 600px;
+
     position: absolute;
     top: 35px;
     left: 20px;
@@ -67,7 +67,41 @@
 }
 
 .chatMessageBlock {
+    overflow: auto;
+    min-height: 500px;
+    max-height: 500px;
+    height: max-content;
     padding: 8px 4px;
+
+    &::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+    &::-webkit-scrollbar-corner {
+        display: none;
+    }
+
+    &::-webkit-resizer {
+        display: none;
+    }
 }
 
 .chatUserMessageWrapper {
