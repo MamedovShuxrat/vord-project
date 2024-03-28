@@ -58,14 +58,15 @@
     font-size: 15px;
     font-weight: 400;
     line-height: 140%;
-    max-width: 640px;
+    max-width: 650px;
     width: 100%;
     margin-bottom: 24px;
+    outline: none;
     transition: transform 0.3s ease;
 
 
     &:focus {
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
 
     &::placeholder {
@@ -77,6 +78,6 @@
     }
 
     &:focus::placeholder {
-        transform: translateY(100%);
+        transform: translateY(200%);
     }
 }

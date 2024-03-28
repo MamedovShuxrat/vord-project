@@ -17,11 +17,46 @@
     padding: 10px 0;
     width: 240px;
     height: 100vh;
+    overflow: hidden;
+
+
 }
 
 
 .tabsWrapper {
     margin-top: 10px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+    &::-webkit-scrollbar-corner {
+        display: none;
+    }
+
+    &::-webkit-resizer {
+        display: none;
+    }
 }
 
 .tabsItem {
@@ -57,11 +92,119 @@
 
 }
 
+.tabsTopBlock {
+    background: linear-gradient(0.00deg, rgba(135, 132, 146, 0.2), rgba(135, 132, 146, 0.04) 13.542%);
+    display: flex;
+    padding: 0 30px;
+    position: relative;
+}
+
 .tabsTopBlockWrapper {
     padding-top: 10px;
     display: flex;
     align-items: center;
+    max-width: 700px;
+    overflow-x: auto;
+    position: relative;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+    }
+
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+    &::-webkit-scrollbar-corner {
+        display: none;
+    }
+
+    &::-webkit-resizer {
+        display: none;
+    }
 }
+
+.tabsLeft {
+    position: absolute;
+    top: 20px;
+    left: 10px;
+}
+
+// .tabsTopBlockWrapper {
+//     padding-top: 10px;
+//     display: flex;
+//     align-items: center;
+//     max-width: 700px;
+//     width: 100%;
+//     overflow: auto;
+
+//     &::-webkit-scrollbar {
+//         width: 3px;
+//         height: 3px;
+//     }
+
+//     &::-webkit-scrollbar-button:horizontal:start {
+//         display: block;
+//         height: 3px;
+//         background-color: transparent;
+//         background-repeat: no-repeat;
+//         background-position: center;
+//     }
+
+//     &::-webkit-scrollbar-button:horizontal:end {
+//         display: block;
+//         height: 3px;
+//         background-color: transparent;
+//         background-repeat: no-repeat;
+//         background-position: center;
+//     }
+
+//     &::-webkit-scrollbar-button:horizontal:start:depressed {
+//         background-color: gray;
+//     }
+
+//     &::-webkit-scrollbar-button:horizontal:end:depressed {
+//         background-color: gray;
+//     }
+
+//     &::-webkit-scrollbar-track:horizontal {
+//         background: transparent;
+//         border-left: 1px solid transparent;
+//         border-right: 1px solid transparent;
+//     }
+
+//     &::-webkit-scrollbar-thumb:horizontal {
+//         background: #ccc;
+//         border-radius: 5px;
+//         border: none;
+//     }
+
+//     &::-webkit-scrollbar-thumb:horizontal:hover {
+//         background: #999;
+//     }
+
+//     &::-webkit-scrollbar-corner:horizontal {
+//         display: none;
+//     }
+
+//     &::-webkit-resizer:horizontal {
+//         display: none;
+//     }
+// }
 
 .tabsLeft,
 .tabsRight {
@@ -77,15 +220,9 @@
 }
 
 
-.tabsTopBlock {
-    background: linear-gradient(0.00deg, rgba(135, 132, 146, 0.2), rgba(135, 132, 146, 0.04) 13.542%);
-    display: flex;
-    padding: 0 8px;
-}
 
 .tabsTopWrapper {
     display: flex;
-    margin-left: 10px;
 
 }
 

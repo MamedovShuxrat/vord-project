@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
 import styles from './searchBlock.module.scss';
-const SearchBlock = ({ onSearch, onFilter, onAdd, placeholder }) => {
+const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
         onSearch(event.target.value);
     };
+    const handleAddNewTab = () => {
+        const newMySQLValue = prompt("Enter the name of the new MySQL")
+        if (newMySQLValue) {
+            addNewTab(newMySQLValue)
+        }
+    }
     return (
         <div className={styles.searchBar}>
             <input
@@ -16,10 +22,10 @@ const SearchBlock = ({ onSearch, onFilter, onAdd, placeholder }) => {
                 onChange={handleSearchChange}
                 placeholder={placeholder}
             />
-            <button className={styles.searchFilterBtn} onClick={onFilter}>
+            <button className={styles.searchFilterBtn} onClick={onFilter} >
                 <img src="./icons/connection/filter.svg" alt="plus pic" />
             </button>
-            <button className={styles.searchPlusBtn} onClick={onAdd}>
+            <button className={styles.searchPlusBtn} onClick={handleAddNewTab}>
                 <img width={12} height={12} src="./icons/connection/plus.svg" alt="plus pic" />
             </button>
         </div>

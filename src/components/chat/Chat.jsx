@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styles from './chat.module.scss'
 import HeaderStyles from '../Header/header.module.scss'
 
@@ -22,6 +22,16 @@ const Chat = () => {
     const isOpenChat = () => {
         setIsOpened(!isOpened)
     }
+    const fileInput = useRef(null)
+
+    const handleFileClick = () => {
+        fileInput.current.click()
+    }
+
+    const handleFileInputChange = (event) => {
+        const files = event.target.files;
+    }
+
 
     return (
         <div className={styles.chatWrapper}>
@@ -61,7 +71,8 @@ const Chat = () => {
                         ))}
                     </div>
                     <div className={styles.chatTextBlock}>
-                        <button className={styles.chatFilesBtn}>
+                        <button className={styles.chatFilesBtn} onClick={handleFileClick}>
+                            <input type="file" ref={fileInput} style={{ display: 'none' }} onChange={handleFileInputChange} />
                             <img src="./icons/chat/files-btn.svg" alt="files btn" />
                         </button>
                         <input

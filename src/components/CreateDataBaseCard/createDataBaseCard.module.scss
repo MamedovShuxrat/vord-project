@@ -16,8 +16,81 @@
     line-height: 140%;
 }
 
+.formData {
+    width: 650px;
+}
+
 .connectCheckBoxWrapper {
+    display: flex;
+    align-items: center;
+
     input {
         margin-right: 5px;
+        transition: all .3s ease-in-out;
+    }
+
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #878492;
+        border-radius: 5px;
+        cursor: pointer;
+        outline: none;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: #57AAE4;
+    }
+
+}
+
+.hostWrapper {
+    display: flex;
+    padding-right: 30%;
+
+    >*:nth-child(1) {
+        flex: 1 0 40%;
+        margin-right: 10%;
+    }
+
+    >*:nth-child(2) {
+        flex: 1 0 20%;
+    }
+}
+
+.formDataDescr {
+    color: rgb(111, 95, 121);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 140%;
+    display: block;
+    text-align: center;
+    margin: 0 auto 35px;
+}
+
+.formDataBtn {
+    padding: 10px 20px;
+    border-radius: 9px;
+
+
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 140%;
+    display: block;
+    margin: 0 auto;
+    transition: .3s ease-in-out;
+}
+
+.formDataBtnBlue {
+    background: rgb(87, 170, 228);
+    color: rgb(244, 241, 252);
+
+    &:hover {
+        border-radius: 9px 1px 9px 9px;
+
+        background: rgb(8, 89, 145);
     }
 }
