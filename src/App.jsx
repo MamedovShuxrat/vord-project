@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import HeaderComponent from './Components/Header/HeaderComponent';
+import Header from './Components/HeaderComponent/Header';
 import Login from './Components/Login/Login';
 import Home from './Pages/Main/Home';
 import Registration from './Components/Registration/Registration';
@@ -18,7 +18,7 @@ function App() {
   return (
     <>
       <div className="container">
-        <HeaderComponent />
+        <Header />
         <main className="wrapper">
           <Sidebar />
           <Routes>
