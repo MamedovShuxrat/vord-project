@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const Home = () => {
+const HomePage = () => {
     return (
         <div>
             Тут главная страница !
@@ -12,4 +12,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default HomePage

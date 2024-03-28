@@ -1,11 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Header from './components/Header/Header';
+import Header from './components/HeaderComponent/Header';
 import Login from './components/LoginComponent/Login';
-import Home from './Pages/MainPage/Home';
 import Registration from './components/RegistrationComponent/Registration';
 import Sidebar from './components/SidebarComponent/Sidebar';
+import HomePage from './Pages/MainPage/HomePage';
 import Dashboard from './Pages/DashboardPage/Dashboard';
 import Connections from './Pages/ConnectionsPage/Connections';
 import Files from './Pages/FilesPage/Files';
@@ -22,7 +22,7 @@ function App() {
         <main className="wrapper">
           <Sidebar />
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
             <Route path="/dashboard" element={<Dashboard />} />
