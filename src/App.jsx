@@ -1,11 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Header from './Components/HeaderComponent/Header';
-import Login from './Components/Login/Login';
+import Header from './components/Header/Header';
+import Login from './components/Login/Login';
 import Home from './Pages/Main/Home';
-import Registration from './Components/Registration/Registration';
-import Sidebar from './Components/Sidebar/Sidebar';
+import Registration from './components/Registration/Registration';
+import Sidebar from './components/Sidebar/Sidebar';
 import Dashboard from './Pages/Dashboard/Dashboard';
 import Connections from './Pages/Connections/Connections';
 import Files from './Pages/Files/Files';
