@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { v4 as uuid } from 'uuid'
 
 import styles from './connection.module.scss'
-import SearchBlock from '../../components/SearchBlock/SearchBlock'
-import Chat from '../../components/Chat/Chat'
+import SearchBlock from '../../components/SearchBlockComponent/SearchBlock'
+import Chat from '../../components/ChatComponent/Chat'
 import CreateDataBaseCard from '../../components/CreateDataBaseCard/CreateDataBaseCard'
 import RandomColorIcon from '../../Elements/CreateDynamicSvgIcon/RandomColorIcon'
 

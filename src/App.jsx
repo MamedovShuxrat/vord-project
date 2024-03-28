@@ -2,17 +2,17 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import Header from './components/Header/Header';
-import Login from './components/Login/Login';
-import Home from './Pages/Main/Home';
-import Registration from './components/Registration/Registration';
-import Sidebar from './components/Sidebar/Sidebar';
-import Dashboard from './Pages/Dashboard/Dashboard';
-import Connections from './Pages/Connections/Connections';
-import Files from './Pages/Files/Files';
-import Charts from './Pages/Charts/Charts';
+import Login from './components/LoginComponent/Login';
+import Home from './Pages/MainPage/Home';
+import Registration from './components/RegistrationComponent/Registration';
+import Sidebar from './components/SidebarComponent/Sidebar';
+import Dashboard from './Pages/DashboardPage/Dashboard';
+import Connections from './Pages/ConnectionsPage/Connections';
+import Files from './Pages/FilesPage/Files';
+import Charts from './Pages/ChartsPage/Charts';
 import Wiki from './Pages/Wiki/Wiki';
 import BestPractices from './Pages/BestPractices/BestPractices';
-import Community from './Pages/Community/Community';
+import Community from './Pages/CommunityPage/Community';
 
 function App() {
   return (

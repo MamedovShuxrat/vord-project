@@ -1,9 +1,9 @@
 import React from 'react'
-import styles from '../Registration/registration.module.scss'
+import styles from '../RegistrationComponent/registration.module.scss'
 
-import SimpleInput from '../Inputs/SimpleInput'
-import AuthPasswordInput from '../Inputs/AuthPasswordInput'
-import Button from '../Button/Button'
+import SimpleInput from '../InputsComponent/SimpleInput'
+import AuthPasswordInput from '../InputsComponent/AuthPasswordInput'
+import Button from '../ButtonComponent/Button'
 
 const Login = () => {
     return (
