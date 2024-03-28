@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import HeaderStyles from './header.module.scss'
 
-const Header = () => {
+const HeaderComponent = () => {
     return (
         <header className={HeaderStyles.header}>
             <div className="container">
@@ -33,4 +33,4 @@ const Header = () => {
     )
 }
 
-export default Header
+export default HeaderComponent
