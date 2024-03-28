@@ -5,14 +5,14 @@ import Header from './components/HeaderComponent/Header';
 import Login from './components/LoginComponent/Login';
 import Registration from './components/RegistrationComponent/Registration';
 import Sidebar from './components/SidebarComponent/Sidebar';
-import HomePage from './Pages/MainPage/HomePage';
-import Dashboard from './Pages/DashboardPage/Dashboard';
-import Connections from './Pages/ConnectionsPage/Connections';
-import Files from './Pages/FilesPage/Files';
-import Charts from './Pages/ChartsPage/Charts';
-import Wiki from './Pages/Wiki/Wiki';
-import BestPractices from './Pages/BestPractices/BestPractices';
-import Community from './Pages/CommunityPage/Community';
+import HomePage from './WebPages/MainPage/HomePage';
+import Dashboard from './WebPages/DashboardPage/Dashboard';
+import Connections from './WebPages/ConnectionsPage/Connections';
+import Files from './WebPages/FilesPage/Files';
+import Charts from './WebPages/ChartsPage/Charts';
+import Wiki from './WebPages/Wiki/Wiki';
+import BestPractices from './WebPages/BestPractices/BestPractices';
+import Community from './WebPages/CommunityPage/Community';
 
 function App() {
   return (
