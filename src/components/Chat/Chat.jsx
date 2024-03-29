@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import styles from './chat.module.scss'
 import HeaderStyles from '../HeaderComponent/header.module.scss'
 const Chat = () => {
-    console.log(HeaderStyles);
     const [isOpened, setIsOpened] = useState(false)
     const [inputValue, setInputValue] = useState('')
     const [userMessages, setUserMessages] = useState([])

@@ -47,6 +47,32 @@ const Connections = () => {
 
     const [activeTab, setActiveTabs] = useState(null)
     const [searchTerm, setSearchTerm] = useState('')
+    const [dotsChange, setDotsChange] = useState({})
+
+
+    const handleDotsChange = (id) => {
+        const updatedDotsChange = {};
+        Object.keys(dotsChange).forEach(key => {
+            updatedDotsChange[key] = false;
+        });
+
+        updatedDotsChange[id] = !dotsChange[id];
+        setDotsChange(updatedDotsChange);
+    }
+
+    const handleRenameSQLTabs = (itemId) => {
+        const itemToUpdate = connectionTabs.find(item => item.id === itemId);
+        if (itemToUpdate) {
+            itemToUpdate.MySQL = prompt("Enter the name of the new MySQL")
+            setConnectionTabs([...connectionTabs]);
+        }
+    }
+
+    const handleDeleteTabs = (itemId) => {
+        const updatedTabs = connectionTabs.filter(item => item.id !== itemId);
+        setConnectionTabs(updatedTabs);
+    };
+
 
     const handleSearch = (term) => {
         setSearchTerm(term)
@@ -80,7 +106,7 @@ const Connections = () => {
         }
     }
 
-    const addNewTab = (newMySQLValue) => {
+    const addNewSQLTab = (newMySQLValue) => {
         const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16)
         const newTab = {
             id: uuid(),
@@ -96,7 +122,7 @@ const Connections = () => {
         <div className={styles.sectionWrapper} >
             <div className={styles.searchContent}>
                 <div className={styles.searchBlock}>
-                    <SearchBlock onSearch={handleSearch} placeholder='Search Connection' addNewTab={addNewTab} />
+                    <SearchBlock onSearch={handleSearch} placeholder='Search Connection' addNewTab={addNewSQLTab} />
                     <div className={styles.tabsWrapper}>
                         {connectionTabs
                             .filter(item => item.MySQL.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -107,8 +133,12 @@ const Connections = () => {
                                 >
                                     {renderImageOrIcon(item)}
                                     <span className={styles.tabsName}>MySQL: {item.MySQL}</span>
-                                    <button className={styles.tabsDots}>
-                                        <img src='./icons/connection/dots_three.svg' alt={`${item.MySQL}_pic`} />
+                                    <button className={styles.tabsDots} onClick={() => handleDotsChange(item.id)}>
+                                        <img style={{ transform: dotsChange[item.id] ? 'rotate(360deg)' : 'none' }} src='./icons/connection/dots_three.svg' alt={`${item.MySQL}_pic`} />
+                                        {dotsChange[item.id] && <div className={styles.dotsChangeWrapper}>
+                                            <span onClick={() => handleRenameSQLTabs(item.id)} className={styles.dotsChangeRename}>Rename</span>
+                                            <span onClick={() => handleDeleteTabs(item.id)} className={styles.dotsChangeDelete}>Delete </span>
+                                        </div>}
                                     </button>
                                 </div>
                             ))}
