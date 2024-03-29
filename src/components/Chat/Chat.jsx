@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styles from './chat.module.scss'
 import HeaderStyles from '../HeaderComponent/header.module.scss'
-
 const Chat = () => {
+    console.log(HeaderStyles);
     const [isOpened, setIsOpened] = useState(false)
     const [inputValue, setInputValue] = useState('')
     const [userMessages, setUserMessages] = useState([])
@@ -52,7 +52,7 @@ const Chat = () => {
                     <div className={styles.chatUserBlock}>
                         <img onClick={() => setIsOpened(false)} style={{ cursor: 'pointer' }} src="./icons/chat/arrow-left.svg" alt="arrow-left" />
                         <div className={HeaderStyles.user}>
-                            <div className={`${HeaderStyles.userAvatar} ${styles.chatBg}`}>
+                            <div className={styles.chatBg}  >
                                 <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
                             </div>
                             <p className={HeaderStyles.userName}>{'user 1'}</p>

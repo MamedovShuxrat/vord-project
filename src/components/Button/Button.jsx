@@ -1,6 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
-import styles from '../RegistrationComponent/registration.module.scss'
+import styles from '../Registration/registration.module.scss'
 
 const Button = ({ children, className }) => {
     console.log('Мистика');

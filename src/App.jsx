@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Header from './components/Header/Header';
+import Header from './components/HeaderComponent/Header';
 import Login from './components/Login/Login';
 import Registration from './components/Registration/Registration';
 import Sidebar from './components/Sidebar/Sidebar';

@@ -55,6 +55,10 @@
 }
 
 .chatBg {
+    display: flex;
+    justify-content: center;
+    padding: 6px 8px;
+    border-radius: 50px;
     background: rgb(207, 170, 229);
 }
 
