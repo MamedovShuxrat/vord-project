@@ -3,8 +3,6 @@ import styles from './chat.module.scss'
 import HeaderStyles from '../HeaderComponent/header.module.scss'
 
 const Chat = () => {
-    console.log('Мистика');
-
     const [isOpened, setIsOpened] = useState(false)
     const [inputValue, setInputValue] = useState('')
     const [userMessages, setUserMessages] = useState([])

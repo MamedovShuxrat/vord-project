@@ -1,10 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Header from './components/HeaderComponent/Header';
-import Login from './components/LoginComponent/Login';
-import Registration from './components/RegistrationComponent/Registration';
-import Sidebar from './components/SidebarComponent/Sidebar';
+import Header from './components/Header/Header';
+import Login from './components/Login/Login';
+import Registration from './components/Registration/Registration';
+import Sidebar from './components/Sidebar/Sidebar';
 import HomePage from './WebPages/MainPage/HomePage';
 import Dashboard from './WebPages/DashboardPage/Dashboard';
 import Connections from './WebPages/ConnectionsPage/Connections';

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { v4 as uuid } from 'uuid'
 
 import styles from './connection.module.scss'
-import SearchBlock from '../../components/SearchBlockComponent/SearchBlock'
-import Chat from '../../components/ChatComponent/Chat'
+import SearchBlock from '../../components/SearchBlock/SearchBlock'
+import Chat from '../../components/Chat/Chat'
 import CreateDataBaseCard from '../../components/CreateDataBaseCard/CreateDataBaseCard'
 import RandomColorIcon from '../../Elements/CreateDynamicSvgIcon/RandomColorIcon'
 
@@ -31,10 +31,11 @@ const Connections = () => {
             h: '20px'
         }
     ])
-    console.log(connectionTabs);
 
     useEffect(() => {
-        localStorage.setItem('connectionTabs', JSON.stringify(connectionTabs))
+        if (connectionTabs !== null) {
+            localStorage.setItem('connectionTabs', JSON.stringify(connectionTabs))
+        }
     }, [connectionTabs])
 
     useEffect(() => {
@@ -43,9 +44,6 @@ const Connections = () => {
             setConnectionTabs(JSON.parse(storedConnectionTabs))
         }
     }, [])
-
-
-
 
     const [activeTab, setActiveTabs] = useState(null)
     const [searchTerm, setSearchTerm] = useState('')
@@ -95,7 +93,7 @@ const Connections = () => {
     }
 
     return (
-        <div className={styles.connections} >
+        <div className={styles.sectionWrapper} >
             <div className={styles.searchContent}>
                 <div className={styles.searchBlock}>
                     <SearchBlock onSearch={handleSearch} placeholder='Search Connection' addNewTab={addNewTab} />

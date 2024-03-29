@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import styles from './registration.module.scss'
-import Button from '../ButtonComponent/Button'
-import SimpleInput from '../InputsComponent/SimpleInput'
-import AuthPasswordInput from '../InputsComponent/AuthPasswordInput'
+import Button from '../Button/Button'
+import SimpleInput from '../Inputs/SimpleInput'
+import AuthPasswordInput from '../Inputs/AuthPasswordInput'
 
 const Registration = () => {
     return (

@@ -17,36 +17,36 @@ const Sidebar = () => {
             id: 1,
             img: './icons/dashboard/dashboards.svg',
             name: 'Dashboard',
-            w: '32px',
-            h: '32px'
+            w: '40px',
+            h: '40px'
         },
         {
             id: 2,
             img: './icons/dashboard/connections.svg',
             name: 'Connections',
-            w: '26px',
-            h: '21px'
+            w: '40px',
+            h: '40px'
         },
         {
             id: 3,
             img: './icons/dashboard/files.svg',
             name: 'Files',
-            w: '22px',
-            h: '29px'
+            w: '40px',
+            h: '40px'
         },
         {
             id: 4,
             img: './icons/dashboard/charts.svg',
             name: 'Charts',
-            w: '32px',
-            h: '28px'
+            w: '40px',
+            h: '40px'
         },
         {
             id: 5,
             img: './icons/dashboard/wiki.svg',
             name: 'Wiki',
-            w: '28px',
-            h: '25px'
+            w: '40px',
+            h: '40px'
         },
     ]
 
@@ -55,15 +55,15 @@ const Sidebar = () => {
             id: 6,
             img: './icons/dashboard/best_practices.svg',
             name: 'Best Practices',
-            w: '28px',
-            h: '25px'
+            w: '40px',
+            h: '40px'
         },
         {
             id: 7,
             img: './icons/dashboard/community.svg',
             name: 'Community',
-            w: '30px',
-            h: '25px'
+            w: '40px',
+            h: '40px'
         }
 
     ]

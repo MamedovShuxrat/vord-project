@@ -1,9 +1,10 @@
 import React from 'react'
-import styles from '../RegistrationComponent/registration.module.scss'
+import { Link } from 'react-router-dom'
+import styles from '../Registration/registration.module.scss'
 
-import SimpleInput from '../InputsComponent/SimpleInput'
-import AuthPasswordInput from '../InputsComponent/AuthPasswordInput'
-import Button from '../ButtonComponent/Button'
+import SimpleInput from '../Inputs/SimpleInput'
+import AuthPasswordInput from '../Inputs/AuthPasswordInput'
+import Button from '../Button/Button'
 
 const Login = () => {
     return (
@@ -15,6 +16,10 @@ const Login = () => {
             <SimpleInput placeholder='Email' className="loginInput" />
             <AuthPasswordInput placeholder='Password' />
             <Button className={styles.main} >Log in</Button>
+            <span className={styles.login__or}>or</span>
+            <Link to='/register'>
+                <Button className={styles.secondary} >Create account</Button>
+            </Link>
         </div>
 
     )
