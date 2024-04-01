@@ -1,33 +1,57 @@
-import React from 'react'
+import React, { useState } from 'react'
 import SearchBlock from '../../components/SearchBlock/SearchBlock'
 import Chat from '../../components/Chat/Chat'
-import styles from '../ConnectionsPage/connection.module.scss'
+import CommonStyles from '../../components/CommonStyles/common.module.scss'
+
 const Files = () => {
+    const [FilesTabs, setFilesTabs] = useState([
+        {
+            id: 'untilted3',
+            folderImg: './icons/files/folder.svg',
+            folderName: 'Untilted',
+            fileImg: ''
+        }
+    ])
+    const [folderIconRotate, setFolderIconRotate] = useState('0deg')
+    const handleFolderRotate = () => {
+        setFolderIconRotate((prevRotate) => (prevRotate === '0deg' ? '90deg' : '0deg'))
+    }
     return (
-        <div className={styles.sectionWrapper} >
-            <div className={styles.searchContent}>
-                <div className={styles.searchBlock}>
+        <div className={CommonStyles.sectionWrapper} >
+            <div >
+                <div className={CommonStyles.searchBlock}>
                     <SearchBlock placeholder='Search Files' />
-                    <div className={styles.tabsWrapper}>
-                        тут папки
+                    <div className={CommonStyles.tabsWrapper}>
+                        <ul className={CommonStyles.folderWrapper} >
+                            <li className={CommonStyles.folderItem}>
+                                <img onClick={handleFolderRotate}
+                                    className={CommonStyles.FolderArrowRight}
+                                    style={{ transform: `rotate(${folderIconRotate})` }} src="./icons/files/arrow-right.svg" alt="arrow-down" />
+                                <img src="./icons/files/folder.svg" alt="folder" />
+                                <span className > Untitled  </span>
+                                <button className={CommonStyles.tabsDots}  >
+                                    <img src='./icons/connection/dots_three.svg' alt='_pic' />
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
             </div>
-            <div className={styles.mainContent}>
-                <div className={styles.tabsTopBlock}>
-                    <button className={styles.tabsLeft} >
+            <div className={CommonStyles.mainContent}>
+                <div className={CommonStyles.tabsTopBlock}>
+                    <button className={CommonStyles.tabsLeft} >
                         <img src='./icons/connection/arrow.svg' alt='arrow-pic' />
                     </button>
-                    <div className={styles.tabsTopBlockWrapper}>
-                        <div className={styles.tabsTopWrapper}>
+                    <div className={CommonStyles.tabsTopBlockWrapper}>
+                        <div className={CommonStyles.tabsTopWrapper}>
                             тут список папок
                         </div>
                     </div>
-                    <button className={`${styles.tabsRight}`} >
+                    <button className={`${CommonStyles.tabsRight}`} >
                         <img src='./icons/connection/arrow.svg' alt='arrow-pic' />
                     </button>
-                    <div className={styles.chatWrapper}>
+                    <div className={CommonStyles.chatWrapper}>
                         <Chat />
                     </div>
                 </div>

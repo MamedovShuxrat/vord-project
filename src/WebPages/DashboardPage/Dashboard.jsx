@@ -1,9 +1,16 @@
 import React from 'react'
+import CommonStyles from '../../components/CommonStyles/common.module.scss'
+import SearchBlock from '../../components/SearchBlock/SearchBlock'
+import Chat from '../../components/Chat/Chat'
 
 const Dashboard = () => {
     return (
-        <div>
-            Dashboard
+        <div className={CommonStyles.sectionWrapper} >
+            <div className={CommonStyles.tabsTopBlock}>
+                <div className={CommonStyles.chatWrapper}>
+                    <Chat />
+                </div>
+            </div>
         </div>
     )
 }

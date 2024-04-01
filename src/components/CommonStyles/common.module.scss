@@ -18,10 +18,7 @@
     width: 240px;
     height: 100vh;
     overflow: hidden;
-
-
 }
-
 
 .tabsWrapper {
     margin-top: 10px;
@@ -95,7 +92,6 @@
     }
 }
 
-
 .dotsChangeWrapper {
     position: absolute;
     top: -6px;
@@ -140,7 +136,7 @@
 
 }
 
-.mainContent {
+.sectionMainContent {
     width: 100%;
 
 }
@@ -152,11 +148,13 @@
     position: relative;
 }
 
+
 .tabsTopBlockWrapper {
-    padding-top: 10px;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     max-width: 700px;
+    min-width: 700px;
+    height: 52px;
     overflow-x: auto;
     position: relative;
 
@@ -244,6 +242,18 @@
     background: none;
 }
 
-.chatWrapper {
+.sectionChatWrapper {
     margin-left: auto;
+}
+
+
+.folderItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.FolderArrowRight {
+    cursor: pointer;
+    transition: all .3s ease-in-out;
 }

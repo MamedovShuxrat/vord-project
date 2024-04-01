@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { v4 as uuid } from 'uuid'
 
-import styles from './connection.module.scss'
+import CommonStyles from '../../components/CommonStyles/common.module.scss'
 import SearchBlock from '../../components/SearchBlock/SearchBlock'
 import Chat from '../../components/Chat/Chat'
 import CreateDataBaseCard from '../../components/CreateDataBaseCard/CreateDataBaseCard'
@@ -119,25 +119,25 @@ const Connections = () => {
     }
 
     return (
-        <div className={styles.sectionWrapper} >
-            <div className={styles.searchContent}>
-                <div className={styles.searchBlock}>
+        <div className={CommonStyles.sectionWrapper} >
+            <div >
+                <div className={CommonStyles.searchBlock}>
                     <SearchBlock onSearch={handleSearch} placeholder='Search Connection' addNewTab={addNewSQLTab} />
-                    <div className={styles.tabsWrapper}>
+                    <div className={CommonStyles.tabsWrapper}>
                         {connectionTabs
                             .filter(item => item.MySQL.toLowerCase().includes(searchTerm.toLowerCase()))
                             .map((item) => (
                                 <div key={item.id}
                                     onClick={() => onSelectTabsItem(item.id)}
-                                    className={`${styles.tabsItem} ${activeTab === item.id ? styles.active : ''}`}
+                                    className={`${CommonStyles.tabsItem} ${activeTab === item.id ? CommonStyles.active : ''}`}
                                 >
                                     {renderImageOrIcon(item)}
-                                    <span className={styles.tabsName}>MySQL: {item.MySQL}</span>
-                                    <button className={styles.tabsDots} onClick={() => handleDotsChange(item.id)}>
+                                    <span className={CommonStyles.tabsName}>MySQL: {item.MySQL}</span>
+                                    <button className={CommonStyles.tabsDots} onClick={() => handleDotsChange(item.id)}>
                                         <img style={{ transform: dotsChange[item.id] ? 'rotate(360deg)' : 'none' }} src='./icons/connection/dots_three.svg' alt={`${item.MySQL}_pic`} />
-                                        {dotsChange[item.id] && <div className={styles.dotsChangeWrapper}>
-                                            <span onClick={() => handleRenameSQLTabs(item.id)} className={styles.dotsChangeRename}>Rename</span>
-                                            <span onClick={() => handleDeleteTabs(item.id)} className={styles.dotsChangeDelete}>Delete </span>
+                                        {dotsChange[item.id] && <div className={CommonStyles.dotsChangeWrapper}>
+                                            <span onClick={() => handleRenameSQLTabs(item.id)} className={CommonStyles.dotsChangeRename}>Rename</span>
+                                            <span onClick={() => handleDeleteTabs(item.id)} className={CommonStyles.dotsChangeDelete}>Delete </span>
                                         </div>}
                                     </button>
                                 </div>
@@ -145,27 +145,27 @@ const Connections = () => {
                     </div>
                 </div>
             </div>
-            <div className={styles.mainContent}>
-                <div className={styles.tabsTopBlock}>
-                    <button className={styles.tabsLeft} onClick={handleLeftButtonClick}>
+            <div className={CommonStyles.sectionMainContent}>
+                <div className={CommonStyles.tabsTopBlock}>
+                    <button className={CommonStyles.tabsLeft} onClick={handleLeftButtonClick}>
                         <img src='./icons/connection/arrow.svg' alt='arrow-pic' />
                     </button>
-                    <div className={styles.tabsTopBlockWrapper}>
-                        <div className={styles.tabsTopWrapper}>
+                    <div className={CommonStyles.tabsTopBlockWrapper}>
+                        <div className={CommonStyles.tabsTopWrapper}>
                             {connectionTabs.map((item) => <div key={item.id}
                                 onClick={() => onSelectTabsItem(item.id)}
-                                className={`${styles.tabsTopItem} ${activeTab === item.id ? styles.active : ''}`}>
-                                <span className={`${styles.tabsName} ${styles.tabsTopName}`}> {item.MySQL}</span>
-                                <button className={styles.tabsTopDots}>
+                                className={`${CommonStyles.tabsTopItem} ${activeTab === item.id ? CommonStyles.active : ''}`}>
+                                <span className={`${CommonStyles.tabsName} ${CommonStyles.tabsTopName}`}> {item.MySQL}</span>
+                                <button className={CommonStyles.tabsTopDots}>
                                     <img src='./icons/connection/dots_three.svg' alt={`${item.MySQL}_pic`} />
                                 </button>
                             </div>)}
                         </div>
                     </div>
-                    <button className={`${styles.tabsRight}`} onClick={handleRightButtonClick}>
+                    <button className={`${CommonStyles.tabsRight}`} onClick={handleRightButtonClick}>
                         <img src='./icons/connection/arrow.svg' alt='arrow-pic' />
                     </button>
-                    <div className={styles.chatWrapper}>
+                    <div className={CommonStyles.sectionChatWrapper}>
                         <Chat />
                     </div>
                 </div>
