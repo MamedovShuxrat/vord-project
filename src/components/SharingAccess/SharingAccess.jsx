@@ -4,8 +4,7 @@ import checkbox from '../CreateDataBaseCard/createDataBaseCard.module.scss'
 import SimpleInput from '../Inputs/SimpleInput';
 
 const SharingAccess = () => {
-    const [isOpen, setIsOpen] = useState(true)
-    console.log(styles);
+    const [isOpen, setIsOpen] = useState(false)
     return (
         <div className={styles.access}>
             <h3 className={styles.accessTitle}><span>File name/</span>Connection/Chart name</h3>
@@ -31,7 +30,7 @@ const SharingAccess = () => {
                 <div className={styles.usersWrapper}>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -43,7 +42,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -55,7 +54,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -67,7 +66,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -79,7 +78,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
