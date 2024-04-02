@@ -32,7 +32,7 @@ const Charts = () => {
                 </div>
 
             </div>
-            <div className={CommonStyles.mainContent}>
+            <div className={CommonStyles.sectionMainContent}>
                 <div className={CommonStyles.tabsTopBlock}>
                     <button className={CommonStyles.tabsLeft} >
                         <img src='./icons/connection/arrow.svg' alt='arrow-pic' />
