@@ -1,9 +1,10 @@
 import React from 'react'
+import SharingAccess from '../../components/SharingAccess/SharingAccess'
 
 const Community = () => {
     return (
-        <div>
-            Community
+        <div style={{ margin: '100px auto 0' }} >
+            <SharingAccess />
         </div>
     )
 }

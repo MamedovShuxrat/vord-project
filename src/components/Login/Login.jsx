@@ -17,11 +17,7 @@ const Login = () => {
             const response = await axios.post('http://95.163.185.57/api/users/', { email, password })
             console.log(response);
         } catch (error) {
-            if (error.response) {
-                console.log('Login failed-data:', error.response.data);
-            } else {
-                console.log('Login failed:', error.response);
-            }
+            console.log('Login failed:', error.response);
         }
     }
     return (

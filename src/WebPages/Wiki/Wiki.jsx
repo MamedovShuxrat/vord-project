@@ -12,7 +12,7 @@ const Wiki = () => {
         <div className={CommonStyles.sectionWrapper} >
             <div >
                 <div className={CommonStyles.searchBlock}>
-                    <SearchBlock placeholder='Search Charts' />
+                    <SearchBlock placeholder='Search Wiki' />
                     <div className={CommonStyles.tabsWrapper}>
                         <ul className={CommonStyles.folderWrapper} >
                             <li className={CommonStyles.folderItem}>

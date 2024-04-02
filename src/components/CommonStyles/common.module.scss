@@ -246,6 +246,13 @@
     margin-left: auto;
 }
 
+.folderItems {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+
+}
+
 
 .folderItem {
     display: flex;
