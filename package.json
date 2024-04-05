@@ -40,6 +40,7 @@
     ]
   },
   "devDependencies": {
+    "react-hot-toast": "^2.4.1",
     "uuid": "^9.0.1"
   }
 }

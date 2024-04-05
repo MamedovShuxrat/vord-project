@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { toast } from 'react-hot-toast'
 import styles from '../Registration/registration.module.scss'
 
 import SimpleInput from '../Inputs/SimpleInput'
@@ -17,6 +18,7 @@ const Login = () => {
             const response = await axios.post('http://95.163.185.57/api/users/', { email, password })
             console.log(response);
         } catch (error) {
+            toast.error('Login failed:')
             console.log('Login failed:', error.response);
         }
     }

@@ -11,7 +11,13 @@ const Files = () => {
       name: 'Untitled',
       icon: './icons/files/folder.svg',
       isOpen: false,
-      subfolders: []
+      subfolders: [{
+        id: uuid(),
+        name: 'Untitled2',
+        icon: './icons/files/folder.svg',
+        isOpen: false,
+        subfolders: []
+      },]
     },
     {
       id: uuid(),
@@ -23,19 +29,22 @@ const Files = () => {
         name: 'Untitled3',
         icon: './icons/files/folder.svg',
         isOpen: false,
-        subfolders: [{
-          id: uuid(),
-          name: 'Untitled4',
-          icon: './icons/files/folder.svg',
-          isOpen: false,
-          subfolders: [{
+        subfolders: [
+          {
             id: uuid(),
             name: 'Untitled5',
             icon: './icons/files/folder.svg',
             isOpen: false,
             subfolders: []
-          },]
-        },]
+          },
+          {
+            id: uuid(),
+            name: 'Untitled4',
+            icon: './icons/files/folder.svg',
+            isOpen: false,
+            subfolders: []
+          },
+        ]
       },]
     },
   ]);
@@ -73,7 +82,7 @@ const Files = () => {
 
   const renderSubFolders = (subfolders) => {
     return subfolders.map((subfolder) => (
-      <li key={subfolder.id} className={CommonStyles.folderItem}>
+      <li style={{ margin: '20px' }} key={subfolder.id} className={CommonStyles.folderItem}>
         <img
           onClick={() => handleFolderRotate(subfolder.id)}
           className={CommonStyles.FolderArrowRight}

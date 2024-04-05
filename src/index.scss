@@ -67,10 +67,11 @@ $dark-violet: #6F5F79;
 $main-white: #fff;
 $main-dark: #0E0825;
 
+
 .container {
   margin: 0 auto;
-  max-width: 100%;
-  min-width: 1600px;
+  width: 100%;
+  max-width: 1600px;
 
 }
 
@@ -80,4 +81,11 @@ a {
 
 .wrapper {
   display: flex;
+}
+
+@media (min-width: 1600px) {
+  .container {
+    max-width: 100%;
+    min-width: 1600px;
+  }
 }

@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import styles from './searchBlock.module.scss';
+import { toast } from 'react-hot-toast';
+
+
 const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -8,11 +11,14 @@ const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
         onSearch(event.target.value);
     };
     const handleAddNewTab = () => {
-        const newMySQLValue = prompt("Enter the name of the new MySQL")
-        if (newMySQLValue) {
-            addNewTab(newMySQLValue)
+        const newMySQLValue = prompt("Enter the name of the new MySQL");
+        if (newMySQLValue && newMySQLValue.trim() !== "") {
+            addNewTab(newMySQLValue);
+            toast.success("New MySQL tab added successfully!");
+        } else {
+            toast.error("Please enter a non-empty value for the new MySQL name.");
         }
-    }
+    };
     return (
         <div className={styles.searchBar}>
             <input
