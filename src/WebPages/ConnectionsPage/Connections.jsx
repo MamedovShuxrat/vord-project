@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { v4 as uuid } from 'uuid'
 
 import CommonStyles from '../../components/CommonStyles/common.module.scss'
@@ -6,6 +6,7 @@ import SearchBlock from '../../components/SearchBlock/SearchBlock'
 import Chat from '../../components/Chat/Chat'
 import CreateDataBaseCard from '../../components/CreateDataBaseCard/CreateDataBaseCard'
 import RandomColorIcon from '../../Elements/CreateDynamicSvgIcon/RandomColorIcon'
+import toast from 'react-hot-toast'
 
 const Connections = () => {
     const [connectionTabs, setConnectionTabs] = useState([
@@ -71,6 +72,9 @@ const Connections = () => {
     const handleDeleteTabs = (itemId) => {
         const updatedTabs = connectionTabs.filter(item => item.id !== itemId);
         setConnectionTabs(updatedTabs);
+        toast('MySQL is deleted!', {
+            icon: '🚨',
+        });
     };
 
 
@@ -118,6 +122,15 @@ const Connections = () => {
         setConnectionTabs([...connectionTabs, newTab])
     }
 
+    const activeItemRef = useRef(null)
+
+    useEffect(() => {
+        if (activeItemRef.current) {
+            activeItemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        }
+    }, [activeTab]);
+
+
     return (
         <div className={CommonStyles.sectionWrapper} >
             <div >
@@ -154,7 +167,8 @@ const Connections = () => {
                         <div className={CommonStyles.tabsTopWrapper}>
                             {connectionTabs.map((item) => <div key={item.id}
                                 onClick={() => onSelectTabsItem(item.id)}
-                                className={`${CommonStyles.tabsTopItem} ${activeTab === item.id ? CommonStyles.active : ''}`}>
+                                className={`${CommonStyles.tabsTopItem} ${activeTab === item.id ? CommonStyles.active : ''}`}
+                                ref={activeTab === item.id ? activeItemRef : null}>
                                 <span className={`${CommonStyles.tabsName} ${CommonStyles.tabsTopName}`}> {item.MySQL}</span>
                                 <button className={CommonStyles.tabsTopDots}>
                                     <img src='./icons/connection/dots_three.svg' alt={`${item.MySQL}_pic`} />
