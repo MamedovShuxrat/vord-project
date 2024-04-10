@@ -2,9 +2,17 @@ import React from 'react'
 import inputStyles from './inputs.module.scss'
 
 
-const SimpleInput = ({ placeholder, className }) => {
+const SimpleInput = ({ placeholder, className, value, onChange }) => {
     return (
-        <input type="text" className={`${inputStyles[className]}`} placeholder={placeholder} required />
+        <input
+            type="text"
+            className={`${inputStyles[className]}`}
+            placeholder={placeholder}
+            required
+            value={value}
+            onChange={onChange}
+            autoComplete='Email'
+        />
     )
 }
 

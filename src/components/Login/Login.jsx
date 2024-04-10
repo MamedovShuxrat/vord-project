@@ -1,27 +1,33 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import axios from 'axios'
-import { toast } from 'react-hot-toast'
-import styles from '../Registration/registration.module.scss'
+import { Link, Redirect } from 'react-router-dom'
+import { useAuthContext } from '../../Contexts/AuhtContext'
 
+import styles from '../Registration/registration.module.scss'
 import SimpleInput from '../Inputs/SimpleInput'
 import AuthPasswordInput from '../Inputs/AuthPasswordInput'
 import Button from '../Button/Button'
 
 const Login = () => {
+    const { login } = useAuthContext();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    // const [redirect, setRedirect] = useState(false)
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('http://95.163.185.57/api/users/', { email, password })
-            console.log(response);
+            await login(email, password)
+            // setRedirect(true)
         } catch (error) {
-            toast.error('Login failed:')
-            console.log('Login failed:', error.response);
+            console.log('Login failed:', error)
+
         }
+
     }
+
+    // if (redirect) {
+    //     return <Redirect to='/dashboard' />
+    // }
     return (
         <div className={styles.register}>
             <div className={styles.register__title_wrapper}>
@@ -29,19 +35,17 @@ const Login = () => {
                 <img width={32} height={32} src="./icons/main-logo.svg" alt="main logo" />
             </div>
             <form onSubmit={handleLoginSubmit}>
-
-                <SimpleInput placeholder='Email' className="loginInput"
+                <SimpleInput
+                    placeholder='Email'
+                    className="loginInput"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)} />
-
-                <AuthPasswordInput placeholder='Password'
+                <AuthPasswordInput
+                    placeholder='Password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)} />
-
                 <Button className={styles.main} >Log in</Button>
-
                 <span className={styles.login__or}>or</span>
-
                 <Link to='/register'>
                     <Button className={styles.secondary} >Create account</Button>
                 </Link>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './Contexts/AuhtContext';
 
 import Header from './components/HeaderComponent/Header';
 import Login from './components/Login/Login';
@@ -18,22 +19,24 @@ function App() {
   return (
     <>
       <div className="container">
-        <Header />
-        <main className="wrapper">
-          <Sidebar />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Registration />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/connections" element={<Connections />} />
-            <Route path="/files" element={<Files />} />
-            <Route path="/charts" element={<Charts />} />
-            <Route path="/wiki" element={<Wiki />} />
-            <Route path="/best_practices" element={<BestPractices />} />
-            <Route path="/community" element={<Community />} />
-          </Routes>
-        </main>
+        <AuthProvider>
+          <Header />
+          <main className="wrapper">
+            <Sidebar />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Registration />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/connections" element={<Connections />} />
+              <Route path="/files" element={<Files />} />
+              <Route path="/charts" element={<Charts />} />
+              <Route path="/wiki" element={<Wiki />} />
+              <Route path="/best_practices" element={<BestPractices />} />
+              <Route path="/community" element={<Community />} />
+            </Routes>
+          </main>
+        </AuthProvider>
       </div>
 
     </>

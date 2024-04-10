@@ -78,7 +78,7 @@
     margin-left: 5px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis
+    text-overflow: ellipsis;
 }
 
 .tabsDots {
@@ -235,6 +235,10 @@
 
 .tabsTopName {
     font-weight: 600;
+    width: 70px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tabsTopDots {
