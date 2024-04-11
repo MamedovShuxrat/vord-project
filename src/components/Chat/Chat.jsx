@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useAuthContext } from '../../Contexts/AuthContext'
+
+
 import styles from './chat.module.scss'
 import HeaderStyles from '../HeaderComponent/header.module.scss'
 const Chat = () => {
+    const { user } = useAuthContext()
+
     const [isOpened, setIsOpened] = useState(false)
     const [inputValue, setInputValue] = useState('')
     const [userMessages, setUserMessages] = useState([])
@@ -54,7 +59,8 @@ const Chat = () => {
                             <div className={styles.chatBg}  >
                                 <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
                             </div>
-                            <p className={HeaderStyles.userName}>{'user 1'}</p>
+                            {user && user.email && (
+                                <p className={HeaderStyles.userName}>{user.email}</p>)}
                         </div>
                     </div>
                     <div className={styles.chatMessageBlock}>

@@ -11,7 +11,7 @@ const Files = () => {
       name: 'Untitled',
       icon: './icons/files/folder.svg',
       isOpen: false,
-      subfolders: [{
+      subfolder: [{
         id: uuid(),
         name: 'Untitled2',
         icon: './icons/files/folder.svg',
@@ -24,7 +24,7 @@ const Files = () => {
       name: 'Untitled2',
       icon: './icons/files/folder.svg',
       isOpen: false,
-      subfolders: [{
+      subfolder: [{
         id: uuid(),
         name: 'Untitled3',
         icon: './icons/files/folder.svg',
@@ -65,10 +65,10 @@ const Files = () => {
           return { ...folder, isOpen: !folder.isOpen };
         }
 
-        if (folder.subfolders.length > 0) {
+        if (folder.subfolder.length > 0) {
           return {
             ...folder,
-            subfolders: folder.subfolders.map((subfolder) => ({
+            subfolder: folder.subfolder.map((subfolder) => ({
               ...subfolder,
               isOpen: !folder.isOpen,
             })),
@@ -119,7 +119,7 @@ const Files = () => {
                   </div>
                   {folder.isOpen && (
                     <div className={CommonStyles.folderItem}>
-                      {renderSubFolders(folder.subfolders)}
+                      {renderSubFolders(folder.subfolder)}
                     </div>
                   )}
 

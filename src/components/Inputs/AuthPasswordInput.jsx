@@ -14,7 +14,6 @@ const AuthPasswordInput = ({ placeholder, value, onChange }) => {
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
-                autoComplete='new-password'
                 required
             />
             <img onClick={togglePasswordVisibility} className={inputStyles.loginEyes} width={18} height={18} src='./icons/eye.svg' alt='Show password' />

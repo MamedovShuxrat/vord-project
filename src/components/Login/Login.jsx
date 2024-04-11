@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { Link, Redirect } from 'react-router-dom'
-import { useAuthContext } from '../../Contexts/AuhtContext'
+import React, { useState, useEffect } from 'react'
+import { Link, Navigate } from 'react-router-dom'
+
+import { useAuthContext } from '../../Contexts/AuthContext'
 
 import styles from '../Registration/registration.module.scss'
 import SimpleInput from '../Inputs/SimpleInput'
@@ -8,26 +9,30 @@ import AuthPasswordInput from '../Inputs/AuthPasswordInput'
 import Button from '../Button/Button'
 
 const Login = () => {
-    const { login } = useAuthContext();
+    const { login, user } = useAuthContext()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    // const [redirect, setRedirect] = useState(false)
+    const [redirect, setRedirect] = useState(false)
+
+
+    useEffect(() => {
+        if (user) {
+            setRedirect(true)
+        }
+    }, [user])
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault()
         try {
             await login(email, password)
-            // setRedirect(true)
         } catch (error) {
-            console.log('Login failed:', error)
-
+            console.log('Login failed: invalid username or password', error)
         }
-
+    }
+    if (redirect) {
+        return <Navigate to="/dashboard" />
     }
 
-    // if (redirect) {
-    //     return <Redirect to='/dashboard' />
-    // }
     return (
         <div className={styles.register}>
             <div className={styles.register__title_wrapper}>

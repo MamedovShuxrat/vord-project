@@ -11,7 +11,6 @@ const SimpleInput = ({ placeholder, className, value, onChange }) => {
             required
             value={value}
             onChange={onChange}
-            autoComplete='Email'
         />
     )
 }
