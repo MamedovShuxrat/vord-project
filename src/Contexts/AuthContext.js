@@ -4,9 +4,9 @@ import { toast } from 'react-hot-toast'
 
 const AuthContext = createContext()
 
-const authLogin = process.env.REACT_APP_AUTH_LOGIN
-const getUserInfo = process.env.REACT_APP_GET_USER
-const authLogout = process.env.REACT_APP_AUTH_LOGOUT
+const authLogin = 'http://95.163.185.57/auth/login/'
+const getUserInfo = 'http://95.163.185.57/auth/user/'
+const authLogout = 'http://95.163.185.57/auth/logout/'
 const authRegister = process.env.REACT_APP_AUTH_REGISTER
 
 export const AuthProvider = ({ children }) => {
