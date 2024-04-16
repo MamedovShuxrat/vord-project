@@ -1,10 +1,43 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styles from './sharing.module.scss'
 import checkbox from '../CreateDataBaseCard/createDataBaseCard.module.scss'
 import SimpleInput from '../Inputs/SimpleInput';
 
 const SharingAccess = () => {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isUserBlockOpen, setIsUserBlockOpen] = useState(false)
+    const [isRestrictedBlockOpen, setIsRestrictedBlockOpen] = useState(false)
+    const userBlockRef = useRef(null)
+    const restrickedBlockRef = useRef(null)
+
+    const toggleUserBlock = () => {
+        setIsUserBlockOpen(!isUserBlockOpen)
+        setIsRestrictedBlockOpen(false)
+    }
+
+    const toggleRestrictedBlock = () => {
+        setIsRestrictedBlockOpen(!isRestrictedBlockOpen)
+        setIsUserBlockOpen(false)
+    }
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                userBlockRef.current &&
+                !userBlockRef.current.contains(event.target) &&
+                restrickedBlockRef.current &&
+                !restrickedBlockRef.current.contains(event.target)
+            ) {
+                setIsUserBlockOpen(false);
+                setIsRestrictedBlockOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
     return (
         <div className={styles.access}>
             <h3 className={styles.accessTitle}><span>File name/</span>Connection/Chart name</h3>
@@ -12,9 +45,9 @@ const SharingAccess = () => {
             <div className={styles.addRole}>
                 <div className={styles.addRoleName}>
                     <span>Add role</span>
-                    <img style={{ transform: `rotate(${isOpen ? '180deg' : '0deg'})` }} onClick={() => setIsOpen(!isOpen)} src="./icons/shared/iconDown.svg" alt="Icon-down" />
-                    {isOpen &&
-                        <div className={styles.addRoleDndMenu}>
+                    <img style={{ transform: `rotate(${isUserBlockOpen ? '180deg' : '0deg'})` }} onClick={toggleUserBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
+                    {isUserBlockOpen &&
+                        <div className={styles.addRoleDndMenu} ref={userBlockRef}>
                             <span className={styles.addRoleDndItem} >Reader</span>
                             <span className={styles.addRoleDndItem} >Editor</span>
                             <span className={styles.addRoleDndItem} >Commentator</span>
@@ -91,15 +124,15 @@ const SharingAccess = () => {
                 </div>
 
             </div>
-            <div className={styles.restrictedBlock}>
+            <div className={styles.restrictedBlock}  >
                 <h4 className={styles.restrictedTitle}>Shared accesss</h4>
                 <div className={styles.addRoleRectricted}>
-                    <div className={styles.addRoleRectrictedContent}>
+                    <div className={styles.addRoleRectrictedContent} >
                         <img src="./icons/shared/lock.svg" alt="locked" />
                         <span>Access is restricted</span>
-                        <img style={{ transform: `rotate(${isOpen ? '180deg' : '0deg'})` }} onClick={() => setIsOpen(!isOpen)} src="./icons/shared/iconDown.svg" alt="Icon-down" />
-                        {isOpen &&
-                            <div className={styles.addRoleDndMenu}>
+                        <img style={{ transform: `rotate(${isRestrictedBlockOpen ? '180deg' : '0deg'})` }} onClick={toggleRestrictedBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
+                        {isRestrictedBlockOpen &&
+                            <div className={styles.addRoleDndMenu} ref={restrickedBlockRef}>
                                 <span className={styles.addRoleDndItem} >Access is restricted</span>
                                 <span className={styles.addRoleDndItem} >Everyone who has a link</span>
                                 <span className={styles.addRoleDndItem} >Publish</span>

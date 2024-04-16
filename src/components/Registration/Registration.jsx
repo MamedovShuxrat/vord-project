@@ -17,13 +17,10 @@ const Registration = () => {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        if (password !== confirmPassword) {
-            toast.error('Passwords do not match.');
-            return;
-        }
-        register(name, email, password, confirmPassword)
+        register(name, email, password, confirmPassword);
+
     }
     return (
         <div className={styles.register}>
