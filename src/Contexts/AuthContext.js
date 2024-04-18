@@ -4,13 +4,14 @@ import { toast } from 'react-hot-toast'
 
 const AuthContext = createContext()
 
-const authLogin = 'http://95.163.185.57/auth/login/'
-const getUserInfo = 'http://95.163.185.57/auth/user/'
-const authLogout = 'http://95.163.185.57/auth/logout/'
-const authRegister = 'http://95.163.185.57/auth/register/'
+const authLogin = 'https://natalietkachuk.pythonanywhere.com/auth/login/'
+const getUserInfo = 'https://natalietkachuk.pythonanywhere.com/auth/user/'
+const authLogout = 'https://natalietkachuk.pythonanywhere.com/auth/logout/'
+const authRegister = 'https://natalietkachuk.pythonanywhere.com/auth/register/'
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState('')
+
     useEffect(() => {
         const userData = localStorage.getItem('userData')
         if (userData) {
@@ -18,70 +19,36 @@ export const AuthProvider = ({ children }) => {
         }
     }, [])
 
-    // const register = async ({ name, email, password, confirmPassword }) => {
-    //     try {
-    //         const response = await toast.promise(
-    //             axios.post(authRegister, { name, email, password, confirmPassword }),
-    //             {
-    //                 loading: 'Register in...',
-    //                 success: <b>Success Register!</b>,
-    //                 error: <b>Register failed: invalid username or password</b>
-    //             }
-    //         )
-    //         toast.success('Registration successful:', response.data);
-    //     } catch (error) {
-    //         console.error('Registration failed:', error);
-    //         throw new Error('Failed to register');
-    //     }
-    // }
-
-    // const register = async (name, email, password, confirmPassword) => {
-    //     try {
-    //         const response = await axios.post(authRegister, { name, email, password, confirmPassword })
-    //         toast.success('Registration successful:', response.data);
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('Registration failed:', error);
-    //         throw new Error('Failed to register');
-    //     }
-
-    // }
-    // const register = async ({ name, email, password, confirmPassword }) => {
-    //     try {
-    //         if (password !== confirmPassword) {
-    //             toast.error('Passwords do not match.');
-    //             return
-    //         }
-
-    //         const response = await axios.post(authRegister, { name, email, password, confirmPassword });
-    //         toast.success('Registration successful');
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('Registration failed:', error);
-    //         toast.error('Failed to register');
-    //         throw error;
-    //     }
-    // }
-
     const register = async (name, email, password, confirmPassword) => {
         try {
             if (password !== confirmPassword) {
                 toast.error('Passwords do not match.');
                 return
             }
-            const response = await axios.post(authRegister, {
-                username: name,
-                email: email,
-                password1: password,
-                password2: confirmPassword
-            });
-            toast.success('Registration successful');
-            return response.data;
+            const response = await toast.promise(
+                axios.post(authRegister, {
+                    username: name,
+                    email: email,
+                    password1: password,
+                    password2: confirmPassword
+                }),
+                {
+                    loading: 'Registering...',
+                    success: <b>'Registration successful'</b>,
+                    error: 'Registration failed'
+                }
+            );
+            // localStorage.setItem('userData', JSON.stringify(response.data))
+            // setUser(response.data)
+            const configJson = JSON.stringify(response.data);
+            return console.log(configJson);
         } catch (error) {
             toast.error('Registration failed:', error);
             throw new Error('Failed to register');
         }
     }
+
+
 
     const login = async (email, password) => {
         try {

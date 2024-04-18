@@ -47,22 +47,15 @@ const Files = () => {
         ]
       },]
     },
-  ]);
+  ])
 
 
-  // const handleFolderRotate = (folderID) => {
-  //   setFoldersTab(prevFolder => prevFolder.map(folder => {
-  //     if (folder.id === folderID) {
-  //       return { ...folder, isOpen: !folder.isOpen }
-  //     }
-  //     return folder
-  //   }))
-  // }
+
   const handleFolderRotate = (folderID) => {
     setFoldersTab((prevFolder) =>
       prevFolder.map((folder) => {
         if (folder.id === folderID) {
-          return { ...folder, isOpen: !folder.isOpen };
+          return { ...folder, isOpen: !folder.isOpen }
         }
 
         if (folder.subfolder.length > 0) {
@@ -72,13 +65,13 @@ const Files = () => {
               ...subfolder,
               isOpen: !folder.isOpen,
             })),
-          };
+          }
         }
 
-        return folder;
+        return folder
       })
-    );
-  };
+    )
+  }
 
   const renderSubFolders = (subfolders) => {
     return subfolders.map((subfolder) => (
@@ -97,8 +90,8 @@ const Files = () => {
         </button>
         {subfolder.isOpen && renderSubFolders(subfolder.subfolders)}
       </li>
-    ));
-  };
+    ))
+  }
 
   return (
     <div className={CommonStyles.sectionWrapper} >
