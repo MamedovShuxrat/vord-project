@@ -8,6 +8,7 @@ const Charts = () => {
     const handleFolderRotate = () => {
         setFolderIconRotate((prevRotate) => (prevRotate === '0deg' ? '90deg' : '0deg'))
     }
+
     return (
         <div className={CommonStyles.sectionWrapper} >
             <div >
@@ -39,7 +40,12 @@ const Charts = () => {
                     </button>
                     <div className={CommonStyles.tabsTopBlockWrapper}>
                         <div className={CommonStyles.tabsTopWrapper}>
-                            тут список Query
+                            <div className={CommonStyles.tabsTopItem} >
+                                <span className={`${CommonStyles.tabsName} ${CommonStyles.tabsTopName}`}> Query</span>
+                                <button className={CommonStyles.tabsTopDots}>
+                                    <img src='./icons/connection/dots_three.svg' alt={`query_pic`} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <button className={`${CommonStyles.tabsRight}`} >

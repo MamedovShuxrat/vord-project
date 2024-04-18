@@ -25,6 +25,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    column-gap: 10px;
 }
 
 .userAvatar {
@@ -35,9 +36,6 @@
     border-radius: 50px;
 }
 
-.userSetting {
-    margin: 0 20px 0 10px;
-}
 
 .user {
     display: flex;

@@ -14,6 +14,7 @@ import Charts from './WebPages/ChartsPage/Charts'
 import Wiki from './WebPages/Wiki/Wiki'
 import BestPractices from './WebPages/BestPractices/BestPractices'
 import Community from './WebPages/CommunityPage/Community'
+import ProfilePage from './WebPages/ProfilePage/ProfilePage'
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
           <main className="wrapper">
             <Sidebar />
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Registration />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -34,6 +35,7 @@ function App() {
               <Route path="/wiki" element={<Wiki />} />
               <Route path="/best_practices" element={<BestPractices />} />
               <Route path="/community" element={<Community />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Routes>
           </main>
         </AuthProvider>

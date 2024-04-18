@@ -1,0 +1,97 @@
+.profilePage {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+
+    h2 {
+        margin-bottom: 50px;
+    }
+
+    button {
+        transition: all .3s ease-in-out;
+    }
+}
+
+
+
+.avatarSection,
+.usernameSection,
+.passwordSection {
+    margin-bottom: 20px;
+}
+
+.avatarContainer {
+    display: flex;
+    align-items: center;
+}
+
+.avatarImage {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.inputField {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-shadow: inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    background: rgb(255, 255, 255);
+
+    position: relative;
+    border-radius: 3px;
+    border: none;
+    color: rgb(135, 132, 146);
+    font-size: 15px;
+    font-weight: 400;
+    width: 100%;
+    outline: none;
+    transition: transform 0.3s ease;
+
+
+    &:focus {
+        transform: translateY(10px);
+        border: 1px solid rgb(87, 170, 228);
+    }
+
+    &::placeholder {
+        position: absolute;
+        top: 10px;
+        left: 5px;
+        transition: transform 0.3s ease;
+
+    }
+
+    &:focus::placeholder {
+        transform: translateY(200%);
+    }
+}
+
+.changeButton {
+    background-color: rgb(87, 170, 228);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    align-self: flex-end;
+    padding: 10px 20px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 140%;
+
+    &:hover {
+        border-radius: 9px 1px 9px 9px;
+        background: rgb(8, 89, 145)
+    }
+}
+
+
+.usernameSection {
+    display: flex;
+    flex-wrap: wrap;
+
+    button {
+        margin-left: auto;
+    }
+}

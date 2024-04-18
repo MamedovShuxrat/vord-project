@@ -36,9 +36,12 @@ const Header = () => {
                         <button >
                             <img width={24} height={24} src="./icons/faq.svg" alt="faq" />
                         </button>
-                        <button className={HeaderStyles.userSetting}>
-                            <img width={24} height={24} src="./icons/setting.svg" alt="user settings" />
-                        </button>
+                        {user &&
+                            <Link to='/profile'>
+                                <button className={HeaderStyles.userSetting}>
+                                    <img width={24} height={24} src="./icons/setting.svg" alt="user settings" />
+                                </button>
+                            </Link>}
                         {isUserAuth ? (<div className={HeaderStyles.user}>
                             <div className={HeaderStyles.userAvatar}>
                                 <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />

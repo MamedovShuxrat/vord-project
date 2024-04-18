@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
                 }),
                 {
                     loading: 'Registering...',
-                    success: <b>'Registration successful'</b>,
+                    success: <b>Registration successful</b>,
                     error: 'Registration failed'
                 }
             );

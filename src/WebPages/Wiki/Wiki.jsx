@@ -39,7 +39,12 @@ const Wiki = () => {
                     </button>
                     <div className={CommonStyles.tabsTopBlockWrapper}>
                         <div className={CommonStyles.tabsTopWrapper}>
-                            тут список Faq
+                            <div className={CommonStyles.tabsTopItem} >
+                                <span className={`${CommonStyles.tabsName} ${CommonStyles.tabsTopName}`}> FAQ</span>
+                                <button className={CommonStyles.tabsTopDots}>
+                                    <img src='./icons/connection/dots_three.svg' alt={` Faq_pic`} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <button className={`${CommonStyles.tabsRight}`} >

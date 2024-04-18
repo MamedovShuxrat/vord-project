@@ -48,8 +48,10 @@ const Files = () => {
       },]
     },
   ])
-
-
+  const [activeTab, setActiveTabs] = useState(null)
+  const onSelectTabsItem = (id) => {
+    setActiveTabs(id)
+  }
 
   const handleFolderRotate = (folderID) => {
     setFoldersTab((prevFolder) =>
@@ -130,7 +132,15 @@ const Files = () => {
           </button>
           <div className={CommonStyles.tabsTopBlockWrapper}>
             <div className={CommonStyles.tabsTopWrapper}>
-              тут список папок
+              {foldersTab.map((item) => <div key={item.id}
+                onClick={() => onSelectTabsItem(item.id)}
+                className={`${CommonStyles.tabsTopItem} ${activeTab === item.id ? CommonStyles.active : ''}`}
+              >
+                <span className={`${CommonStyles.tabsName} ${CommonStyles.tabsTopName}`}> {item.name}</span>
+                <button className={CommonStyles.tabsTopDots}>
+                  <img src='./icons/connection/dots_three.svg' alt={`${item.name}_pic`} />
+                </button>
+              </div>)}
             </div>
           </div>
           <button className={`${CommonStyles.tabsRight}`} >
