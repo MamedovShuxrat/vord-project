@@ -22,7 +22,6 @@ const CreateDataBaseCard = () => {
                 <SimpleInput placeholder='Password' className='dataBaseInput' />
                 <SimpleInput placeholder='Driver' className='dataBaseInput' />
                 <SimpleInput placeholder='URL' className='dataBaseInput' />
-                <SimpleInput placeholder='Driver' className='dataBaseInput' />
                 <div className={styles.hostWrapper}>
                     <SimpleInput placeholder='Host' className='dataBaseInput' />
                     <SimpleInput placeholder='Port' className='dataBaseInput' />

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import CommonStyles from '../../components/CommonStyles/common.module.scss'
 import styles from './ProfilePage.module.scss'
-
 import Chat from '../../components/Chat/Chat'
+
 const ProfilePage = () => {
     const [username, setUsername] = useState('')
     const [useremail, setUseremail] = useState('')

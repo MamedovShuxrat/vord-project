@@ -11,7 +11,7 @@ const authRegister = 'https://natalietkachuk.pythonanywhere.com/auth/register/'
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState('')
-
+    console.log(user, 'reg');
     useEffect(() => {
         const userData = localStorage.getItem('userData')
         if (userData) {
@@ -38,10 +38,11 @@ export const AuthProvider = ({ children }) => {
                     error: 'Registration failed'
                 }
             );
-            // localStorage.setItem('userData', JSON.stringify(response.data))
-            // setUser(response.data)
-            const configJson = JSON.stringify(response.data);
-            return console.log(configJson);
+            const { data } = response;
+            const [token, userData] = data;
+            localStorage.setItem('userToken', JSON.stringify(token));
+            localStorage.setItem('userData', JSON.stringify(userData));
+            setUser(userData);
         } catch (error) {
             toast.error('Registration failed:', error);
             throw new Error('Failed to register');

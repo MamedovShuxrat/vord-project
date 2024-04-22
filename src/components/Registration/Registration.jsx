@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useAuthContext } from '../../Contexts/AuthContext'
-import { toast } from 'react-hot-toast'
 
 
 import styles from './registration.module.scss'
@@ -10,7 +9,7 @@ import SimpleInput from '../Inputs/SimpleInput'
 import AuthPasswordInput from '../Inputs/AuthPasswordInput'
 
 const Registration = () => {
-    const { register } = useAuthContext()
+    const { user, register } = useAuthContext()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -19,8 +18,15 @@ const Registration = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        register(name, email, password, confirmPassword);
+        try {
+            register(name, email, password, confirmPassword);
+        } catch (error) {
+            console.log('Register failed', error)
+        }
 
+    }
+    if (user) {
+        return <Navigate to="/dashboard" />
     }
     return (
         <div className={styles.register}>
