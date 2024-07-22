@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import styles from './searchBlock.module.scss';
-import { toast } from 'react-hot-toast';
+import React, { useState } from "react"
+import styles from "./searchBlock.module.scss";
+import { toast } from "react-hot-toast";
 
 
 const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState("");
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);

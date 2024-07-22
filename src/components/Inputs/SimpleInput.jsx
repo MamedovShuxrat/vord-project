@@ -1,5 +1,5 @@
-import React from 'react'
-import inputStyles from './inputs.module.scss'
+import React from "react"
+import inputStyles from "./inputs.module.scss"
 
 
 const SimpleInput = ({ placeholder, className, value, onChange }) => {

@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import React, { useState, useEffect } from "react"
+import { Link, Navigate } from "react-router-dom"
 
-import { useAuthContext } from '../../Contexts/AuthContext'
+import { useAuthContext } from "../../Contexts/AuthContext"
 
-import styles from '../Registration/registration.module.scss'
-import SimpleInput from '../Inputs/SimpleInput'
-import AuthPasswordInput from '../Inputs/AuthPasswordInput'
-import Button from '../Button/Button'
+import styles from "../Registration/registration.module.scss"
+import SimpleInput from "../Inputs/SimpleInput"
+import AuthPasswordInput from "../Inputs/AuthPasswordInput"
+import Button from "../Button/Button"
 
 const Login = () => {
     const { login, user } = useAuthContext()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
     const [redirect, setRedirect] = useState(false)
 
 
@@ -26,7 +26,7 @@ const Login = () => {
         try {
             await login(email, password)
         } catch (error) {
-            console.log('Login failed: invalid username or password', error)
+            console.log("Login failed: invalid username or password", error)
         }
     }
     if (redirect) {
@@ -41,17 +41,17 @@ const Login = () => {
             </div>
             <form onSubmit={handleLoginSubmit}>
                 <SimpleInput
-                    placeholder='Email'
+                    placeholder="Email"
                     className="loginInput"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)} />
                 <AuthPasswordInput
-                    placeholder='Password'
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)} />
                 <Button className={styles.main} >Log in</Button>
                 <span className={styles.login__or}>or</span>
-                <Link to='/register'>
+                <Link to="/register">
                     <Button className={styles.secondary} >Create account</Button>
                 </Link>
             </form>

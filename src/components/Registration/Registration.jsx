@@ -1,27 +1,27 @@
-import React, { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { useAuthContext } from '../../Contexts/AuthContext'
+import React, { useState } from "react"
+import { Link, Navigate } from "react-router-dom"
+import { useAuthContext } from "../../Contexts/AuthContext"
 
 
-import styles from './registration.module.scss'
-import Button from '../Button/Button'
-import SimpleInput from '../Inputs/SimpleInput'
-import AuthPasswordInput from '../Inputs/AuthPasswordInput'
+import styles from "./registration.module.scss"
+import Button from "../Button/Button"
+import SimpleInput from "../Inputs/SimpleInput"
+import AuthPasswordInput from "../Inputs/AuthPasswordInput"
 
 const Registration = () => {
     const { user, register } = useAuthContext()
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             register(name, email, password, confirmPassword);
         } catch (error) {
-            console.log('Register failed', error)
+            console.log("Register failed", error)
         }
 
     }
@@ -38,41 +38,41 @@ const Registration = () => {
             </div>
             <form onSubmit={handleSubmit}>
                 <SimpleInput
-                    placeholder='Name'
+                    placeholder="Name"
                     className="loginInput"
-                    name='name'
+                    name="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
                 <SimpleInput
-                    placeholder='Email'
+                    placeholder="Email"
                     className="loginInput"
-                    name='email'
+                    name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <AuthPasswordInput
-                    placeholder='Password'
-                    name='password'
+                    placeholder="Password"
+                    name="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <AuthPasswordInput
-                    placeholder='Confirm password'
-                    name='confirmPassword'
+                    placeholder="Confirm password"
+                    name="confirmPassword"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <div className={styles.login__privacy}>
                     <input type="checkbox" className={styles.login__checkbox} required />
                     <span className={styles.login__privacy_text}>I agree with</span>
-                    <a href="https://vard.tech/service" target="_blank" className={styles.login__privacy_link}>Terms of service</a>
+                    <a href="https://vard.tech/service" target="_blank" rel="noopener noreferrer" className={styles.login__privacy_link}>Terms of service</a>
                     <span className={styles.login__privacy_text}>and</span>
-                    <a href="https://vard.tech/policy" target="_blank" className={styles.login__privacy_link}>Privacy policy</a>
+                    <a href="https://vard.tech/policy" target="_blank" rel="noopener noreferrer" className={styles.login__privacy_link}>Privacy policy</a>
                 </div>
                 <Button className={styles.main} >Create account</Button>
                 <span className={styles.login__or}>or</span>
-                <Link to='/login'>
+                <Link to="/login">
                     <Button className={styles.secondary} >Log in</Button>
                 </Link>
                 <div className={styles.sign_or}>

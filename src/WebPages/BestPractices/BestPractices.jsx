@@ -1,5 +1,5 @@
-import React from 'react'
-import styles from './betsPracties.module.scss'
+import React from "react"
+import styles from "./betsPracties.module.scss"
 const BestPractices = () => {
 
     return (

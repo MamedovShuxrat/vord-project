@@ -1,20 +1,20 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './Contexts/AuthContext'
+import React from "react"
+import { Routes, Route } from "react-router-dom"
+import { AuthProvider } from "./Contexts/AuthContext"
 
-import Header from './components/HeaderComponent/Header'
-import Login from './components/Login/Login'
-import Registration from './components/Registration/Registration'
-import Sidebar from './components/Sidebar/Sidebar'
-import HomePage from './WebPages/MainPage/HomePage'
-import Dashboard from './WebPages/DashboardPage/Dashboard'
-import Connections from './WebPages/ConnectionsPage/Connections'
-import Files from './WebPages/FilesPage/Files'
-import Charts from './WebPages/ChartsPage/Charts'
-import Wiki from './WebPages/Wiki/Wiki'
-import BestPractices from './WebPages/BestPractices/BestPractices'
-import Community from './WebPages/CommunityPage/Community'
-import ProfilePage from './WebPages/ProfilePage/ProfilePage'
+import Header from "./components/HeaderComponent/Header"
+import Login from "./components/Login/Login"
+import Registration from "./components/Registration/Registration"
+import Sidebar from "./components/Sidebar/Sidebar"
+// import HomePage from "./WebPages/MainPage/HomePage"
+import Dashboard from "./WebPages/DashboardPage/Dashboard"
+import Connections from "./WebPages/ConnectionsPage/Connections"
+import Files from "./WebPages/FilesPage/Files"
+import Charts from "./WebPages/ChartsPage/Charts"
+import Wiki from "./WebPages/Wiki/Wiki"
+import BestPractices from "./WebPages/BestPractices/BestPractices"
+import Community from "./WebPages/CommunityPage/Community"
+import ProfilePage from "./WebPages/ProfilePage/ProfilePage"
 
 function App() {
   return (

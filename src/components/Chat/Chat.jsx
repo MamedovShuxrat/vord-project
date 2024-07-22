@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useAuthContext } from '../../Contexts/AuthContext'
+import React, { useState, useEffect, useRef } from "react"
+import { useAuthContext } from "../../Contexts/AuthContext"
 
 
-import styles from './chat.module.scss'
-import HeaderStyles from '../HeaderComponent/header.module.scss'
+import styles from "./chat.module.scss"
+import HeaderStyles from "../HeaderComponent/header.module.scss"
 const Chat = () => {
     const { user } = useAuthContext()
 
     const [isOpened, setIsOpened] = useState(false)
-    const [inputValue, setInputValue] = useState('')
+    const [inputValue, setInputValue] = useState("")
     const [userMessages, setUserMessages] = useState([])
 
     useEffect(() => {
-        const storedMessages = localStorage.getItem('userMessages')
+        const storedMessages = localStorage.getItem("userMessages")
         if (storedMessages) {
             setUserMessages(JSON.parse(storedMessages))
         }
     }, [])
 
     useEffect(() => {
-        localStorage.setItem('userMessages', JSON.stringify(userMessages))
+        localStorage.setItem("userMessages", JSON.stringify(userMessages))
     }, [userMessages])
 
 
@@ -54,7 +54,7 @@ const Chat = () => {
             {isOpened &&
                 <div className={styles.chatContent}>
                     <div className={styles.chatUserBlock}>
-                        <img onClick={() => setIsOpened(false)} style={{ cursor: 'pointer' }} src="./icons/chat/arrow-left.svg" alt="arrow-left" />
+                        <img onClick={() => setIsOpened(false)} style={{ cursor: "pointer" }} src="./icons/chat/arrow-left.svg" alt="arrow-left" />
                         <div className={HeaderStyles.user}>
                             <div className={styles.chatBg}  >
                                 <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
@@ -77,26 +77,26 @@ const Chat = () => {
                     </div>
                     <div className={styles.chatTextBlock}>
                         <button className={styles.chatFilesBtn} onClick={handleFileClick}>
-                            <input type="file" ref={fileInput} style={{ display: 'none' }} onChange={handleFileInputChange} />
+                            <input type="file" ref={fileInput} style={{ display: "none" }} onChange={handleFileInputChange} />
                             <img src="./icons/chat/files-btn.svg" alt="files btn" />
                         </button>
                         <input
                             className={styles.chatInput}
                             type="text"
-                            placeholder='Text a message...'
+                            placeholder="Text a message..."
                             value={inputValue}
                             onChange={(event) =>
                                 setInputValue(event.target.value)
                             }
                         />
-                        <button className={`${styles.chatSendBtn} ${inputValue.trim() !== '' ? '' : styles.chatBtnInactive}`}
+                        <button className={`${styles.chatSendBtn} ${inputValue.trim() !== "" ? "" : styles.chatBtnInactive}`}
                             onClick={() => {
-                                if (inputValue.trim() !== '') {
+                                if (inputValue.trim() !== "") {
                                     setUserMessages([...userMessages, inputValue])
-                                    setInputValue('')
+                                    setInputValue("")
                                 }
                             }}
-                            disabled={inputValue.trim() === ''}>
+                            disabled={inputValue.trim() === ""}>
                             <img src="./icons/chat/send-message.svg" alt="files btn" />
                         </button>
                     </div>

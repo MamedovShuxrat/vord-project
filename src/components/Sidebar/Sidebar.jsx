@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import styles from './sidebar.module.scss'
-import SidebarItem from './SidebarItem'
+import React, { useState } from "react"
+import { Link } from "react-router-dom"
+import styles from "./sidebar.module.scss"
+import SidebarItem from "./SidebarItem"
 
 
 const Sidebar = () => {
@@ -15,55 +15,55 @@ const Sidebar = () => {
     const dashboardTopMenu = [
         {
             id: 1,
-            img: './icons/dashboard/dashboards.svg',
-            name: 'Dashboard',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/dashboards.svg",
+            name: "Dashboard",
+            w: "40px",
+            h: "40px"
         },
         {
             id: 2,
-            img: './icons/dashboard/connections.svg',
-            name: 'Connections',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/connections.svg",
+            name: "Connections",
+            w: "40px",
+            h: "40px"
         },
         {
             id: 3,
-            img: './icons/dashboard/files.svg',
-            name: 'Files',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/files.svg",
+            name: "Files",
+            w: "40px",
+            h: "40px"
         },
         {
             id: 4,
-            img: './icons/dashboard/charts.svg',
-            name: 'Charts',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/charts.svg",
+            name: "Charts",
+            w: "40px",
+            h: "40px"
         },
         {
             id: 5,
-            img: './icons/dashboard/wiki.svg',
-            name: 'Wiki',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/wiki.svg",
+            name: "Wiki",
+            w: "40px",
+            h: "40px"
         },
     ]
 
     const dashboardBottomMenu = [
         {
             id: 6,
-            img: './icons/dashboard/best_practices.svg',
-            name: 'Best Practices',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/best_practices.svg",
+            name: "Best Practices",
+            w: "40px",
+            h: "40px"
         },
         {
             id: 7,
-            img: './icons/dashboard/community.svg',
-            name: 'Community',
-            w: '40px',
-            h: '40px'
+            img: "./icons/dashboard/community.svg",
+            name: "Community",
+            w: "40px",
+            h: "40px"
         }
 
     ]
@@ -71,10 +71,10 @@ const Sidebar = () => {
         <aside className={styles.sidebar}>
             <div className={styles.sidebarTopMenu}>
                 {dashboardTopMenu.map((item) =>
-                    <Link key={`top_${item.id}`} to={`${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    <Link key={`top_${item.id}`} to={`${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                         className={styles.sidebarItemWrapper}>
                         <SidebarItem
-                            className={activeSideItem === item.id ? styles.active : ''}
+                            className={activeSideItem === item.id ? styles.active : ""}
                             onClick={() => onSelectSideItem(item.id)}>
                             <img
                                 width={item.w}
@@ -89,10 +89,10 @@ const Sidebar = () => {
             </div>
             <div className={styles.sidebarBottomMenu}>
                 {dashboardBottomMenu.map((item) =>
-                    <Link key={`bottom_${item.id}`} to={`${item.name.toLowerCase().replace(/\s+/g, '_')}`}
+                    <Link key={`bottom_${item.id}`} to={`${item.name.toLowerCase().replace(/\s+/g, "_")}`}
                         className={styles.sidebarItemWrapper}>
                         <SidebarItem
-                            className={activeSideItem === item.id ? styles.active : ''}
+                            className={activeSideItem === item.id ? styles.active : ""}
                             onClick={() => onSelectSideItem(item.id)}>
                             <img
                                 width={item.w}

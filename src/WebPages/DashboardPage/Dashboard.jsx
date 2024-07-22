@@ -1,7 +1,7 @@
-import React from 'react'
-import CommonStyles from '../../components/CommonStyles/common.module.scss'
-import SearchBlock from '../../components/SearchBlock/SearchBlock'
-import Chat from '../../components/Chat/Chat'
+import React from "react"
+import CommonStyles from "../../components/CommonStyles/common.module.scss"
+import SearchBlock from "../../components/SearchBlock/SearchBlock"
+import Chat from "../../components/Chat/Chat"
 
 const Dashboard = () => {
     return (

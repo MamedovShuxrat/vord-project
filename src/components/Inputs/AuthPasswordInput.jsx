@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import inputStyles from './inputs.module.scss'
+import React, { useState } from "react";
+import inputStyles from "./inputs.module.scss"
 
 const AuthPasswordInput = ({ placeholder, value, onChange }) => {
     const [showPassword, setShowPassword] = useState(true);
@@ -10,13 +10,13 @@ const AuthPasswordInput = ({ placeholder, value, onChange }) => {
     return (
         <div className={inputStyles.loginPassword} >
             <input className={inputStyles.loginInput}
-                type={showPassword ? 'password' : 'text'}
+                type={showPassword ? "password" : "text"}
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
                 required
             />
-            <img onClick={togglePasswordVisibility} className={inputStyles.loginEyes} width={18} height={18} src='./icons/eye.svg' alt='Show password' />
+            <img onClick={togglePasswordVisibility} className={inputStyles.loginEyes} width={18} height={18} src="./icons/eye.svg" alt="Show password" />
 
         </div>
     );

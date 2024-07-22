@@ -1,9 +1,9 @@
-import React from 'react'
-import SharingAccess from '../../components/SharingAccess/SharingAccess'
+import React from "react"
+import SharingAccess from "../../components/SharingAccess/SharingAccess"
 
 const Community = () => {
     return (
-        <div style={{ margin: '100px auto 0', height: '100vh' }} >
+        <div style={{ margin: "100px auto 0", height: "100vh" }} >
             <SharingAccess />
         </div>
     )

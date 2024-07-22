@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react'
-import styles from './sharing.module.scss'
-import checkbox from '../CreateDataBaseCard/createDataBaseCard.module.scss'
-import SimpleInput from '../Inputs/SimpleInput';
+import React, { useState, useRef, useEffect } from "react"
+import styles from "./sharing.module.scss"
+import checkbox from "../CreateDataBaseCard/createDataBaseCard.module.scss"
+import SimpleInput from "../Inputs/SimpleInput";
 
 const SharingAccess = () => {
     const [isUserBlockOpen, setIsUserBlockOpen] = useState(false)
@@ -32,20 +32,20 @@ const SharingAccess = () => {
             }
         };
 
-        document.addEventListener('click', handleClickOutside);
+        document.addEventListener("click", handleClickOutside);
         return () => {
-            document.removeEventListener('click', handleClickOutside);
+            document.removeEventListener("click", handleClickOutside);
         };
     }, []);
 
     return (
         <div className={styles.access}>
             <h3 className={styles.accessTitle}><span>File name/</span>Connection/Chart name</h3>
-            <SimpleInput placeholder='Add user' className='dataBaseInput' />
+            <SimpleInput placeholder="Add user" className="dataBaseInput" />
             <div className={styles.addRole}>
                 <div className={styles.addRoleName}>
                     <span>Add role</span>
-                    <img style={{ transform: `rotate(${isUserBlockOpen ? '180deg' : '0deg'})` }} onClick={toggleUserBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
+                    <img style={{ transform: `rotate(${isUserBlockOpen ? "180deg" : "0deg"})` }} onClick={toggleUserBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
                     {isUserBlockOpen &&
                         <div className={styles.addRoleDndMenu} ref={userBlockRef}>
                             <span className={styles.addRoleDndItem} >Reader</span>
@@ -54,7 +54,7 @@ const SharingAccess = () => {
                         </div>}
                 </div>
                 <label className={checkbox.connectCheckBoxWrapper} htmlFor="connectHost">
-                    <input type="checkbox" id='connectConfirm' name="Confirm" className={checkbox.checkboxInput} />
+                    <input type="checkbox" id="connectConfirm" name="Confirm" className={checkbox.checkboxInput} />
                     <span className={checkbox.connectTitle}>Confirm</span>
                 </label>
             </div>
@@ -130,7 +130,7 @@ const SharingAccess = () => {
                     <div className={styles.addRoleRectrictedContent} >
                         <img src="./icons/shared/lock.svg" alt="locked" />
                         <span>Access is restricted</span>
-                        <img style={{ transform: `rotate(${isRestrictedBlockOpen ? '180deg' : '0deg'})` }} onClick={toggleRestrictedBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
+                        <img style={{ transform: `rotate(${isRestrictedBlockOpen ? "180deg" : "0deg"})` }} onClick={toggleRestrictedBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
                         {isRestrictedBlockOpen &&
                             <div className={styles.addRoleDndMenu} ref={restrickedBlockRef}>
                                 <span className={styles.addRoleDndItem} >Access is restricted</span>
