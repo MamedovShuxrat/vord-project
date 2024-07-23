@@ -1,7 +1,7 @@
 import React from "react"
 
 import styles from "./createDataBaseCard.module.scss"
-import SimpleInput from "../Inputs/SimpleInput"
+import SimpleInput from "../ui/Inputs/SimpleInput"
 
 const CreateDataBaseCard = () => {
     return (

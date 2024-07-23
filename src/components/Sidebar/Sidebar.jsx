@@ -3,7 +3,71 @@ import { Link } from "react-router-dom"
 import styles from "./sidebar.module.scss"
 import SidebarItem from "./SidebarItem"
 
+import dashboardsSvg from "../../assets/images/icons/sidebar/dashboards.svg"
+import connectionSvg from "../../assets/images/icons/sidebar/connections.svg"
+import filesSvg from "../../assets/images/icons/sidebar/files.svg"
+import chartsSvg from "../../assets/images/icons/sidebar/charts.svg"
+import wikiSvg from "../../assets/images/icons/sidebar/wiki.svg"
+import bestPracticesSvg from "../../assets/images/icons/sidebar/best_practices.svg"
+import communitySvg from "../../assets/images/icons/sidebar/community.svg"
 
+
+
+const dashboardTopMenu = [
+    {
+        id: 1,
+        img: dashboardsSvg,
+        name: "Dashboard",
+        w: "40px",
+        h: "40px"
+    },
+    {
+        id: 2,
+        img: connectionSvg,
+        name: "Connections",
+        w: "40px",
+        h: "40px"
+    },
+    {
+        id: 3,
+        img: filesSvg,
+        name: "Files",
+        w: "40px",
+        h: "40px"
+    },
+    {
+        id: 4,
+        img: chartsSvg,
+        name: "Charts",
+        w: "40px",
+        h: "40px"
+    },
+    {
+        id: 5,
+        img: wikiSvg,
+        name: "Wiki",
+        w: "40px",
+        h: "40px"
+    },
+]
+
+const dashboardBottomMenu = [
+    {
+        id: 6,
+        img: bestPracticesSvg,
+        name: "Best Practices",
+        w: "40px",
+        h: "40px"
+    },
+    {
+        id: 7,
+        img: communitySvg,
+        name: "Community",
+        w: "40px",
+        h: "40px"
+    }
+
+]
 const Sidebar = () => {
 
     const [activeSideItem, setActiveSideItem] = useState(null)
@@ -12,61 +76,6 @@ const Sidebar = () => {
         setActiveSideItem(id)
     }
 
-    const dashboardTopMenu = [
-        {
-            id: 1,
-            img: "./icons/dashboard/dashboards.svg",
-            name: "Dashboard",
-            w: "40px",
-            h: "40px"
-        },
-        {
-            id: 2,
-            img: "./icons/dashboard/connections.svg",
-            name: "Connections",
-            w: "40px",
-            h: "40px"
-        },
-        {
-            id: 3,
-            img: "./icons/dashboard/files.svg",
-            name: "Files",
-            w: "40px",
-            h: "40px"
-        },
-        {
-            id: 4,
-            img: "./icons/dashboard/charts.svg",
-            name: "Charts",
-            w: "40px",
-            h: "40px"
-        },
-        {
-            id: 5,
-            img: "./icons/dashboard/wiki.svg",
-            name: "Wiki",
-            w: "40px",
-            h: "40px"
-        },
-    ]
-
-    const dashboardBottomMenu = [
-        {
-            id: 6,
-            img: "./icons/dashboard/best_practices.svg",
-            name: "Best Practices",
-            w: "40px",
-            h: "40px"
-        },
-        {
-            id: 7,
-            img: "./icons/dashboard/community.svg",
-            name: "Community",
-            w: "40px",
-            h: "40px"
-        }
-
-    ]
     return (
         <aside className={styles.sidebar}>
             <div className={styles.sidebarTopMenu}>

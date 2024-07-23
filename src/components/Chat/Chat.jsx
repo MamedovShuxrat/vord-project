@@ -3,7 +3,16 @@ import { useAuthContext } from "../../Contexts/AuthContext"
 
 
 import styles from "./chat.module.scss"
-import HeaderStyles from "../HeaderComponent/header.module.scss"
+import HeaderStyles from "../Header/header.module.scss"
+
+
+import arrowLeftSvg from "../../assets/images/icons/chat/arrow-left.svg"
+import userAvatarImg from "../../assets/images/icons/common/user-avatar.svg"
+import filesBtnSvg from "../../assets/images/icons/chat/files-btn.svg"
+import messageBtnSvg from "../../assets/images/icons/chat/send-message.svg"
+import chatMessageSvg from "../../assets/images/icons/chat/chat.svg"
+import chatInfoSvg from "../../assets/images/icons/chat/chat-purple.svg"
+
 const Chat = () => {
     const { user } = useAuthContext()
 
@@ -43,10 +52,10 @@ const Chat = () => {
                 <div className={styles.chatHeader}>
                     <div onClick={isOpenChat} className={styles.chatNameWrapper}>
                         <span className={styles.chatName}>Chat</span>
-                        <img width={20} height={20} src="./icons/chat/chat.svg" alt="chat svg" />
+                        <img width={20} height={20} src={chatMessageSvg} alt="chat svg" />
                     </div>
                     <div onClick={isOpenChat} className={styles.chatNotifyWrapper}>
-                        <img width={20} height={20} src="./icons/chat/chat-purple.svg" alt="chat svg" />
+                        <img width={20} height={20} src={chatInfoSvg} alt="chat svg" />
                         <span className={styles.chatNotify}>{userMessages.length}</span>
                     </div>
                 </div>
@@ -54,10 +63,10 @@ const Chat = () => {
             {isOpened &&
                 <div className={styles.chatContent}>
                     <div className={styles.chatUserBlock}>
-                        <img onClick={() => setIsOpened(false)} style={{ cursor: "pointer" }} src="./icons/chat/arrow-left.svg" alt="arrow-left" />
+                        <img onClick={() => setIsOpened(false)} style={{ cursor: "pointer" }} src={arrowLeftSvg} alt="arrow-left" />
                         <div className={HeaderStyles.user}>
                             <div className={styles.chatBg}  >
-                                <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                                <img width={15} height={18} src={userAvatarImg} alt="user avatar" />
                             </div>
                             {user && user.email && (
                                 <p className={HeaderStyles.userName}>{user.email}</p>)}
@@ -68,7 +77,7 @@ const Chat = () => {
                             <div className={styles.chatUserMessageWrapper} key={index}>
                                 <div className={HeaderStyles.user}>
                                     <div className={`${HeaderStyles.user__avatar} ${styles.chatBg}`}>
-                                        <img width={15} height={18} src="./icons/user-avatar.svg" alt="user avatar" />
+                                        <img width={15} height={18} src={userAvatarImg} alt="user avatar" />
                                     </div>
                                 </div>
                                 <span className={styles.chatUserMessage}>{message}</span>
@@ -78,7 +87,7 @@ const Chat = () => {
                     <div className={styles.chatTextBlock}>
                         <button className={styles.chatFilesBtn} onClick={handleFileClick}>
                             <input type="file" ref={fileInput} style={{ display: "none" }} onChange={handleFileInputChange} />
-                            <img src="./icons/chat/files-btn.svg" alt="files btn" />
+                            <img src={filesBtnSvg} alt="files btn" />
                         </button>
                         <input
                             className={styles.chatInput}
@@ -97,7 +106,7 @@ const Chat = () => {
                                 }
                             }}
                             disabled={inputValue.trim() === ""}>
-                            <img src="./icons/chat/send-message.svg" alt="files btn" />
+                            <img src={messageBtnSvg} alt="files btn" />
                         </button>
                     </div>
                 </div>}

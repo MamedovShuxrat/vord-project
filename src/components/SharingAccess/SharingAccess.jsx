@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from "react"
 import styles from "./sharing.module.scss"
 import checkbox from "../CreateDataBaseCard/createDataBaseCard.module.scss"
-import SimpleInput from "../Inputs/SimpleInput";
+import SimpleInput from "../ui/Inputs/SimpleInput";
+
+import userAvatarImg from "../../assets/images/icons/common/user-avatar.svg"
+import arrowDownSvg from "../../assets/images/icons/shared/iconDown.svg"
+import linkSvg from "../../assets/images/icons/shared/link.svg"
+import lockSvg from "../../assets/images/icons/shared/lock.svg"
 
 const SharingAccess = () => {
     const [isUserBlockOpen, setIsUserBlockOpen] = useState(false)
@@ -45,7 +50,7 @@ const SharingAccess = () => {
             <div className={styles.addRole}>
                 <div className={styles.addRoleName}>
                     <span>Add role</span>
-                    <img style={{ transform: `rotate(${isUserBlockOpen ? "180deg" : "0deg"})` }} onClick={toggleUserBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
+                    <img style={{ transform: `rotate(${isUserBlockOpen ? "180deg" : "0deg"})` }} onClick={toggleUserBlock} src={arrowDownSvg} alt="Icon-down" />
                     {isUserBlockOpen &&
                         <div className={styles.addRoleDndMenu} ref={userBlockRef}>
                             <span className={styles.addRoleDndItem} >Reader</span>
@@ -63,7 +68,7 @@ const SharingAccess = () => {
                 <div className={styles.usersWrapper}>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src={userAvatarImg} alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -75,7 +80,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src={userAvatarImg} alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -87,7 +92,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src={userAvatarImg} alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -99,7 +104,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src={userAvatarImg} alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -111,7 +116,7 @@ const SharingAccess = () => {
                     </div>
                     <div className={styles.userItem}>
                         <div className={styles.userBg}>
-                            <img width={20} height={20} src="./icons/user-avatar.svg" alt="user avatar" />
+                            <img width={20} height={20} src={userAvatarImg} alt="user avatar" />
                         </div>
                         <div className={styles.userInfo}>
                             <p className={styles.userName} >John Smith</p>
@@ -128,9 +133,9 @@ const SharingAccess = () => {
                 <h4 className={styles.restrictedTitle}>Shared accesss</h4>
                 <div className={styles.addRoleRectricted}>
                     <div className={styles.addRoleRectrictedContent} >
-                        <img src="./icons/shared/lock.svg" alt="locked" />
+                        <img src={lockSvg} alt="locked" />
                         <span>Access is restricted</span>
-                        <img style={{ transform: `rotate(${isRestrictedBlockOpen ? "180deg" : "0deg"})` }} onClick={toggleRestrictedBlock} src="./icons/shared/iconDown.svg" alt="Icon-down" />
+                        <img style={{ transform: `rotate(${isRestrictedBlockOpen ? "180deg" : "0deg"})` }} onClick={toggleRestrictedBlock} src={arrowDownSvg} alt="Icon-down" />
                         {isRestrictedBlockOpen &&
                             <div className={styles.addRoleDndMenu} ref={restrickedBlockRef}>
                                 <span className={styles.addRoleDndItem} >Access is restricted</span>
@@ -145,7 +150,7 @@ const SharingAccess = () => {
                 </div>
                 <div className={styles.accessBtnWrapper}>
                     <button className={styles.accessBtnItem}>
-                        <img src="./icons/shared/link.svg" alt="link" /> Copy link</button>
+                        <img src={linkSvg} alt="link" /> Copy link</button>
                     <button className={styles.accessBtnItem}>Done</button>
                 </div>
             </div>
