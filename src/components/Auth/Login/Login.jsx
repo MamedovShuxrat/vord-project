@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
-
-import { useAuthContext } from "../../../Contexts/AuthContext";
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "../../../core/store/userSlice";
 
 import styles from "../Registration/registration.module.scss";
 import SimpleInput from "../../ui/Inputs/SimpleInput";
@@ -11,7 +11,11 @@ import Button from "../../ui/Button/Button";
 import mainLogoSvg from "../../../assets/images/icons/common/main-logo.svg";
 
 const Login = () => {
-  const { login, user } = useAuthContext();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
+  const status = useSelector((state) => state.user.status);
+  const error = useSelector((state) => state.user.error);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
@@ -24,12 +28,9 @@ const Login = () => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-    } catch (error) {
-      console.log("Login failed: invalid username or password", error);
-    }
+    dispatch(login({ email, password }));
   };
+
   if (redirect) {
     return <Navigate to="/dashboard" />;
   }
@@ -37,7 +38,7 @@ const Login = () => {
   return (
     <div className={styles.register}>
       <div className={styles.register__title_wrapper}>
-        <h2 className={styles.register__title}>Log in to VARD </h2>
+        <h2 className={styles.register__title}>Log in to VARD</h2>
         <img width={32} height={32} src={mainLogoSvg} alt="main logo" />
       </div>
       <form onSubmit={handleLoginSubmit}>
@@ -57,6 +58,7 @@ const Login = () => {
         <Link to="/register">
           <Button className={styles.secondary}>Create account</Button>
         </Link>
+        {status === "failed" && <p className={styles.error}>{error}</p>}
       </form>
     </div>
   );
