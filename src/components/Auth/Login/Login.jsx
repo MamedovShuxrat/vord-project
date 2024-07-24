@@ -1,65 +1,65 @@
-import React, { useState, useEffect } from "react"
-import { Link, Navigate } from "react-router-dom"
+import React, { useState, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
 
-import { useAuthContext } from "../../../Contexts/AuthContext"
+import { useAuthContext } from "../../../Contexts/AuthContext";
 
-import styles from "../Registration/registration.module.scss"
-import SimpleInput from "../../ui/Inputs/SimpleInput"
-import AuthPasswordInput from "../../ui/Inputs/AuthPasswordInput"
-import Button from "../../ui/Button/Button"
+import styles from "../Registration/registration.module.scss";
+import SimpleInput from "../../ui/Inputs/SimpleInput";
+import AuthPasswordInput from "../../ui/Inputs/AuthPasswordInput";
+import Button from "../../ui/Button/Button";
 
-
-import mainLogoSvg from "../../../assets/images/icons/common/main-logo.svg"
+import mainLogoSvg from "../../../assets/images/icons/common/main-logo.svg";
 
 const Login = () => {
-    const { login, user } = useAuthContext()
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [redirect, setRedirect] = useState(false)
+  const { login, user } = useAuthContext();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [redirect, setRedirect] = useState(false);
 
-
-    useEffect(() => {
-        if (user) {
-            setRedirect(true)
-        }
-    }, [user])
-
-    const handleLoginSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            await login(email, password)
-        } catch (error) {
-            console.log("Login failed: invalid username or password", error)
-        }
+  useEffect(() => {
+    if (user) {
+      setRedirect(true);
     }
-    if (redirect) {
-        return <Navigate to="/dashboard" />
+  }, [user]);
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(email, password);
+    } catch (error) {
+      console.log("Login failed: invalid username or password", error);
     }
+  };
+  if (redirect) {
+    return <Navigate to="/dashboard" />;
+  }
 
-    return (
-        <div className={styles.register}>
-            <div className={styles.register__title_wrapper}>
-                <h2 className={styles.register__title}>Log in to VARD  </h2>
-                <img width={32} height={32} src={mainLogoSvg} alt="main logo" />
-            </div>
-            <form onSubmit={handleLoginSubmit}>
-                <SimpleInput
-                    placeholder="Email"
-                    className="loginInput"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)} />
-                <AuthPasswordInput
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)} />
-                <Button className={styles.main} >Log in</Button>
-                <span className={styles.login__or}>or</span>
-                <Link to="/register">
-                    <Button className={styles.secondary} >Create account</Button>
-                </Link>
-            </form>
-        </div>
-    )
-}
+  return (
+    <div className={styles.register}>
+      <div className={styles.register__title_wrapper}>
+        <h2 className={styles.register__title}>Log in to VARD </h2>
+        <img width={32} height={32} src={mainLogoSvg} alt="main logo" />
+      </div>
+      <form onSubmit={handleLoginSubmit}>
+        <SimpleInput
+          placeholder="Email"
+          className="loginInput"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <AuthPasswordInput
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button className={styles.main}>Log in</Button>
+        <span className={styles.login__or}>or</span>
+        <Link to="/register">
+          <Button className={styles.secondary}>Create account</Button>
+        </Link>
+      </form>
+    </div>
+  );
+};
 
-export default Login
+export default Login;
