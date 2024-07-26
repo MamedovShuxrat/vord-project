@@ -4,9 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { register } from "../../../core/store/userSlice";
 
 import styles from "./registration.module.scss";
-import Button from "../../ui/Button/Button";
 import SimpleInput from "../../ui/Inputs/SimpleInput";
 import AuthPasswordInput from "../../ui/Inputs/AuthPasswordInput";
+import Button from "../../ui/Button/Button";
 
 import mainLogoSvg from "../../../assets/images/icons/common/main-logo.svg";
 import googleLogoSvg from "../../../assets/images/icons/registration/google-logo.svg";

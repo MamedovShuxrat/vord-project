@@ -1,7 +1,9 @@
 import axios from "axios";
 
-const authRegister = "https://natalietkachuk.pythonanywhere.com/auth/register/";
-const authLogin = "https://natalietkachuk.pythonanywhere.com/auth/login/";
+const API_URL = process.env.REACT_APP_API_URL;
+
+const authRegister = `${API_URL}/auth/register/`;
+const authLogin = `${API_URL}/auth/login/`;
 
 export const registerUser = async (name, email, password, confirmPassword) => {
   try {
