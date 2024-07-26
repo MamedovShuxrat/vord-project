@@ -48,5 +48,6 @@
     "react-hot-toast": "^2.4.1",
     "stream-browserify": "^3.0.0",
     "uuid": "^9.0.1"
-  }
+  },
+  "proxy": "http://81.200.151.85"
 }

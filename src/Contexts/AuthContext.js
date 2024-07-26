@@ -4,10 +4,10 @@ import { toast } from 'react-hot-toast'
 
 const AuthContext = createContext()
 
-const authLogin = 'https://natalietkachuk.pythonanywhere.com/auth/login/'
-const getUserInfo = 'https://natalietkachuk.pythonanywhere.com/auth/user/'
-const authLogout = 'https://natalietkachuk.pythonanywhere.com/auth/logout/'
-const authRegister = 'https://natalietkachuk.pythonanywhere.com/auth/register/'
+const authLogin = '/auth/login/';
+const getUserInfo = '/auth/user/';
+const authLogout = '/auth/logout/';
+const authRegister = '/auth/register/';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState('')
