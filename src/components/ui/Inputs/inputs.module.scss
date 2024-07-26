@@ -1,0 +1,84 @@
+.loginInput {
+    border: 1px solid rgb(135, 132, 146);
+    background: rgb(255, 255, 255);
+    border-radius: 5px;
+    padding: 14px 20px;
+    margin-bottom: 25px;
+    width: 100%;
+    transition: all .3s ease-in-out;
+    outline: none;
+
+    &:hover {
+        border: 1px solid rgb(87, 170, 228);
+        border-radius: 5px;
+
+        background: rgb(223, 239, 250);
+    }
+
+    &:focus {
+        border: 1px solid rgb(87, 170, 228);
+        border-radius: 5px;
+        background: rgb(255, 255, 255);
+    }
+
+    // &:invalid {
+    //     border: 2px solid rgb(215, 48, 38);
+    //     border-radius: 5px;
+    //     background: rgb(255, 255, 255);
+    // }
+
+    &::placeholder {
+        color: rgb(135, 132, 146);
+        font-family: 'Open Sans';
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        letter-spacing: 0%;
+    }
+}
+
+.loginPassword {
+    position: relative;
+
+    .loginEyes {
+        position: absolute;
+        top: 13px;
+        right: 10px;
+        cursor: pointer;
+    }
+}
+
+.dataBaseInput {
+    position: relative;
+    padding: 5px;
+    border: 1px solid rgb(135, 132, 146);
+    border-radius: 5px;
+    background: rgb(255, 255, 255);
+    color: rgb(135, 132, 146);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 140%;
+    max-width: 650px;
+    width: 100%;
+    margin-bottom: 24px;
+    outline: none;
+    transition: transform 0.3s ease;
+
+
+    &:focus {
+        transform: translateY(1px);
+        border: 1px solid rgb(87, 170, 228);
+    }
+
+    &::placeholder {
+        position: absolute;
+        top: 10px;
+        left: 5px;
+        transition: transform 0.3s ease;
+
+    }
+
+    &:focus::placeholder {
+        transform: translateY(200%);
+    }
+}
