@@ -6,10 +6,10 @@ const AuthContext = createContext();
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
-const authLogin = `${API_URL}/auth/login/`;
-const getUserInfo = `${API_URL}/auth/user/`;
-const authLogout = `${API_URL}/auth/logout/`;
-const authRegister = `${API_URL}/auth/register/`;
+const authLogin = "${API_URL}/auth/login/";
+const getUserInfo = "${API_URL}/auth/user/";
+const authLogout = "${API_URL}/auth/logout/";
+const authRegister = "${API_URL}/auth/register/";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState("");
