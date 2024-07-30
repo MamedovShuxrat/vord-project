@@ -23,21 +23,24 @@ const ConnectionsPage = () => {
       img: dataBaseRedSvg,
       MySQL: "Magazine",
       w: "20px",
-      h: "20px"
+      h: "20px",
+      formData: {} // Состояние для CreateDataBaseCard
     },
     {
       id: "home2",
       img: dataBaseGreenSvg,
       MySQL: "Home",
       w: "20px",
-      h: "20px"
+      h: "20px",
+      formData: {} // Состояние для CreateDataBaseCard
     },
     {
       id: "untilted3",
       img: dataBaseBlackSvg,
       MySQL: "Untilted",
       w: "20px",
-      h: "20px"
+      h: "20px",
+      formData: {} // Состояние для CreateDataBaseCard
     }
   ]);
 
@@ -136,7 +139,8 @@ const ConnectionsPage = () => {
       img: randomColor,
       MySQL: newMySQLValue,
       w: "20px",
-      h: "20px"
+      h: "20px",
+      formData: {} // Состояние для CreateDataBaseCard
     };
     setConnectionTabs([...connectionTabs, newTab]);
   };
@@ -152,6 +156,14 @@ const ConnectionsPage = () => {
       });
     }
   }, [activeTab]);
+
+  const handleFormDataChange = (id, newFormData) => {
+    console.log(`Updating tab ${id} with new formData:`, newFormData);
+    const updatedTabs = connectionTabs.map((item) =>
+      item.id === id ? { ...item, formData: newFormData } : item
+    );
+    setConnectionTabs(updatedTabs);
+  };
 
   return (
     <div className={commonStyles.sectionWrapper}>
@@ -252,7 +264,16 @@ const ConnectionsPage = () => {
             <Chat />
           </div>
         </div>
-        <CreateDataBaseCard />
+        {activeTab && (
+          <CreateDataBaseCard
+            formData={
+              connectionTabs.find((tab) => tab.id === activeTab).formData
+            }
+            onFormDataChange={(newFormData) =>
+              handleFormDataChange(activeTab, newFormData)
+            }
+          />
+        )}
       </div>
     </div>
   );
