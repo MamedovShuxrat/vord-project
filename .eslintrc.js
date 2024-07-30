@@ -15,7 +15,7 @@ module.exports = {
   plugins: ["react"],
   rules: {
     "react/react-in-jsx-scope": "off",
-    quotes: ["error", "double", { allowTemplateLiterals: true }],
+    quotes: ["error", "single", { allowTemplateLiterals: true }],
     "jsx-quotes": ["error", "prefer-double"],
     "react/prop-types": "off",
     "no-unused-vars": "warn"
