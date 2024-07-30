@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-
+import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
 
 const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
   const [localFormData, setLocalFormData] = useState(formData);
+  const [dbType, setDbType] = useState(formData.dbType || "");
 
   useEffect(() => {
     console.log("CreateDataBaseCard rendered with formData:", formData);
     setLocalFormData(formData);
+    setDbType(formData.dbType || "");
   }, [formData]);
 
   const handleChange = (e) => {
@@ -19,30 +21,14 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
     onFormDataChange(updatedFormData);
   };
 
+  const handleDbTypeChange = (e) => {
+    const value = e.target.value;
+    setDbType(value);
+    handleChange(e);
+  };
+
   return (
     <div className={styles.CardWrapper}>
-      <div className={styles.connectMenu}>
-        <p className={styles.connectTitle}>Connect by:</p>
-        <label className={styles.connectCheckBoxWrapper} htmlFor="connectHost">
-          <input
-            type="checkbox"
-            id="connectHost"
-            name="host"
-            className={styles.checkboxInput}
-            onChange={handleChange}
-          />
-          <span className={styles.connectTitle}>Host</span>
-        </label>
-        <label className={styles.connectCheckBoxWrapper} htmlFor="connectUrl">
-          <input
-            type="checkbox"
-            id="connectUrl"
-            name="url"
-            onChange={handleChange}
-          />
-          <span className={styles.connectTitle}>URL</span>
-        </label>
-      </div>
       <form action="/submit" className={styles.formData}>
         <SimpleInput
           placeholder="User"
@@ -55,43 +41,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
           placeholder="Password"
           name="password"
           value={localFormData.password || ""}
-          className="dataBaseInput"
-          onChange={handleChange}
-        />
-        <SimpleInput
-          placeholder="Driver"
-          name="driver"
-          value={localFormData.driver || ""}
-          className="dataBaseInput"
-          onChange={handleChange}
-        />
-        <SimpleInput
-          placeholder="URL"
-          name="url"
-          value={localFormData.url || ""}
-          className="dataBaseInput"
-          onChange={handleChange}
-        />
-        <div className={styles.hostWrapper}>
-          <SimpleInput
-            placeholder="Host"
-            name="host"
-            value={localFormData.host || ""}
-            className="dataBaseInput"
-            onChange={handleChange}
-          />
-          <SimpleInput
-            placeholder="Port"
-            name="port"
-            value={localFormData.port || ""}
-            className="dataBaseInput"
-            onChange={handleChange}
-          />
-        </div>
-        <SimpleInput
-          placeholder="Data Base Type"
-          name="dbType"
-          value={localFormData.dbType || ""}
           className="dataBaseInput"
           onChange={handleChange}
         />
@@ -109,6 +58,30 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
           className="dataBaseInput"
           onChange={handleChange}
         />
+        <div className={`${styles.selectWrapper} dataBaseInput`}>
+          <label htmlFor="dbType" className={styles.selectLabel}>
+            Data Base Type
+          </label>
+          <select
+            id="dbType"
+            name="dbType"
+            value={dbType}
+            className={styles.selectInput}
+            onChange={handleDbTypeChange}
+          >
+            <option value="">Select Database Type</option>
+            <option value="MySQL">MySQL</option>
+          </select>
+        </div>
+        {dbType === "MySQL" && (
+          <SimpleInput
+            placeholder="URL"
+            name="url"
+            value={localFormData.url || ""}
+            className="dataBaseInput"
+            onChange={handleChange}
+          />
+        )}
         <span className={styles.formDataDescr}>
           Connections between VARD and your database will be encrypted
         </span>
@@ -118,6 +91,18 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
       </form>
     </div>
   );
+};
+
+CreateDataBaseCard.propTypes = {
+  formData: PropTypes.shape({
+    user: PropTypes.string,
+    password: PropTypes.string,
+    dbType: PropTypes.string,
+    dbName: PropTypes.string,
+    description: PropTypes.string,
+    url: PropTypes.string
+  }).isRequired,
+  onFormDataChange: PropTypes.func.isRequired
 };
 
 export default CreateDataBaseCard;
