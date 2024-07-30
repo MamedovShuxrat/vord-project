@@ -27,7 +27,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["webpack.config.js", ".eslintrc.js"],
+      files: ["webpack.config.ts", ".eslintrc.js"],
       env: {
         node: true
       }
