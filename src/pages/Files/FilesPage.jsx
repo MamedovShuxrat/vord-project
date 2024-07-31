@@ -9,8 +9,10 @@ import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 import folder from "../../assets/images/icons/common/folder.svg";
-
+import useSearch from "../../components/utils/useSearch";
 const FilesPage = () => {
+  const { searchTerm, setSearchTerm } = useSearch()
+
   const [foldersTab, setFoldersTab] = useState([
     {
       id: uuid(),
@@ -20,7 +22,7 @@ const FilesPage = () => {
       subfolder: [
         {
           id: uuid(),
-          name: "Untitled2",
+          name: "vard test",
           icon: folder,
           isOpen: false,
           subfolders: []
@@ -111,14 +113,22 @@ const FilesPage = () => {
     ));
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
         <div className={commonStyles.searchBlock}>
-          <SearchBlock placeholder="Search Files" />
+          <SearchBlock
+            onSearch={handleSearch}
+            placeholder="Search Files" />
           <div className={commonStyles.tabsWrapper}>
             <div className={commonStyles.folderWrapper}>
-              {foldersTab.map((folder) => (
+              {foldersTab.filter((item) =>
+                item.name.toLowerCase().includes(searchTerm.toLowerCase())
+              ).map((folder) => (
                 <div key={folder.id} className={commonStyles.folderItems}>
                   <div className={commonStyles.folderItem}>
                     <img

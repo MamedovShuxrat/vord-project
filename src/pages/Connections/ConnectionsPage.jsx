@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { v4 as uuid } from "uuid";
+import useSearch from "../../components/utils/useSearch";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 
@@ -17,6 +18,8 @@ import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
 const ConnectionsPage = () => {
+  const { searchTerm, setSearchTerm } = useSearch()
+
   const [connectionTabs, setConnectionTabs] = useState([
     {
       id: "magazine1",
@@ -58,9 +61,7 @@ const ConnectionsPage = () => {
   }, []);
 
   const [activeTab, setActiveTabs] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [dotsChange, setDotsChange] = useState({});
-
   const handleDotsChange = (id) => {
     const updatedDotsChange = {};
     Object.keys(dotsChange).forEach((key) => {
@@ -85,10 +86,6 @@ const ConnectionsPage = () => {
     toast("MySQL is deleted!", {
       icon: "🚨"
     });
-  };
-
-  const handleSearch = (term) => {
-    setSearchTerm(term);
   };
 
   const handleLeftButtonClick = () => {
@@ -157,6 +154,8 @@ const ConnectionsPage = () => {
     }
   }, [activeTab]);
 
+
+
   const handleFormDataChange = (id, newFormData) => {
     console.log(`Updating tab ${id} with new formData:`, newFormData);
     const updatedTabs = connectionTabs.map((item) =>
@@ -165,6 +164,9 @@ const ConnectionsPage = () => {
     setConnectionTabs(updatedTabs);
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>

@@ -14,6 +14,7 @@ const WikiPage = () => {
     setFolderIconRotate((prevRotate) =>
       prevRotate === "0deg" ? "90deg" : "0deg"
     );
+
   };
   return (
     <div className={commonStyles.sectionWrapper}>
