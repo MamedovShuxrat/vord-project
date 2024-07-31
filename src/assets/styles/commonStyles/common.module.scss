@@ -205,17 +205,15 @@
     cursor: pointer;
 }
 
-
 .tabsRight {
     transform: rotate(180deg);
     margin-left: auto;
+    margin-right: 15px;
 }
-
-
 
 .tabsTopWrapper {
     display: flex;
-
+    margin-right: 15px;
 }
 
 .tabsTopItem {
