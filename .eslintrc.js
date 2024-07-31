@@ -2,15 +2,20 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true
+    node: true,
   },
-  extends: ["eslint:recommended", "plugin:react/recommended", "prettier"],
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "prettier",
+    "plugin:prettier/recommended",
+  ],
   parserOptions: {
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
     ecmaVersion: 12,
-    sourceType: "module"
+    sourceType: "module",
   },
   plugins: ["react", "prettier"],
   rules: {
@@ -18,19 +23,19 @@ module.exports = {
     quotes: ["error", "double", { allowTemplateLiterals: true }],
     "jsx-quotes": ["error", "prefer-double"],
     "react/prop-types": "off",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
   },
   globals: {
     process: "readonly",
     module: "readonly",
-    require: "readonly"
+    require: "readonly",
   },
   overrides: [
     {
       files: ["webpack.config.ts", ".eslintrc.js"],
       env: {
-        node: true
-      }
-    }
-  ]
+        node: true,
+      },
+    },
+  ],
 };

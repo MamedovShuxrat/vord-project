@@ -35,6 +35,17 @@
       "react-app/jest"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -61,6 +72,8 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.35.0",
     "globals": "^15.8.0",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7",
     "node-polyfill-webpack-plugin": "^3.0.0",
     "path-browserify": "^1.0.1",
     "prettier": "^3.3.3",

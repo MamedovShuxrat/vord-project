@@ -24,7 +24,7 @@ const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
         className={styles.searchInput}
         type="text"
         value={searchTerm}
-        onChange={(event) => handleSearchChange(event, onSearch)}
+        onChange={event => handleSearchChange(event, onSearch)}
         placeholder={placeholder}
       />
       <button className={styles.searchFilterBtn} onClick={onFilter}>
