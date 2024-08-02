@@ -127,6 +127,18 @@ const FileView = ({
     });
   };
 
+  const handleDeleteFile = (id, folders) => {
+    return folders.map((folder) => {
+      if (folder.files.find((file) => file.id === id)) {
+        folder.files = folder.files.filter((file) => file.id !== id);
+      }
+      if (folder.subfolders.length > 0) {
+        folder.subfolders = handleDeleteFile(id, folder.subfolders);
+      }
+      return folder;
+    });
+  };
+
   const handleContextMenuClick = (action) => {
     if (contextMenu.type === "folder") {
       if (action === "addFolder") {
@@ -141,7 +153,7 @@ const FileView = ({
     } else if (contextMenu.type === "file") {
       if (action === "rename") {
         setIsRenaming(true);
-        setNewName(selectedItem.name);
+        
       } else if (action === "delete") {
         setFoldersTab((prevFolders) =>
           handleDeleteFile(contextMenu.id, prevFolders)
@@ -170,15 +182,12 @@ const FileView = ({
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && isRenaming && newName.trim()) {
       setFoldersTab((prevFolders) =>
-        handleRename(selectedItem.id, newName, prevFolders)
-      );
-      updateTabName(selectedItem.id, newName);
       setIsRenaming(false);
     }
   };
 
   const handleFileClick = (id, name) => {
-    setSelectedItem({ id, name });
+
     handleItemClick(id, name, "file");
   };
 
@@ -246,7 +255,7 @@ const FileView = ({
               onClick={() => handleFileClick(file.id, file.name)}
             >
               <img src={file.icon} alt="file" />
-              {isRenaming && selectedItem && selectedItem.id === file.id ? (
+
                 <input
                   type="text"
                   value={newName}

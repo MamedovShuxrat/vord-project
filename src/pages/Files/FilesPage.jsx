@@ -91,17 +91,6 @@ const FilesPage = () => {
     }
   };
 
-  const handleContextMenu = (e, id) => {
-    e.preventDefault();
-    const rect = e.target.getBoundingClientRect();
-    setContextMenu({
-      id,
-      visible: true,
-      x: rect.right - 200,
-      y: rect.bottom + window.scrollY
-    });
-  };
-
   const handleContextMenuClick = (action) => {
     if (action === "closeAllTabs") {
       setOpenTabs([]);
