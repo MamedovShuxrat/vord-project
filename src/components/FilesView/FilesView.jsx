@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuid } from "uuid";
-
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 import folderIcon from "../../assets/images/icons/common/folder.svg";
 import fileIcon from "../../assets/images/icons/common/file.svg";
 import styles from "./filesView.module.scss";
+import MenuForFolder from "./menu/MenuForFolder";
+import MenuForFiles from "./menu/MenuForFiles";
 
 const FileView = ({ foldersTab, setFoldersTab }) => {
   const [contextMenu, setContextMenu] = useState({
     id: null,
+    type: null,
     visible: false,
     x: 0,
     y: 0
@@ -24,7 +26,7 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
         contextMenuRef.current &&
         !contextMenuRef.current.contains(event.target)
       ) {
-        setContextMenu({ id: null, visible: false, x: 0, y: 0 });
+        setContextMenu({ id: null, type: null, visible: false, x: 0, y: 0 });
       }
     };
 
@@ -94,23 +96,34 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
     });
   };
 
-  const handleContextMenu = (e, id) => {
+  const handleContextMenu = (e, id, type) => {
     e.preventDefault();
     const rect = e.target.getBoundingClientRect();
-    setContextMenu({ id, visible: true, x: rect.right + 15, y: rect.top });
+    setContextMenu({
+      id,
+      type,
+      visible: true,
+      x: rect.right + 10,
+      y: rect.top
+    });
   };
 
   const handleContextMenuClick = (action) => {
-    if (action === "addFolder") {
-      setFoldersTab((prevFolders) =>
-        handleAddFolder(contextMenu.id, prevFolders)
-      );
-    } else if (action === "addFile") {
-      setFoldersTab((prevFolders) =>
-        handleAddFile(contextMenu.id, prevFolders)
-      );
+    if (contextMenu.type === "folder") {
+      if (action === "addFolder") {
+        setFoldersTab((prevFolders) =>
+          handleAddFolder(contextMenu.id, prevFolders)
+        );
+      } else if (action === "addFile") {
+        setFoldersTab((prevFolders) =>
+          handleAddFile(contextMenu.id, prevFolders)
+        );
+      }
+    } else if (contextMenu.type === "file") {
+      // Здесь вы можете добавить обработку других действий для файлов
+      console.log(`File action: ${action}`);
     }
-    setContextMenu({ id: null, visible: false, x: 0, y: 0 });
+    setContextMenu({ id: null, type: null, visible: false, x: 0, y: 0 });
   };
 
   const handleItemClick = (id) => {
@@ -149,7 +162,7 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
               <span>{subfolder.name}</span>
               <button
                 className={styles.tabsDots}
-                onClick={(e) => handleContextMenu(e, subfolder.id)}
+                onClick={(e) => handleContextMenu(e, subfolder.id, "folder")}
               >
                 <img src={dotsSvg} alt="_pic" />
               </button>
@@ -178,7 +191,7 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
               <span>{file.name}</span>
               <button
                 className={styles.tabsDots}
-                onClick={(e) => handleContextMenu(e, file.id)}
+                onClick={(e) => handleContextMenu(e, file.id, "file")}
               >
                 <img src={dotsSvg} alt="_pic" />
               </button>
@@ -218,7 +231,7 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
               <span>{folder.name}</span>
               <button
                 className={styles.tabsDots}
-                onClick={(e) => handleContextMenu(e, folder.id)}
+                onClick={(e) => handleContextMenu(e, folder.id, "folder")}
               >
                 <img src={dotsSvg} alt="_pic" />
               </button>
@@ -234,12 +247,11 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
           className={styles.contextMenu}
           style={{ top: contextMenu.y, left: contextMenu.x }}
         >
-          <button onClick={() => handleContextMenuClick("addFolder")}>
-            Add Folder
-          </button>
-          <button onClick={() => handleContextMenuClick("addFile")}>
-            Add File
-          </button>
+          {contextMenu.type === "folder" ? (
+            <MenuForFolder handleContextMenuClick={handleContextMenuClick} />
+          ) : (
+            <MenuForFiles handleContextMenuClick={handleContextMenuClick} />
+          )}
         </div>
       )}
     </div>

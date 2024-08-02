@@ -27,11 +27,11 @@ const FilesPage = () => {
           isOpen: false,
           subfolders: [],
           files: [
-            {
-              id: uuid(),
-              name: "Untitled",
-              icon: folderIcon
-            }
+            // {
+            //   id: uuid(),
+            //   name: "Untitled",
+            //   icon: folderIcon
+            // }
           ]
         }
       ],
