@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import FileView from "../../components/FilesView/FilesView";
+import MenuForView from "../../components/FilesView/menu/MenuForView";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 
@@ -35,6 +36,30 @@ const FilesPage = () => {
 
   const [activeTab, setActiveTabs] = useState(null);
   const [openTabs, setOpenTabs] = useState([]);
+  const [contextMenu, setContextMenu] = useState({
+    id: null,
+    visible: false,
+    x: 0,
+    y: 0
+  });
+
+  const contextMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target)
+      ) {
+        setContextMenu({ id: null, visible: false, x: 0, y: 0 });
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [contextMenuRef]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
@@ -66,6 +91,27 @@ const FilesPage = () => {
     }
   };
 
+  const handleContextMenu = (e, id) => {
+    e.preventDefault();
+    const rect = e.target.getBoundingClientRect();
+    setContextMenu({
+      id,
+      visible: true,
+      x: rect.right - 200, // Корректируем положение по оси x, чтобы было левее
+      y: rect.bottom + window.scrollY
+    });
+  };
+
+  const handleContextMenuClick = (action) => {
+    if (action === "closeAllTabs") {
+      setOpenTabs([]);
+      setActiveTabs(null);
+    } else if (action === "closeSelectedTab") {
+      removeTab(contextMenu.id);
+    }
+    setContextMenu({ id: null, visible: false, x: 0, y: 0 });
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
@@ -93,18 +139,20 @@ const FilesPage = () => {
               {openTabs.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => onSelectTabsItem(item.id)}
                   className={`${commonStyles.tabsTopItem} ${
                     activeTab === item.id ? commonStyles.active : ""
                   }`}
                 >
                   <span
                     className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
+                    onClick={() => onSelectTabsItem(item.id)}
                   >
-                    {" "}
                     {item.name}
                   </span>
-                  <button className={commonStyles.tabsTopDots}>
+                  <button
+                    className={commonStyles.tabsTopDots}
+                    onClick={(e) => handleContextMenu(e, item.id)}
+                  >
                     <img src={dotsSvg} alt={`${item.name}_pic`} />
                   </button>
                 </div>
@@ -119,6 +167,15 @@ const FilesPage = () => {
           </div>
         </div>
       </div>
+      {contextMenu.visible && (
+        <div
+          ref={contextMenuRef}
+          className={commonStyles.contextMenuForView}
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+        >
+          <MenuForView handleContextMenuClick={handleContextMenuClick} />
+        </div>
+      )}
     </div>
   );
 };
