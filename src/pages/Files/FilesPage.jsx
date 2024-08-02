@@ -2,158 +2,61 @@ import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
+import FileView from "../../components/FilesView/FilesView";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 
-import arrowSvg from "../../assets/images/icons/common/arrow.svg";
-import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
-import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
-import folder from "../../assets/images/icons/common/folder.svg";
+import arrowSvg from "../../assets/images/icons/common/arrow.svg"; // Импортируем arrowSvg
+import dotsSvg from "../../assets/images/icons/common/dots_three.svg"; // Импортируем dotsSvg
+import folderIcon from "../../assets/images/icons/common/folder.svg";
 import useSearch from "../../components/utils/useSearch";
-const FilesPage = () => {
-  const { searchTerm, setSearchTerm } = useSearch()
 
+const FilesPage = () => {
+  const { searchTerm, setSearchTerm } = useSearch();
   const [foldersTab, setFoldersTab] = useState([
     {
       id: uuid(),
       name: "Untitled",
-      icon: folder,
+      icon: folderIcon,
       isOpen: false,
-      subfolder: [
+      subfolders: [
         {
           id: uuid(),
-          name: "vard test",
-          icon: folder,
+          name: "Untitled",
+          icon: folderIcon,
           isOpen: false,
-          subfolders: []
-        }
-      ]
-    },
-    {
-      id: uuid(),
-      name: "Untitled2",
-      icon: folder,
-      isOpen: false,
-      subfolder: [
-        {
-          id: uuid(),
-          name: "Untitled3",
-          icon: folder,
-          isOpen: false,
-          subfolders: [
+          subfolders: [],
+          files: [
             {
               id: uuid(),
-              name: "Untitled5",
-              icon: folder,
-              isOpen: false,
-              subfolders: []
-            },
-            {
-              id: uuid(),
-              name: "Untitled4",
-              icon: folder,
-              isOpen: false,
-              subfolders: []
+              name: "Untitled",
+              icon: folderIcon
             }
           ]
         }
-      ]
+      ],
+      files: []
     }
   ]);
-  const [activeTab, setActiveTabs] = useState(null);
-  const onSelectTabsItem = (id) => {
-    setActiveTabs(id);
-  };
 
-  const handleFolderRotate = (folderID) => {
-    setFoldersTab((prevFolder) =>
-      prevFolder.map((folder) => {
-        if (folder.id === folderID) {
-          return { ...folder, isOpen: !folder.isOpen };
-        }
-
-        if (folder.subfolder.length > 0) {
-          return {
-            ...folder,
-            subfolder: folder.subfolder.map((subfolder) => ({
-              ...subfolder,
-              isOpen: !folder.isOpen
-            }))
-          };
-        }
-
-        return folder;
-      })
-    );
-  };
-
-  const renderSubFolders = (subfolders) => {
-    return subfolders.map((subfolder) => (
-      <li
-        style={{ margin: "20px" }}
-        key={subfolder.id}
-        className={commonStyles.folderItem}
-      >
-        <img
-          onClick={() => handleFolderRotate(subfolder.id)}
-          className={commonStyles.FolderArrowRight}
-          style={{
-            transform: `rotate(${subfolder.isOpen ? "90deg" : "0deg"})`
-          }}
-          src={arrowRightSvg}
-          alt="arrow-down"
-        />
-        <img src={subfolder.icon} alt="folder" />
-        <span>{subfolder.name}</span>
-        <button className={commonStyles.tabsDots}>
-          <img src={dotsSvg} alt="_pic" />
-        </button>
-        {subfolder.isOpen && renderSubFolders(subfolder.subfolders)}
-      </li>
-    ));
-  };
+  const [activeTab, setActiveTabs] = useState(null); // Добавляем объявление activeTab
 
   const handleSearch = (term) => {
     setSearchTerm(term);
+  };
+
+  const onSelectTabsItem = (id) => {
+    // Добавляем объявление onSelectTabsItem
+    setActiveTabs(id);
   };
 
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
         <div className={commonStyles.searchBlock}>
-          <SearchBlock
-            onSearch={handleSearch}
-            placeholder="Search Files" />
+          <SearchBlock onSearch={handleSearch} placeholder="Search Files" />
           <div className={commonStyles.tabsWrapper}>
-            <div className={commonStyles.folderWrapper}>
-              {foldersTab.filter((item) =>
-                item.name.toLowerCase().includes(searchTerm.toLowerCase())
-              ).map((folder) => (
-                <div key={folder.id} className={commonStyles.folderItems}>
-                  <div className={commonStyles.folderItem}>
-                    <img
-                      onClick={() => handleFolderRotate(folder.id)}
-                      className={commonStyles.FolderArrowRight}
-                      style={{
-                        transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
-                      }}
-                      src={arrowRightSvg}
-                      alt="arrow-down"
-                    />
-                    <img src={folder.icon} alt="folder" />
-                    <span>{folder.name}</span>
-                    <button className={commonStyles.tabsDots}>
-                      <img src={dotsSvg} alt="_pic" />
-                    </button>
-                  </div>
-                  {folder.isOpen && (
-                    <div className={commonStyles.folderItem}>
-                      {renderSubFolders(folder.subfolder)}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <FileView foldersTab={foldersTab} setFoldersTab={setFoldersTab} />
           </div>
         </div>
       </div>
@@ -169,7 +72,9 @@ const FilesPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsTopItem} ${activeTab === item.id ? commonStyles.active : ""}`}
+                  className={`${commonStyles.tabsTopItem} ${
+                    activeTab === item.id ? commonStyles.active : ""
+                  }`}
                 >
                   <span
                     className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
