@@ -1,269 +1,263 @@
 .sectionWrapper {
-    background-image: url('../../images/common/bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    width: 100%;
-    height: 100vh;
-    z-index: 5;
-    display: flex;
-
+  background-image: url("../../images/common/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  width: 100%;
+  height: 100vh;
+  z-index: 5;
+  display: flex;
 }
 
 .searchBlock {
-    border-radius: 4px;
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    background: inherit;
-    padding: 10px 0;
-    width: 240px;
-    height: 100vh;
-    overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  background: inherit;
+  padding: 10px 0;
+  min-width: 240px;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .tabsWrapper {
-    margin-top: 10px;
-    height: calc(100vh - 100px);
-    overflow-y: auto;
+  margin-top: 10px;
+  height: calc(100vh - 100px);
+  overflow-y: auto;
 
-    &::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-    }
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
 
-    &::-webkit-scrollbar-button {
-        display: none;
-    }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
 
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background: #ccc;
-        border-radius: 5px;
-    }
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 5px;
+  }
 
-    &::-webkit-scrollbar-thumb:hover {
-        background: #999;
-    }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
 
-    &::-webkit-scrollbar-corner {
-        display: none;
-    }
+  &::-webkit-scrollbar-corner {
+    display: none;
+  }
 
-    &::-webkit-resizer {
-        display: none;
-    }
+  &::-webkit-resizer {
+    display: none;
+  }
 }
 
 .tabsItem {
-    padding: 10px 10px 10px 5px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: all .3s ease-in-out;
+  padding: 10px 10px 10px 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 
-    &.active {
-        background: rgba(207, 170, 229, 0.5);
-    }
+  &.active {
+    background: rgba(207, 170, 229, 0.5);
+  }
 }
 
 .tabsName {
-    color: rgb(14, 8, 37);
-    font-family: 'Open Sans';
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 140%;
-    margin-left: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  color: rgb(14, 8, 37);
+  font-family: "Open Sans";
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 140%;
+  margin-left: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tabsDots {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-left: auto;
-    position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  position: relative;
 
-    img {
-        transition: transform 0.5s ease;
-    }
+  img {
+    transition: transform 0.5s ease;
+  }
 }
 
 .dotsChangeWrapper {
-    position: absolute;
-    top: -6px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 11;
+  position: absolute;
+  top: -6px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 11;
 
-    span {
-        display: block;
-        padding: 0px 10px;
-        border-radius: 9px;
-        font-size: 11px;
-        font-weight: 300;
-        line-height: 140%;
-        border: 1px solid rgb(87, 170, 228);
-        border-radius: 9px;
-        color: rgb(87, 170, 228);
-    }
+  span {
+    display: block;
+    padding: 0px 10px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 140%;
+    border: 1px solid rgb(87, 170, 228);
+    border-radius: 9px;
+    color: rgb(87, 170, 228);
+  }
 }
 
 .dotsChangeRename {
-    transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 
-    &:hover {
-        background: rgb(207, 170, 229);
-        border: 1px solid rgba(207, 170, 229, 0.5);
-        color: rgb(244, 241, 252);
-    }
+  &:hover {
+    background: rgb(207, 170, 229);
+    border: 1px solid rgba(207, 170, 229, 0.5);
+    color: rgb(244, 241, 252);
+  }
 }
 
 .dotsChangeDelete {
-    transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 
-    &:hover {
-        background: rgb(230, 18, 69);
-        border: 1px solid rgb(230, 18, 69);
-        color: rgb(244, 241, 252);
-    }
-
-
+  &:hover {
+    background: rgb(230, 18, 69);
+    border: 1px solid rgb(230, 18, 69);
+    color: rgb(244, 241, 252);
+  }
 }
 
 .sectionMainContent {
-    width: 100%;
-
+  width: 100%;
 }
 
 .tabsTopBlock {
-    background: linear-gradient(0.00deg, rgba(135, 132, 146, 0.2), rgba(135, 132, 146, 0.04) 13.542%);
-    display: flex;
-    padding: 0 30px;
-    position: relative;
+  background: linear-gradient(
+    0deg,
+    rgba(135, 132, 146, 0.2),
+    rgba(135, 132, 146, 0.04) 13.542%
+  );
+  display: flex;
+  padding: 0 30px;
+  position: relative;
 }
 
-
 .tabsTopBlockWrapper {
-    display: flex;
-    align-items: flex-end;
-    max-width: 700px;
-    width: 100%;
-    height: 52px;
-    overflow-x: auto;
-    position: relative;
+  display: flex;
+  align-items: flex-end;
+  max-width: 700px;
+  width: 100%;
+  height: 52px;
+  overflow-x: auto;
+  position: relative;
 
-    &::-webkit-scrollbar {
-        width: 3px;
-        height: 3px;
-    }
+  &::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
 
-    &::-webkit-scrollbar-button {
-        display: none;
-    }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
 
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background: #ccc;
-        border-radius: 5px;
-    }
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 5px;
+  }
 
-    &::-webkit-scrollbar-thumb:hover {
-        background: #999;
-    }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
 
-    &::-webkit-scrollbar-corner {
-        display: none;
-    }
+  &::-webkit-scrollbar-corner {
+    display: none;
+  }
 
-    &::-webkit-resizer {
-        display: none;
-    }
+  &::-webkit-resizer {
+    display: none;
+  }
 }
 
 .tabsLeft {
-    position: absolute;
-    top: 20px;
-    left: 10px;
+  position: absolute;
+  top: 20px;
+  left: 10px;
 }
-
-
 
 .tabsLeft,
 .tabsRight {
-    border: none;
-    background: none;
-    cursor: pointer;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .tabsRight {
-    transform: rotate(180deg);
-    margin-left: auto;
-    margin-right: 15px;
+  transform: rotate(180deg);
+  margin-left: auto;
+  margin-right: 15px;
 }
 
 .tabsTopWrapper {
-    display: flex;
-    margin-right: 15px;
+  display: flex;
+  margin-right: 15px;
 }
 
 .tabsTopItem {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 9px 9px 0px 0px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 9px 9px 0px 0px;
 
-    box-shadow: inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 
-    &.active {
-        background: rgba(207, 170, 229, 0.5);
-
-    }
+  &.active {
+    background: rgba(207, 170, 229, 0.5);
+  }
 }
 
 .tabsTopName {
-    font-weight: 600;
-    width: 70px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-weight: 600;
+  width: 70px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tabsTopDots {
-    margin-left: 30px;
-    border: none;
-    background: none;
+  margin-left: 30px;
+  border: none;
+  background: none;
 }
 
 .sectionChatWrapper {
-    margin-left: auto;
+  margin-left: auto;
 }
 
 .folderItems {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
 }
 
-
 .folderItem {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .FolderArrowRight {
-    cursor: pointer;
-    transition: all .3s ease-in-out;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }

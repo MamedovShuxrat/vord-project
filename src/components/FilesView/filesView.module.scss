@@ -1,23 +1,40 @@
 .contextMenu {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  left: 30px;
+  top: -10px;
   background: white;
-  border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  padding: 5px 0;
+  width: 180px;
 
-  button {
-    background: none;
-    border: none;
-    padding: 10px 20px;
+  &__row {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 15px;
+    gap: 10px;
     width: 100%;
-    text-align: left;
-    cursor: pointer;
     &:hover {
       background-color: #f5f5f5;
     }
   }
+
+  button {
+    background: none;
+    border: none;
+    // padding: 10px 20px;
+    // width: 100%;
+    // text-align: left;
+    cursor: pointer;
+  }
+}
+
+.deleteButton {
+  padding-left: 15px;
+  color: red;
 }
 
 .folderItem {
