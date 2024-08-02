@@ -8,7 +8,13 @@ import styles from "./filesView.module.scss";
 import MenuForFolder from "./menu/MenuForFolder";
 import MenuForFiles from "./menu/MenuForFiles";
 
-const FileView = ({ foldersTab, setFoldersTab }) => {
+const FileView = ({
+  foldersTab,
+  setFoldersTab,
+  handleItemClick,
+  updateTabName,
+  removeTab
+}) => {
   const [contextMenu, setContextMenu] = useState({
     id: null,
     type: null,
@@ -17,6 +23,8 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
     y: 0
   });
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newName, setNewName] = useState("");
 
   const contextMenuRef = useRef(null);
 
@@ -27,6 +35,7 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
         !contextMenuRef.current.contains(event.target)
       ) {
         setContextMenu({ id: null, type: null, visible: false, x: 0, y: 0 });
+        setIsRenaming(false);
       }
     };
 
@@ -96,6 +105,16 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
     });
   };
 
+  const handleDeleteFile = (fileId, folders) => {
+    return folders.map((folder) => {
+      folder.files = folder.files.filter((file) => file.id !== fileId);
+      if (folder.subfolders.length > 0) {
+        folder.subfolders = handleDeleteFile(fileId, folder.subfolders);
+      }
+      return folder;
+    });
+  };
+
   const handleContextMenu = (e, id, type) => {
     e.preventDefault();
     const rect = e.target.getBoundingClientRect();
@@ -120,14 +139,47 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
         );
       }
     } else if (contextMenu.type === "file") {
-      // Здесь вы можете добавить обработку других действий для файлов
-      console.log(`File action: ${action}`);
+      if (action === "rename") {
+        setIsRenaming(true);
+        setNewName(selectedItem.name);
+      } else if (action === "delete") {
+        setFoldersTab((prevFolders) =>
+          handleDeleteFile(contextMenu.id, prevFolders)
+        );
+        setSelectedItem(null);
+        removeTab(contextMenu.id);
+      }
     }
     setContextMenu({ id: null, type: null, visible: false, x: 0, y: 0 });
   };
 
-  const handleItemClick = (id) => {
-    setSelectedItem(id);
+  const handleRename = (id, newName, folders) => {
+    return folders.map((folder) => {
+      if (folder.files.find((file) => file.id === id)) {
+        folder.files = folder.files.map((file) =>
+          file.id === id ? { ...file, name: newName } : file
+        );
+      }
+      if (folder.subfolders.length > 0) {
+        folder.subfolders = handleRename(id, newName, folder.subfolders);
+      }
+      return folder;
+    });
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && isRenaming && newName.trim()) {
+      setFoldersTab((prevFolders) =>
+        handleRename(selectedItem.id, newName, prevFolders)
+      );
+      updateTabName(selectedItem.id, newName);
+      setIsRenaming(false);
+    }
+  };
+
+  const handleFileClick = (id, name) => {
+    setSelectedItem({ id, name });
+    handleItemClick(id, name, "file");
   };
 
   const renderSubFolders = (subfolders = [], files = [], level = 0) => {
@@ -137,12 +189,16 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
           <li
             key={subfolder.id}
             className={`${styles.folderItem} ${
-              selectedItem === subfolder.id ? styles.selectedItem : ""
+              selectedItem && selectedItem.id === subfolder.id
+                ? styles.selectedItem
+                : ""
             }`}
           >
             <div
               className={styles.folderHeader}
-              onClick={() => handleItemClick(subfolder.id)}
+              onClick={() =>
+                handleItemClick(subfolder.id, subfolder.name, "folder")
+              }
               style={{ paddingLeft: `${level * 20}px` }}
             >
               <img
@@ -179,16 +235,29 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
           <li
             key={file.id}
             className={`${styles.folderItem} ${
-              selectedItem === file.id ? styles.selectedItem : ""
+              selectedItem && selectedItem.id === file.id
+                ? styles.selectedItem
+                : ""
             }`}
             style={{ paddingLeft: `${level * 20}px` }}
           >
             <div
               className={styles.fileHeader}
-              onClick={() => handleItemClick(file.id)}
+              onClick={() => handleFileClick(file.id, file.name)}
             >
               <img src={file.icon} alt="file" />
-              <span>{file.name}</span>
+              {isRenaming && selectedItem && selectedItem.id === file.id ? (
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onBlur={() => setIsRenaming(false)}
+                  autoFocus
+                />
+              ) : (
+                <span>{file.name}</span>
+              )}
               <button
                 className={styles.tabsDots}
                 onClick={(e) => handleContextMenu(e, file.id, "file")}
@@ -209,9 +278,11 @@ const FileView = ({ foldersTab, setFoldersTab }) => {
           <div key={folder.id} className={styles.folderItems}>
             <div
               className={`${styles.folderHeader} ${
-                selectedItem === folder.id ? styles.selectedItem : ""
+                selectedItem && selectedItem.id === folder.id
+                  ? styles.selectedItem
+                  : ""
               }`}
-              onClick={() => handleItemClick(folder.id)}
+              onClick={() => handleItemClick(folder.id, folder.name, "folder")}
               style={{ paddingLeft: "0px" }}
             >
               <img
