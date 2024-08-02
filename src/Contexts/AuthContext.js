@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 
 const AuthContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
 
 const authLogin = `${API_URL}/auth/login/`;
 const getUserInfo = `${API_URL}/auth/user/`;
