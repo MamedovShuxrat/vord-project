@@ -105,6 +105,16 @@ const FileView = ({
     });
   };
 
+  const handleDeleteFile = (fileId, folders) => {
+    return folders.map((folder) => {
+      folder.files = folder.files.filter((file) => file.id !== fileId);
+      if (folder.subfolders.length > 0) {
+        folder.subfolders = handleDeleteFile(fileId, folder.subfolders);
+      }
+      return folder;
+    });
+  };
+
   const handleContextMenu = (e, id, type) => {
     e.preventDefault();
     const rect = e.target.getBoundingClientRect();
@@ -143,16 +153,7 @@ const FileView = ({
     } else if (contextMenu.type === "file") {
       if (action === "rename") {
         setIsRenaming(true);
-        setSelectedItem(contextMenu.id);
-        setNewName(
-          foldersTab
-            .flatMap((folder) =>
-              folder.files.concat(
-                folder.subfolders.flatMap((subfolder) => subfolder.files)
-              )
-            )
-            .find((file) => file.id === contextMenu.id)?.name || ""
-        );
+        
       } else if (action === "delete") {
         setFoldersTab((prevFolders) =>
           handleDeleteFile(contextMenu.id, prevFolders)
@@ -181,15 +182,12 @@ const FileView = ({
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && isRenaming && newName.trim()) {
       setFoldersTab((prevFolders) =>
-        handleRename(selectedItem, newName, prevFolders)
-      );
-      updateTabName(selectedItem, newName);
       setIsRenaming(false);
     }
   };
 
   const handleFileClick = (id, name) => {
-    setSelectedItem(id);
+
     handleItemClick(id, name, "file");
   };
 
@@ -200,7 +198,9 @@ const FileView = ({
           <li
             key={subfolder.id}
             className={`${styles.folderItem} ${
-              selectedItem === subfolder.id ? styles.selectedItem : ""
+              selectedItem && selectedItem.id === subfolder.id
+                ? styles.selectedItem
+                : ""
             }`}
           >
             <div
@@ -244,7 +244,9 @@ const FileView = ({
           <li
             key={file.id}
             className={`${styles.folderItem} ${
-              selectedItem === file.id ? styles.selectedItem : ""
+              selectedItem && selectedItem.id === file.id
+                ? styles.selectedItem
+                : ""
             }`}
             style={{ paddingLeft: `${level * 20}px` }}
           >
@@ -253,7 +255,7 @@ const FileView = ({
               onClick={() => handleFileClick(file.id, file.name)}
             >
               <img src={file.icon} alt="file" />
-              {isRenaming && selectedItem === file.id ? (
+
                 <input
                   type="text"
                   value={newName}
@@ -285,7 +287,9 @@ const FileView = ({
           <div key={folder.id} className={styles.folderItems}>
             <div
               className={`${styles.folderHeader} ${
-                selectedItem === folder.id ? styles.selectedItem : ""
+                selectedItem && selectedItem.id === folder.id
+                  ? styles.selectedItem
+                  : ""
               }`}
               onClick={() => handleItemClick(folder.id, folder.name, "folder")}
               style={{ paddingLeft: "0px" }}
