@@ -13,10 +13,12 @@ import mainLogoSvg from "../../assets/images/icons/common/main-logo.svg";
 
 const Header = () => {
   const dispatch = useDispatch();
+
   const user = useSelector((state) => state.user.user);
 
   const [isUserAuth, setIsUserAuth] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
 
   useEffect(() => {
     if (user) {
@@ -28,7 +30,7 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("userToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("userData");
   };
 
