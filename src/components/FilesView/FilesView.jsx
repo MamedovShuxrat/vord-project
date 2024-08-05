@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
 import { v4 as uuid } from "uuid";
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
@@ -332,6 +333,23 @@ const FileView = ({
       )}
     </div>
   );
+};
+
+FileView.propTypes = {
+  foldersTab: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.string.isRequired,
+      isOpen: PropTypes.bool,
+      subfolders: PropTypes.array,
+      files: PropTypes.array
+    })
+  ).isRequired,
+  setFoldersTab: PropTypes.func.isRequired,
+  handleItemClick: PropTypes.func.isRequired,
+  updateTabName: PropTypes.func.isRequired,
+  removeTab: PropTypes.func.isRequired
 };
 
 export default FileView;
