@@ -5,6 +5,7 @@ import {
   fetchUserData,
   logoutUser
 } from "../../api/auth";
+import { toast } from "react-hot-toast";
 
 export const register = createAsyncThunk(
   "user/register",
@@ -14,8 +15,10 @@ export const register = createAsyncThunk(
       const [token, userData] = data;
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(userData));
+      toast.success("Registration successful");
       return { token, user: userData };
     } catch (error) {
+      toast.error("Registration failed");
       return rejectWithValue(error.message.replace(/[{()}]/g, ""));
     }
   }
@@ -30,8 +33,10 @@ export const login = createAsyncThunk(
       const user = await fetchUserData(token);
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(user));
+      toast.success("Login successful");
       return { token, user };
     } catch (error) {
+      toast.error("Login failed: invalid username or password");
       return rejectWithValue(error.message.replace(/[{()}]/g, ""));
     }
   }
@@ -44,8 +49,10 @@ export const performLogout = createAsyncThunk(
       await logoutUser(token);
       localStorage.removeItem("userData");
       localStorage.removeItem("userToken");
+      toast.success("Logout successful");
       return null;
     } catch (error) {
+      toast.error("Logout failed");
       return rejectWithValue(error.message.replace(/[{()}]/g, ""));
     }
   }

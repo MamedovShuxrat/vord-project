@@ -8,6 +8,7 @@ import fileIcon from "../../assets/images/icons/common/file.svg";
 import styles from "./filesView.module.scss";
 import MenuForFolder from "./menu/MenuForFolder";
 import MenuForFiles from "./menu/MenuForFiles";
+import toast from "react-hot-toast";
 
 const FileView = ({
   foldersTab,
@@ -64,7 +65,7 @@ const FileView = ({
   };
 
   const handleAddFolder = (parentId, folders) => {
-    return folders.map((folder) => {
+    const updatedFolders = folders.map((folder) => {
       if (folder.id === parentId) {
         const newFolder = {
           id: uuid(),
@@ -74,6 +75,7 @@ const FileView = ({
           subfolders: [],
           files: []
         };
+        toast.success("Folder added successfully");
         return { ...folder, subfolders: [...folder.subfolders, newFolder] };
       }
       if (folder.subfolders.length > 0) {
@@ -84,16 +86,18 @@ const FileView = ({
       }
       return folder;
     });
+    return updatedFolders;
   };
 
   const handleAddFile = (parentId, folders) => {
-    return folders.map((folder) => {
+    const updatedFolders = folders.map((folder) => {
       if (folder.id === parentId) {
         const newFile = {
           id: uuid(),
           name: `New File`,
           icon: fileIcon
         };
+        toast.success("File added successfully");
         return { ...folder, files: [...folder.files, newFile] };
       }
       if (folder.subfolders.length > 0) {
@@ -104,6 +108,7 @@ const FileView = ({
       }
       return folder;
     });
+    return updatedFolders;
   };
 
   const handleContextMenu = (e, id, type) => {
@@ -119,15 +124,17 @@ const FileView = ({
   };
 
   const handleDeleteFile = (id, folders) => {
-    return folders.map((folder) => {
+    const updatedFolders = folders.map((folder) => {
       if (folder.files.find((file) => file.id === id)) {
         folder.files = folder.files.filter((file) => file.id !== id);
+        toast.success("File deleted successfully");
       }
       if (folder.subfolders.length > 0) {
         folder.subfolders = handleDeleteFile(id, folder.subfolders);
       }
       return folder;
     });
+    return updatedFolders;
   };
 
   const handleContextMenuClick = (action) => {
@@ -166,17 +173,19 @@ const FileView = ({
   };
 
   const handleRename = (id, newName, folders) => {
-    return folders.map((folder) => {
+    const updatedFolders = folders.map((folder) => {
       if (folder.files.find((file) => file.id === id)) {
         folder.files = folder.files.map((file) =>
           file.id === id ? { ...file, name: newName } : file
         );
+        toast.success("File renamed successfully");
       }
       if (folder.subfolders.length > 0) {
         folder.subfolders = handleRename(id, newName, folder.subfolders);
       }
       return folder;
     });
+    return updatedFolders;
   };
 
   const handleKeyDown = (e) => {
