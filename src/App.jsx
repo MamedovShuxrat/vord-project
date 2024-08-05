@@ -1,33 +1,25 @@
-import React, { useEffect } from "react";
-import { Provider, useDispatch } from "react-redux";
+import React from "react";
+import { Provider } from "react-redux";
 import store from "../src/core/store/store";
 import RoutesConfig from "./router/RoutesConfig";
+import { Toaster } from "react-hot-toast";
 
 import Header from "./components/Header/Header";
 import Sidebar from "./components/Sidebar/Sidebar";
 
-const App = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch({ type: "user/loadFromLocalStorage" });
-  }, [dispatch]);
-
+function App() {
   return (
-    <div className="container">
-      <Header />
-      <main className="wrapper">
-        <Sidebar />
-        <RoutesConfig />
-      </main>
-    </div>
+    <Provider store={store}>
+      <div className="container">
+        <Header />
+        <main className="wrapper">
+          <Sidebar />
+          <RoutesConfig />
+        </main>
+      </div>
+      <Toaster />
+    </Provider>
   );
-};
+}
 
-const AppWithStore = () => (
-  <Provider store={store}>
-    <App />
-  </Provider>
-);
-
-export default AppWithStore;
+export default App;
