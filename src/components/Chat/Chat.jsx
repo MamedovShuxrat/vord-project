@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addMessage } from "../../core/store/chatSlice";
 
@@ -30,8 +30,9 @@ const Chat = () => {
     fileInput.current.click();
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleFileInputChange = (event) => {
-    const files = event.target.files;
+    // const files = event.target.files;
   };
 
   const handleSendMessage = () => {
