@@ -19,7 +19,7 @@ export const register = createAsyncThunk(
       return { token, user: userData };
     } catch (error) {
       toast.error("Registration failed");
-      return rejectWithValue(error.message.replace(/[{()}]/g, ""));
+      return rejectWithValue(error.message || "Login failed");
     }
   }
 );
@@ -37,7 +37,7 @@ export const login = createAsyncThunk(
       return { token, user };
     } catch (error) {
       toast.error("Login failed: invalid username or password");
-      return rejectWithValue(error.message.replace(/[{()}]/g, ""));
+      return rejectWithValue(error.message || "Logout failed");
     }
   }
 );
@@ -53,7 +53,7 @@ export const performLogout = createAsyncThunk(
       return null;
     } catch (error) {
       toast.error("Logout failed");
-      return rejectWithValue(error.message.replace(/[{()}]/g, ""));
+      return rejectWithValue(error.message || "Login failed");
     }
   }
 );
