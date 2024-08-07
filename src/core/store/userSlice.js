@@ -15,10 +15,8 @@ export const register = createAsyncThunk(
       const [token, userData] = data;
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(userData));
-      toast.success("Registration successful");
       return { token, user: userData };
     } catch (error) {
-      toast.error("Registration failed");
       return rejectWithValue(error.message || "Registration failed");
     }
   }
@@ -31,9 +29,9 @@ export const login = createAsyncThunk(
       const data = await loginUser(email, password);
       const token = data.key;
       const user = await fetchUserData(token);
+      console.log("LoggiN with token:", token);
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(user));
-      toast.success("Login successful");
       return { token, user };
     } catch (error) {
       toast.error("Login failed: invalid username or password");
@@ -41,10 +39,13 @@ export const login = createAsyncThunk(
     }
   }
 );
-
 export const performLogout = createAsyncThunk(
   "user/logout",
-  async (token, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
+    const token = getState().user.token;
+    if (!token) {
+      return rejectWithValue("No token found for logout");
+    }
     try {
       await logoutUser(token);
       localStorage.removeItem("userData");
@@ -104,6 +105,7 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
+        console.log("Token:", state.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";

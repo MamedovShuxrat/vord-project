@@ -4,19 +4,26 @@ import { toast } from "react-hot-toast";
 // eslint-disable-next-line no-undef
 const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
 
-const authRegister = `${API_URL}/auth/register/`;
-const authLogin = `${API_URL}/auth/login/`;
-const getUserInfo = `${API_URL}/auth/user/`;
-const authLogout = `${API_URL}/auth/logout/`;
+const authRegister = `${API_URL}/register/`;
+const authLogin = `${API_URL}/login/`;
+const getUserInfo = `${API_URL}/user/`;
+const authLogout = `${API_URL}/logout/`;
 
 export const registerUser = async (name, email, password, confirmPassword) => {
   try {
-    const response = await axios.post(authRegister, {
-      username: name,
-      email: email,
-      password1: password,
-      password2: confirmPassword
-    });
+    const response = await toast.promise(
+      axios.post(authRegister, {
+        username: name,
+        email: email,
+        password1: password,
+        password2: confirmPassword
+      }),
+      {
+        loading: "Registering...",
+        success: <b>Registration successful</b>,
+        error: "Registration failed"
+      }
+    );
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -28,7 +35,15 @@ export const registerUser = async (name, email, password, confirmPassword) => {
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(authLogin, { email, password });
+
+    const response = await toast.promise(
+      axios.post(authLogin, { email, password }),
+      {
+        loading: "Logging in...",
+        success: <b>Success login!</b>,
+        error: <b>Login failed: invalid username or password</b>
+      }
+    );
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -55,14 +70,21 @@ export const fetchUserData = async (token) => {
 
 export const logoutUser = async (token) => {
   try {
-    const response = await axios.post(authLogout, null, {
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-type": "application/json"
-      }
+    console.log("Logging out with token:", token);
+    const response = await toast.promise(
+      axios.post(authLogout, null, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-type": "application/json"
+        }
+      }),
+      {
+        loading: "Logging out...",
+        success: <b>Logout successful!</b>,
+        error: <b>Logout failed: an error occurred</b>
+      })
+    console.log("Logout response:", response.data)
 
-    });
-    toast.success("Logout successful");
     return response.data;
   } catch (error) {
     console.error("Logout failed:", error);

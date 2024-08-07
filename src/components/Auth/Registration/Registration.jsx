@@ -93,8 +93,6 @@ const Registration = () => {
             Privacy policy
           </a>
         </div>
-        {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-        {status === "failed" && <p className={styles.error}>{error}</p>}
         <Button className={styles.main}>Create account</Button>
         <span className={styles.login__or}>or</span>
         <Link to="/login">
