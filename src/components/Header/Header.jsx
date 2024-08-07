@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../core/store/userSlice";
+import { toast } from "react-hot-toast";
+
 
 import HeaderStyles from "./header.module.scss";
 
@@ -30,6 +32,7 @@ const Header = () => {
     dispatch(logout());
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
+    toast.success("Logout successful");
   };
 
   return (

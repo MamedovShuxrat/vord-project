@@ -49,7 +49,6 @@ export const performLogout = createAsyncThunk(
       await logoutUser(token);
       localStorage.removeItem("userData");
       localStorage.removeItem("userToken");
-      toast.success("Logout successful");
       return null;
     } catch (error) {
       toast.error("Logout failed");
@@ -93,7 +92,6 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
-        console.log("Token:", state.token); // Логирование токена
       })
       .addCase(register.rejected, (state, action) => {
         state.status = "failed";
@@ -106,7 +104,6 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
-        console.log("Token:", state.token); // Логирование токена
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
