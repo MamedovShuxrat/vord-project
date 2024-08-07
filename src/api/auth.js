@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 // eslint-disable-next-line no-undef
 const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
@@ -60,8 +61,11 @@ export const logoutUser = async (token) => {
         "Content-type": "application/json"
       }
     });
+    toast.success("Logout successful");
+
     return response.data;
   } catch (error) {
+    toast.error("Logout failed")
     console.error("Logout failed:", error);
     throw new Error("Failed to logout");
   }

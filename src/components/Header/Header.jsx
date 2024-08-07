@@ -66,7 +66,7 @@ const Header = () => {
                   />
                 </div>
                 {user && user.email && (
-                  <p className={HeaderStyles.userName}>{user.email}</p>
+                  <p className={HeaderStyles.userName}>{user.username ? user.username : user.email}</p>
                 )}
                 <div className={HeaderStyles.userDnd}>
                   <img

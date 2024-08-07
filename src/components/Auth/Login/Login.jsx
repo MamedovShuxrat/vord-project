@@ -58,7 +58,6 @@ const Login = () => {
         <Link to="/register">
           <Button className={styles.secondary}>Create account</Button>
         </Link>
-        {status === "failed" && <p className={styles.error}></p>}
       </form>
     </div>
   );

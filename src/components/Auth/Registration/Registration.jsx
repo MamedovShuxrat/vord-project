@@ -15,21 +15,14 @@ import githubLogoSvg from "../../../assets/images/icons/registration/github-logo
 const Registration = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
-  const status = useSelector((state) => state.user.status);
-  const error = useSelector((state) => state.user.error);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      return;
-    }
     dispatch(register({ name, email, password, confirmPassword }));
   };
 
@@ -93,8 +86,6 @@ const Registration = () => {
             Privacy policy
           </a>
         </div>
-        {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-        {status === "failed" && <p className={styles.error}>{error}</p>}
         <Button className={styles.main}>Create account</Button>
         <span className={styles.login__or}>or</span>
         <Link to="/login">
