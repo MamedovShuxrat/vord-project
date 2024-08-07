@@ -34,7 +34,6 @@ export const login = createAsyncThunk(
       localStorage.setItem("userData", JSON.stringify(user));
       return { token, user };
     } catch (error) {
-      toast.error("Login failed: invalid username or password");
       return rejectWithValue(error.message || "Login failed");
     }
   }
