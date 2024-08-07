@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import DashboardsPage from "../pages/Dashboards/DashboardsPage";
 import Login from "../components/Auth/Login/Login";
 import Registration from "../components/Auth/Registration/Registration";
@@ -12,6 +13,12 @@ import CommunityPage from "../pages/Community/CommunityPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
 
 const RoutesConfig = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch({ type: "user/loadFromLocalStorage" });
+  }, [dispatch]);
+
   return (
     <Routes>
       <Route path="/" element={<DashboardsPage />} />
