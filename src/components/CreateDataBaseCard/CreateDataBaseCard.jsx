@@ -2,10 +2,15 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const API_URL = "http://81.200.151.85:8000/api/clientdb/";
 
 const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [dbType, setDbType] = useState(formData.dbType || "");
+  const [isDataSaved, setIsDataSaved] = useState(false);
 
   useEffect(() => {
     console.log("CreateDataBaseCard rendered with formData:", formData);
@@ -27,9 +32,21 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
     handleChange(e);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(API_URL, localFormData);
+      setIsDataSaved(true);
+      toast.success("Data saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      toast.error("Failed to save data");
+    }
+  };
+
   return (
     <div className={styles.CardWrapper}>
-      <form action="/submit" className={styles.formData}>
+      <form onSubmit={handleSubmit} className={styles.formData}>
         <SimpleInput
           placeholder="User"
           name="user"
@@ -85,9 +102,15 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
         <span className={styles.formDataDescr}>
           Connections between VARD and your database will be encrypted
         </span>
-        <button className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}>
+        <button
+          type="submit"
+          className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
+        >
           Connect
         </button>
+        {isDataSaved && (
+          <p className={styles.successMessage}>Данные сохранены</p>
+        )}
       </form>
     </div>
   );
