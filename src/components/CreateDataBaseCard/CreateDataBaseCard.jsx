@@ -2,15 +2,11 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
-import axios from "axios";
-import toast from "react-hot-toast";
 
-const API_URL = "http://81.200.151.85:8000/api/clientdb/";
-
-const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
+const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [dbType, setDbType] = useState(formData.dbType || "");
-  const [isDataSaved, setIsDataSaved] = useState(false);
+  const [driver, setDriver] = useState(formData.driver || "");
 
   useEffect(() => {
     console.log("CreateDataBaseCard rendered with formData:", formData);
@@ -32,16 +28,15 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
     handleChange(e);
   };
 
-  const handleSubmit = async (e) => {
+  const handleDriverChange = (e) => {
+    const value = e.target.value;
+    setDriver(value);
+    handleChange(e);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await axios.post(API_URL, localFormData);
-      setIsDataSaved(true);
-      toast.success("Data saved successfully!");
-    } catch (error) {
-      console.error("Error saving data:", error);
-      toast.error("Failed to save data");
-    }
+    onSubmit(localFormData);
   };
 
   return (
@@ -49,7 +44,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
       <form onSubmit={handleSubmit} className={styles.formData}>
         <SimpleInput
           placeholder="User"
-          name="user"
+          name="user_name"
           value={localFormData.user || ""}
           className="dataBaseInput"
           onChange={handleChange}
@@ -99,6 +94,30 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
             onChange={handleChange}
           />
         )}
+        <div className={`${styles.selectWrapper} driverInput`}>
+          <label htmlFor="driver" className={styles.selectLabel}>
+            Data Base Type
+          </label>
+          <select
+            id="driver"
+            name="driver"
+            value={driver}
+            className={styles.selectInput}
+            onChange={handleDriverChange}
+          >
+            <option value="">Select Driver</option>
+            <option value="SQL Alchemy">sql alchemy mssql+pyodbc</option>
+          </select>
+        </div>
+        {dbType === "SQL Alchemy" && (
+          <SimpleInput
+            placeholder="Driver"
+            name="driver"
+            value={localFormData.url || ""}
+            className="dataBaseInput"
+            onChange={handleChange}
+          />
+        )}
         <span className={styles.formDataDescr}>
           Connections between VARD and your database will be encrypted
         </span>
@@ -108,9 +127,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange }) => {
         >
           Connect
         </button>
-        {isDataSaved && (
-          <p className={styles.successMessage}>Данные сохранены</p>
-        )}
       </form>
     </div>
   );
@@ -125,7 +141,8 @@ CreateDataBaseCard.propTypes = {
     description: PropTypes.string,
     url: PropTypes.string
   }).isRequired,
-  onFormDataChange: PropTypes.func.isRequired
+  onFormDataChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired // Добавляем пропс onSubmit
 };
 
 export default CreateDataBaseCard;

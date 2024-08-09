@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import { v4 as uuid } from "uuid";
 import useSearch from "../../components/utils/useSearch";
-import axios from "axios";
+import toast from "react-hot-toast";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
-
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import CreateDataBaseCard from "../../components/CreateDataBaseCard/CreateDataBaseCard";
 import RandomColorIcon from "../../components/ui/CreateDynamicSvgIcon/RandomColorIcon";
-import toast from "react-hot-toast";
 
 import dataBaseRedSvg from "../../assets/images/icons/connection/database-red.svg";
 import dataBaseGreenSvg from "../../assets/images/icons/connection/database-green.svg";
 import dataBaseBlackSvg from "../../assets/images/icons/connection/database-black.svg";
-
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
@@ -22,7 +20,6 @@ const API_URL = "http://81.200.151.85:8000/api/clientdb/";
 
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
-
   const [connectionTabs, setConnectionTabs] = useState([
     {
       id: "magazine1",
@@ -50,10 +47,6 @@ const ConnectionsPage = () => {
     }
   ]);
 
-  const [activeTab, setActiveTabs] = useState(null);
-  const [dotsChange, setDotsChange] = useState({});
-  const [isDataSaved, setIsDataSaved] = useState(false);
-
   useEffect(() => {
     if (connectionTabs !== null) {
       localStorage.setItem("connectionTabs", JSON.stringify(connectionTabs));
@@ -67,12 +60,14 @@ const ConnectionsPage = () => {
     }
   }, []);
 
+  const [activeTab, setActiveTabs] = useState(null);
+  const [dotsChange, setDotsChange] = useState({});
+
   const handleDotsChange = (id) => {
     const updatedDotsChange = {};
     Object.keys(dotsChange).forEach((key) => {
       updatedDotsChange[key] = false;
     });
-
     updatedDotsChange[id] = !dotsChange[id];
     setDotsChange(updatedDotsChange);
   };
@@ -88,9 +83,7 @@ const ConnectionsPage = () => {
   const handleDeleteTabs = (itemId) => {
     const updatedTabs = connectionTabs.filter((item) => item.id !== itemId);
     setConnectionTabs(updatedTabs);
-    toast("MySQL is deleted!", {
-      icon: "🚨"
-    });
+    toast("MySQL is deleted!", { icon: "🚨" });
   };
 
   const handleLeftButtonClick = () => {
@@ -171,6 +164,21 @@ const ConnectionsPage = () => {
     setSearchTerm(term);
   };
 
+  const handleSubmit = async (formData) => {
+    const token = JSON.parse(localStorage.getItem("userToken"));
+    try {
+      await axios.post(API_URL, formData, {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      });
+      toast.success("Data saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      toast.error("Failed to save data");
+    }
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
@@ -208,7 +216,6 @@ const ConnectionsPage = () => {
                       src={dotsSvg}
                       alt={`${item.MySQL}_pic`}
                     />
-
                     {dotsChange[item.id] && (
                       <div className={commonStyles.dotsChangeWrapper}>
                         <span
@@ -278,16 +285,7 @@ const ConnectionsPage = () => {
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)
             }
-            onSubmit={async (formData) => {
-              try {
-                await axios.post(API_URL, formData);
-                setIsDataSaved(true);
-                toast.success("Data saved successfully!");
-              } catch (error) {
-                console.error("Error saving data:", error);
-                toast.error("Failed to save data");
-              }
-            }}
+            onSubmit={handleSubmit}
           />
         )}
       </div>
