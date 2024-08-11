@@ -32,7 +32,6 @@ const Header = () => {
     dispatch(performLogout());
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
-    // toast.success("Logout successful");
   };
 
   return (
@@ -43,10 +42,12 @@ const Header = () => {
             <img width={32} height={32} src={mainLogoSvg} alt="main logo" />
           </Link>
           <div className={HeaderStyles.userMenu}>
-            <button>
-              <img width={24} height={24} src={faqSvg} alt="faq" />
-            </button>
-            {user && (
+            {user && (<>
+              <Link to="/feedback">
+                <button>
+                  <img width={24} height={24} src={faqSvg} alt="faq" />
+                </button>
+              </Link>
               <Link to="/profile">
                 <button className={HeaderStyles.userSetting}>
                   <img
@@ -57,6 +58,7 @@ const Header = () => {
                   />
                 </button>
               </Link>
+            </>
             )}
             {isUserAuth ? (
               <div className={HeaderStyles.user}>

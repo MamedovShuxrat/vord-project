@@ -10,6 +10,7 @@ import ChartsPage from "../pages/Charts/СhartsPage";
 import WikiPage from "../pages/Wiki/WikiPage";
 import CommunityPage from "../pages/Community/CommunityPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
+import Feedback from "../pages/Feedback/Feedback"
 
 const RoutesConfig = () => {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const RoutesConfig = () => {
       <Route path="/wiki" element={<WikiPage />} />
       <Route path="/community" element={<CommunityPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/feedback" element={<Feedback />} />
     </Routes>
   );
 };
