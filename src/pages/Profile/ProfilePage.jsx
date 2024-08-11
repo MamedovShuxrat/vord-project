@@ -1,21 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ProfilePage.module.scss";
 import Chat from "../../components/Chat/Chat";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
-
+import { setUser } from "../../core/store/userSlice"
 import profileImg from "../../assets/images/common/illustration.jpg";
+import { useDispatch, useSelector } from "react-redux";
 
 const ProfilePage = () => {
-  const [username, setUsername] = useState("");
+
+  const dispatch = useDispatch()
+  const user = useSelector((state) => state.user.user);
+  const [username, setUsername] = useState(user?.username || "user name");
+
+  useEffect(() => {
+    if (user?.username) {
+      setUsername(user.username);
+    }
+  }, [user?.username]);
+
   const [useremail, setUseremail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  const handleAvatarChange = () => {};
+  const handleAvatarChange = () => { };
 
-  const handleUsernameChange = () => {};
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value)
+    dispatch(setUser({ ...user, username: e.target.value }))
+  };
 
-  const handleChangePassword = () => {};
+  const handleChangePassword = () => { };
 
   return (
     <div className={commonStyles.sectionWrapper}>
@@ -35,9 +49,9 @@ const ProfilePage = () => {
         <div className={styles.usernameSection}>
           <input
             type="text"
-            placeholder="User name"
+            placeholder={username}
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={handleUsernameChange}
             className={styles.inputField}
           />
           <button
