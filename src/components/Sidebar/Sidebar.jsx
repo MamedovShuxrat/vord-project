@@ -8,7 +8,6 @@ import connectionSvg from "../../assets/images/icons/sidebar/connections.svg";
 import filesSvg from "../../assets/images/icons/sidebar/files.svg";
 import chartsSvg from "../../assets/images/icons/sidebar/charts.svg";
 import wikiSvg from "../../assets/images/icons/sidebar/wiki.svg";
-import bestPracticesSvg from "../../assets/images/icons/sidebar/best_practices.svg";
 import communitySvg from "../../assets/images/icons/sidebar/community.svg";
 
 const dashboardTopMenu = [
@@ -50,13 +49,6 @@ const dashboardTopMenu = [
 ];
 
 const dashboardBottomMenu = [
-  {
-    id: 6,
-    img: bestPracticesSvg,
-    name: "Best Practices",
-    w: "40px",
-    h: "40px"
-  },
   {
     id: 7,
     img: communitySvg,

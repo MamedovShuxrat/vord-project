@@ -8,7 +8,6 @@ import ConnectionsPage from "../pages/Connections/ConnectionsPage";
 import FilesPage from "../pages/Files/FilesPage";
 import ChartsPage from "../pages/Charts/СhartsPage";
 import WikiPage from "../pages/Wiki/WikiPage";
-import BestPracticesPage from "../pages/BestPractices/BestPracticesPage";
 import CommunityPage from "../pages/Community/CommunityPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
 
@@ -29,7 +28,6 @@ const RoutesConfig = () => {
       <Route path="/files" element={<FilesPage />} />
       <Route path="/charts" element={<ChartsPage />} />
       <Route path="/wiki" element={<WikiPage />} />
-      <Route path="/best_practices" element={<BestPracticesPage />} />
       <Route path="/community" element={<CommunityPage />} />
       <Route path="/profile" element={<ProfilePage />} />
     </Routes>
