@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import { v4 as uuid } from "uuid";
 import useSearch from "../../components/utils/useSearch";
+import toast from "react-hot-toast";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
-
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import CreateDataBaseCard from "../../components/CreateDataBaseCard/CreateDataBaseCard";
 import RandomColorIcon from "../../components/ui/CreateDynamicSvgIcon/RandomColorIcon";
-import toast from "react-hot-toast";
 
 import dataBaseRedSvg from "../../assets/images/icons/connection/database-red.svg";
 import dataBaseGreenSvg from "../../assets/images/icons/connection/database-green.svg";
 import dataBaseBlackSvg from "../../assets/images/icons/connection/database-black.svg";
-
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
+const API_URL = "http://81.200.151.85:8000/api/clientdb/";
+
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
-
   const [connectionTabs, setConnectionTabs] = useState([
     {
       id: "magazine1",
@@ -27,7 +27,7 @@ const ConnectionsPage = () => {
       MySQL: "Magazine",
       w: "20px",
       h: "20px",
-      formData: {}, // Состояние для CreateDataBaseCard
+      formData: {} // Состояние для CreateDataBaseCard
     },
     {
       id: "home2",
@@ -35,7 +35,7 @@ const ConnectionsPage = () => {
       MySQL: "Home",
       w: "20px",
       h: "20px",
-      formData: {}, // Состояние для CreateDataBaseCard
+      formData: {} // Состояние для CreateDataBaseCard
     },
     {
       id: "untilted3",
@@ -43,8 +43,8 @@ const ConnectionsPage = () => {
       MySQL: "Untilted",
       w: "20px",
       h: "20px",
-      formData: {}, // Состояние для CreateDataBaseCard
-    },
+      formData: {} // Состояние для CreateDataBaseCard
+    }
   ]);
 
   useEffect(() => {
@@ -62,35 +62,33 @@ const ConnectionsPage = () => {
 
   const [activeTab, setActiveTabs] = useState(null);
   const [dotsChange, setDotsChange] = useState({});
-  const handleDotsChange = id => {
+
+  const handleDotsChange = (id) => {
     const updatedDotsChange = {};
-    Object.keys(dotsChange).forEach(key => {
+    Object.keys(dotsChange).forEach((key) => {
       updatedDotsChange[key] = false;
     });
-
     updatedDotsChange[id] = !dotsChange[id];
     setDotsChange(updatedDotsChange);
   };
 
-  const handleRenameSQLTabs = itemId => {
-    const itemToUpdate = connectionTabs.find(item => item.id === itemId);
+  const handleRenameSQLTabs = (itemId) => {
+    const itemToUpdate = connectionTabs.find((item) => item.id === itemId);
     if (itemToUpdate) {
       itemToUpdate.MySQL = prompt("Enter the name of the new MySQL");
       setConnectionTabs([...connectionTabs]);
     }
   };
 
-  const handleDeleteTabs = itemId => {
-    const updatedTabs = connectionTabs.filter(item => item.id !== itemId);
+  const handleDeleteTabs = (itemId) => {
+    const updatedTabs = connectionTabs.filter((item) => item.id !== itemId);
     setConnectionTabs(updatedTabs);
-    toast("MySQL is deleted!", {
-      icon: "🚨",
-    });
+    toast("MySQL is deleted!", { icon: "🚨" });
   };
 
   const handleLeftButtonClick = () => {
     const currentIndex = connectionTabs.findIndex(
-      item => item.id === activeTab,
+      (item) => item.id === activeTab
     );
     const newIndex =
       (currentIndex - 1 + connectionTabs.length) % connectionTabs.length;
@@ -100,18 +98,18 @@ const ConnectionsPage = () => {
 
   const handleRightButtonClick = () => {
     const currentIndex = connectionTabs.findIndex(
-      item => item.id === activeTab,
+      (item) => item.id === activeTab
     );
     const newIndex = (currentIndex + 1) % connectionTabs.length;
     const newActiveTabId = connectionTabs[newIndex].id;
     setActiveTabs(newActiveTabId);
   };
 
-  const onSelectTabsItem = id => {
+  const onSelectTabsItem = (id) => {
     setActiveTabs(id);
   };
 
-  const renderImageOrIcon = item => {
+  const renderImageOrIcon = (item) => {
     const isSvg = item.img.includes(".svg");
     if (isSvg) {
       return (
@@ -129,7 +127,7 @@ const ConnectionsPage = () => {
     }
   };
 
-  const addNewSQLTab = newMySQLValue => {
+  const addNewSQLTab = (newMySQLValue) => {
     const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     const newTab = {
       id: uuid(),
@@ -137,7 +135,7 @@ const ConnectionsPage = () => {
       MySQL: newMySQLValue,
       w: "20px",
       h: "20px",
-      formData: {}, // Состояние для CreateDataBaseCard
+      formData: {} // Состояние для CreateDataBaseCard
     };
     setConnectionTabs([...connectionTabs, newTab]);
   };
@@ -149,22 +147,38 @@ const ConnectionsPage = () => {
       activeItemRef.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
-        inline: "start",
+        inline: "start"
       });
     }
   }, [activeTab]);
 
   const handleFormDataChange = (id, newFormData) => {
     console.log(`Updating tab ${id} with new formData:`, newFormData);
-    const updatedTabs = connectionTabs.map(item =>
-      item.id === id ? { ...item, formData: newFormData } : item,
+    const updatedTabs = connectionTabs.map((item) =>
+      item.id === id ? { ...item, formData: newFormData } : item
     );
     setConnectionTabs(updatedTabs);
   };
 
-  const handleSearch = term => {
+  const handleSearch = (term) => {
     setSearchTerm(term);
   };
+
+  const handleSubmit = async (formData) => {
+    const token = JSON.parse(localStorage.getItem("userToken"));
+    try {
+      await axios.post(API_URL, formData, {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      });
+      toast.success("Data saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      toast.error("Failed to save data");
+    }
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
@@ -176,10 +190,10 @@ const ConnectionsPage = () => {
           />
           <div className={commonStyles.tabsWrapper}>
             {connectionTabs
-              .filter(item =>
-                item.MySQL.toLowerCase().includes(searchTerm.toLowerCase()),
+              .filter((item) =>
+                item.MySQL.toLowerCase().includes(searchTerm.toLowerCase())
               )
-              .map(item => (
+              .map((item) => (
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
@@ -197,12 +211,11 @@ const ConnectionsPage = () => {
                       style={{
                         transform: dotsChange[item.id]
                           ? "rotate(360deg)"
-                          : "none",
+                          : "none"
                       }}
                       src={dotsSvg}
                       alt={`${item.MySQL}_pic`}
                     />
-
                     {dotsChange[item.id] && (
                       <div className={commonStyles.dotsChangeWrapper}>
                         <span
@@ -235,7 +248,7 @@ const ConnectionsPage = () => {
           </button>
           <div className={commonStyles.tabsTopBlockWrapper}>
             <div className={commonStyles.tabsTopWrapper}>
-              {connectionTabs.map(item => (
+              {connectionTabs.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
@@ -266,10 +279,13 @@ const ConnectionsPage = () => {
         </div>
         {activeTab && (
           <CreateDataBaseCard
-            formData={connectionTabs.find(tab => tab.id === activeTab).formData}
-            onFormDataChange={newFormData =>
+            formData={
+              connectionTabs.find((tab) => tab.id === activeTab).formData
+            }
+            onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)
             }
+            onSubmit={handleSubmit}
           />
         )}
       </div>
