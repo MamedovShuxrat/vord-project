@@ -20,7 +20,11 @@ const Query = () => {
             {/* Add more options as necessary */}
           </select>
         </div>
-        <SearchBlock placeholder="Search connection" onSearch={() => {}} />
+        <SearchBlock
+          placeholder="Search connection"
+          onSearch={() => {}}
+          showAddButton={false}
+        />
       </div>
 
       {/* Поле для ввода текста SQL-запроса с порядковыми номерами строк */}

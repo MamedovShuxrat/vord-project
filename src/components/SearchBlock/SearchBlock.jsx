@@ -6,8 +6,15 @@ import { toast } from "react-hot-toast";
 import filterSvg from "../../assets/images/icons/common/filter.svg";
 import plusSvg from "../../assets/images/icons/common/plus.svg";
 
-const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
+const SearchBlock = ({
+  onSearch,
+  onFilter,
+  placeholder,
+  addNewTab,
+  showAddButton = true
+}) => {
   const { searchTerm, handleSearchChange } = useSearch(onSearch);
+
   const handleAddNewTab = () => {
     const newMySQLValue = prompt("Enter the name of the new MySQL");
     if (newMySQLValue && newMySQLValue.trim() !== "") {
@@ -24,15 +31,17 @@ const SearchBlock = ({ onSearch, onFilter, placeholder, addNewTab }) => {
         className={styles.searchInput}
         type="text"
         value={searchTerm}
-        onChange={event => handleSearchChange(event, onSearch)}
+        onChange={(event) => handleSearchChange(event, onSearch)}
         placeholder={placeholder}
       />
       <button className={styles.searchFilterBtn} onClick={onFilter}>
         <img src={filterSvg} alt="filter icon" />
       </button>
-      <button className={styles.searchPlusBtn} onClick={handleAddNewTab}>
-        <img width={12} height={12} src={plusSvg} alt="plus icon" />
-      </button>
+      {showAddButton && (
+        <button className={styles.searchPlusBtn} onClick={handleAddNewTab}>
+          <img width={12} height={12} src={plusSvg} alt="plus icon" />
+        </button>
+      )}
     </div>
   );
 };
