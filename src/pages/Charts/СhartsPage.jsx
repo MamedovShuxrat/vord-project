@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
-import Query from "../../components/Query/Query"; // Импортируем компонент Query
+import Query from "../../components/Query/Query";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
@@ -30,7 +30,7 @@ const ChartsPage = () => {
   ]);
 
   const { searchTerm, setSearchTerm } = useSearch();
-  const [activeTab, setActiveTab] = useState(foldersTab[0].id); // Отслеживаем активную вкладку
+  const [activeTab, setActiveTab] = useState(foldersTab[0].id);
 
   const handleFolderRotate = (id) => {
     setFoldersTab((prevTabs) =>
@@ -44,11 +44,27 @@ const ChartsPage = () => {
     setSearchTerm(term);
   };
 
+  const addNewTab = (name) => {
+    const newTab = {
+      id: uuid(),
+      name: name || `Query: Untitled ${foldersTab.length + 1}`,
+      icon: folder,
+      isOpen: true,
+      subfolder: []
+    };
+    setFoldersTab((prevTabs) => [...prevTabs, newTab]);
+    setActiveTab(newTab.id);
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
         <div className={commonStyles.searchBlock}>
-          <SearchBlock placeholder="Search Charts" onSearch={handleSearch} />
+          <SearchBlock
+            placeholder="Search Charts"
+            onSearch={handleSearch}
+            addNewTab={addNewTab}
+          />
           <div className={commonStyles.tabsWrapper}>
             <ul className={commonStyles.folderWrapper}>
               {foldersTab
