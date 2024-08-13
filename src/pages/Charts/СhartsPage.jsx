@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
+import Query from "../../components/Query/Query"; // Импортируем компонент Query
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
@@ -14,143 +15,82 @@ const ChartsPage = () => {
   const [foldersTab, setFoldersTab] = useState([
     {
       id: uuid(),
-      name: "charts 1",
+      name: "Query: Untitled 1",
       icon: folder,
-      isOpen: false,
-      subfolder: [
-        {
-          id: uuid(),
-          name: "charts test",
-          icon: folder,
-          isOpen: false,
-          subfolders: []
-        }
-      ]
+      isOpen: true,
+      subfolder: []
     },
     {
       id: uuid(),
-      name: "charts 2",
+      name: "Query: Untitled 2",
       icon: folder,
       isOpen: false,
-      subfolder: [
-        {
-          id: uuid(),
-          name: "charts 3",
-          icon: folder,
-          isOpen: false,
-          subfolders: [
-            {
-              id: uuid(),
-              name: "charts 4",
-              icon: folder,
-              isOpen: false,
-              subfolders: []
-            },
-            {
-              id: uuid(),
-              name: "charts 5",
-              icon: folder,
-              isOpen: false,
-              subfolders: []
-            }
-          ]
-        }
-      ]
+      subfolder: []
     }
   ]);
-  const { searchTerm, setSearchTerm } = useSearch()
 
-  const [folderIconRotate, setFolderIconRotate] = useState("0deg");
+  const { searchTerm, setSearchTerm } = useSearch();
+  const [activeTab, setActiveTab] = useState(foldersTab[0].id); // Отслеживаем активную вкладку
 
-  const handleFolderRotate = () => {
-    setFolderIconRotate((prevRotate) =>
-      prevRotate === "0deg" ? "90deg" : "0deg"
+  const handleFolderRotate = (id) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === id ? { ...tab, isOpen: !tab.isOpen } : tab
+      )
     );
   };
+
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
 
-
-  const renderSubFolders = (subfolders) => {
-    return subfolders.map((subfolder) => (
-      <li
-        style={{ margin: "20px" }}
-        key={subfolder.id}
-        className={commonStyles.folderItem}
-      >
-        <img
-          onClick={() => handleFolderRotate(subfolder.id)}
-          className={commonStyles.FolderArrowRight}
-          style={{
-            transform: `rotate(${subfolder.isOpen ? "90deg" : "0deg"})`
-          }}
-          src={arrowRightSvg}
-          alt="arrow-down"
-        />
-        <img src={subfolder.icon} alt="folder" />
-        <span>{subfolder.name}</span>
-        <button className={commonStyles.tabsDots}>
-          <img src={dotsSvg} alt="_pic" />
-        </button>
-        {subfolder.isOpen && renderSubFolders(subfolder.subfolders)}
-      </li>
-    ));
-  };
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
         <div className={commonStyles.searchBlock}>
-          <SearchBlock
-            placeholder="Search Charts"
-            onSearch={handleSearch} />
+          <SearchBlock placeholder="Search Charts" onSearch={handleSearch} />
           <div className={commonStyles.tabsWrapper}>
             <ul className={commonStyles.folderWrapper}>
-              {foldersTab.filter((item) =>
-                item.name.toLowerCase().includes(searchTerm.toLowerCase())
-              ).map((folder) => (
-                <div key={folder.id} className={commonStyles.folderItems}>
-                  <div className={commonStyles.folderItem}>
-                    <img
-                      onClick={() => handleFolderRotate(folder.id)}
-                      className={commonStyles.FolderArrowRight}
-                      style={{
-                        transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
-                      }}
-                      src={arrowRightSvg}
-                      alt="arrow-down"
-                    />
-                    <img src={folder.icon} alt="folder" />
-                    <span>{folder.name}</span>
-                    <button className={commonStyles.tabsDots}>
-                      <img src={dotsSvg} alt="_pic" />
-                    </button>
-                  </div>
-                  {folder.isOpen && (
-                    <div className={commonStyles.folderItem}>
-                      {renderSubFolders(folder.subfolder)}
+              {foldersTab
+                .filter((item) =>
+                  item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((folder) => (
+                  <div key={folder.id} className={commonStyles.folderItems}>
+                    <div
+                      className={`${commonStyles.folderItem} ${
+                        activeTab === folder.id ? commonStyles.activeTab : ""
+                      }`}
+                      onClick={() => setActiveTab(folder.id)}
+                    >
+                      <img
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFolderRotate(folder.id);
+                        }}
+                        className={commonStyles.FolderArrowRight}
+                        style={{
+                          transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
+                        }}
+                        src={arrowRightSvg}
+                        alt="arrow-down"
+                      />
+                      <img src={folder.icon} alt="folder" />
+                      <span>{folder.name}</span>
+                      <button
+                        className={commonStyles.tabsDots}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <img src={dotsSvg} alt="_pic" />
+                      </button>
                     </div>
-                  )}
-                </div>
-              ))}
-              {/* <li className={commonStyles.folderItem}>
-                <img
-                  onClick={handleFolderRotate}
-                  className={commonStyles.FolderArrowRight}
-                  style={{
-                    transform: `rotate(${folderIconRotate})`
-                  }}
-                  src={arrowRightSvg}
-                  alt="arrow-down"
-                />
-                <img src={folderSvg} alt="folder" />
-
-                <span className> Query: Untitled </span>
-
-                <button className={commonStyles.tabsDots}>
-                  <img src={dotsSvg} alt="_pic" />
-                </button>
-              </li> */}
+                    {folder.isOpen && (
+                      <div className={commonStyles.folderItem}>
+                        {/* Render subfolders here */}
+                      </div>
+                    )}
+                  </div>
+                ))}
             </ul>
           </div>
         </div>
@@ -162,17 +102,24 @@ const ChartsPage = () => {
           </button>
           <div className={commonStyles.tabsTopBlockWrapper}>
             <div className={commonStyles.tabsTopWrapper}>
-              <div className={commonStyles.tabsTopItem}>
-                <span
-                  className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
+              {foldersTab.map((folder) => (
+                <div
+                  key={folder.id}
+                  className={`${commonStyles.tabsTopItem} ${
+                    activeTab === folder.id ? commonStyles.activeTab : ""
+                  }`}
+                  onClick={() => setActiveTab(folder.id)}
                 >
-                  {" "}
-                  Query
-                </span>
-                <button className={commonStyles.tabsTopDots}>
-                  <img src={dotsSvg} alt={`query_pic`} />
-                </button>
-              </div>
+                  <span
+                    className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
+                  >
+                    {folder.name}
+                  </span>
+                  <button className={commonStyles.tabsTopDots}>
+                    <img src={dotsSvg} alt={`query_pic`} />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
           <button className={`${commonStyles.tabsRight}`}>
@@ -181,6 +128,18 @@ const ChartsPage = () => {
           <div className={commonStyles.chatWrapper}>
             <Chat />
           </div>
+        </div>
+
+        {/* Отображаем компонент Query внутри активной вкладки */}
+        <div className={commonStyles.queryContent}>
+          {foldersTab.map(
+            (folder) =>
+              activeTab === folder.id && (
+                <div key={folder.id}>
+                  <Query />
+                </div>
+              )
+          )}
         </div>
       </div>
     </div>
