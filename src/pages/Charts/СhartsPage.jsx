@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import Query from "../../components/Query/Query";
+import MenuForDataSource from "./menu/MenuForDataSourse";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
@@ -31,6 +32,21 @@ const ChartsPage = () => {
 
   const { searchTerm, setSearchTerm } = useSearch();
   const [activeTab, setActiveTab] = useState(foldersTab[0].id);
+  const [menuVisible, setMenuVisible] = useState(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuVisible(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleFolderRotate = (id) => {
     setFoldersTab((prevTabs) =>
@@ -56,6 +72,11 @@ const ChartsPage = () => {
     setActiveTab(newTab.id);
   };
 
+  const handleContextMenuClick = (action) => {
+    console.log("Action:", action);
+    setMenuVisible(null);
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
@@ -78,6 +99,7 @@ const ChartsPage = () => {
                         activeTab === folder.id ? commonStyles.activeTab : ""
                       }`}
                       onClick={() => setActiveTab(folder.id)}
+                      style={{ position: "relative" }}
                     >
                       <img
                         onClick={(e) => {
@@ -95,10 +117,22 @@ const ChartsPage = () => {
                       <span>{folder.name}</span>
                       <button
                         className={commonStyles.tabsDots}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuVisible(
+                            folder.id === menuVisible ? null : folder.id
+                          );
+                        }}
                       >
                         <img src={dotsSvg} alt="_pic" />
                       </button>
+                      {menuVisible === folder.id && (
+                        <div className={commonStyles.menuWrapper} ref={menuRef}>
+                          <MenuForDataSource
+                            handleContextMenuClick={handleContextMenuClick}
+                          />
+                        </div>
+                      )}
                     </div>
                     {folder.isOpen && (
                       <div className={commonStyles.folderItem}>
