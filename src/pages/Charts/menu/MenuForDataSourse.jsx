@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "../charts.module.scss";
-
 const MenuForDataSource = ({ handleContextMenuClick }) => {
   return (
     <div className={styles.contextMenu}>
