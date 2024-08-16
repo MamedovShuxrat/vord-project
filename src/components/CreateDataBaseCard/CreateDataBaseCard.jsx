@@ -8,11 +8,18 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   const [dbType, setDbType] = useState(formData.dbType || "");
   const [driver, setDriver] = useState(formData.driver || "");
 
+  const [connectionMethod, setConnectionMethod] = useState("")
+
+
   useEffect(() => {
     console.log("CreateDataBaseCard rendered with formData:", formData);
     setLocalFormData(formData);
     setDbType(formData.dbType || "");
   }, [formData]);
+
+  const handleConnectionChange = (e) => {
+    setConnectionMethod(e.target.value)
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,10 +48,36 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
 
   return (
     <div className={styles.CardWrapper}>
+      <div className={styles.connectMenu}>
+        <p className={styles.connectTitle}>Connect by:</p>
+        <label className={styles.connectCheckBoxWrapper} htmlFor="connectHost">
+          <input
+            type="checkbox"
+            id="connectHost"
+            name="connectMethod"
+            value="host"
+            checked={connectionMethod === "host"}
+            onChange={handleConnectionChange}
+            className={styles.checkboxInput}
+          />
+          <span className={styles.connectTitle}>Host</span>
+        </label>
+        <label className={styles.connectCheckBoxWrapper} htmlFor="connectUrl">
+          <input
+            type="checkbox"
+            id="connectUrl"
+            name="connectMethod"
+            value="url"
+            checked={connectionMethod === "url"}
+            onChange={handleConnectionChange}
+          />
+          <span className={styles.connectTitle}>URL</span>
+        </label>
+      </div>
       <form onSubmit={handleSubmit} className={styles.formData}>
         <SimpleInput
           placeholder="User"
-          name="user_name"
+          name="user"
           value={localFormData.user || ""}
           className="dataBaseInput"
           onChange={handleChange}
@@ -70,6 +103,24 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           className="dataBaseInput"
           onChange={handleChange}
         />
+        {connectionMethod === "host" && (
+          <div className={styles.hostWrapper}>
+            <SimpleInput
+              placeholder="Host"
+              name="host"
+              value={formData.host || ""}
+              className="dataBaseInput"
+              onChange={handleChange}
+            />
+            <SimpleInput
+              placeholder="Port"
+              name="port"
+              value={formData.port || ""}
+              className="dataBaseInput"
+              onChange={handleChange}
+            />
+          </div>
+        )}
         <div className={`${styles.selectWrapper} dataBaseInput`}>
           <label htmlFor="dbType" className={styles.selectLabel}>
             Data Base Type
@@ -139,7 +190,9 @@ CreateDataBaseCard.propTypes = {
     dbType: PropTypes.string,
     dbName: PropTypes.string,
     description: PropTypes.string,
-    url: PropTypes.string
+    driver: PropTypes.string,
+    host: PropTypes.string,
+    port: PropTypes.string,
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired // Добавляем пропс onSubmit

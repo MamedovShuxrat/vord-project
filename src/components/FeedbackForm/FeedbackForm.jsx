@@ -11,8 +11,6 @@ const FeedbackForm = () => {
     const [theme, setTheme] = useState("");
     const [description, setDescription] = useState("");
     const token = useSelector((state) => state.user.token)
-    console.log(token);
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,7 +21,7 @@ const FeedbackForm = () => {
                     { theme, description },
                     {
                         headers: {
-                            Authorization: `Bearer ${token}`,
+                            Authorization: `Token ${token}`,
                         },
                     }
                 ),
