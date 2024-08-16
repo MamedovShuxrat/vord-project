@@ -16,7 +16,8 @@ import dataBaseBlackSvg from "../../assets/images/icons/connection/database-blac
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
-const API_URL = "http://81.200.151.85:8000/api/clientdb/";
+const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
+const connection = `${API_URL}/connection/`;
 
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
@@ -165,17 +166,28 @@ const ConnectionsPage = () => {
   };
 
   const handleSubmit = async (formData) => {
-    const token = JSON.parse(localStorage.getItem("userToken"));
     try {
-      await axios.post(API_URL, formData, {
-        headers: {
-          Authorization: `Token ${token}`
+      const token = JSON.parse(localStorage.getItem("userToken"));
+      const response = await toast.promise(
+        axios.post(connection, formData, {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        }),
+        {
+          loading: "Saving data...",
+          success: "Data saved successfully!",
+          error: "Failed to save data. Please try again."
         }
-      });
-      toast.success("Data saved successfully!");
+      );
+      if (response.status === 201) {
+        toast.success("Data saved and connection established!");
+      } else {
+        console.error("Failed to save data. Please try again.");
+      }
     } catch (error) {
       console.error("Error saving data:", error);
-      toast.error("Failed to save data");
+      toast.error("Failed to save data. Please try again.");
     }
   };
 
