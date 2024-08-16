@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const API_URL = "http://81.200.151.85:8000/api/clientdb/";
 
 const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   const [localFormData, setLocalFormData] = useState(formData);
@@ -41,9 +45,26 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     handleChange(e);
   };
 
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   onSubmit(localFormData);
+  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(localFormData);
+    const formDataToSend = {
+      connection_name: localFormData.dbName,
+      user_name: localFormData.user,
+      password: localFormData.password,
+      driver: driver,
+      url: localFormData.url,
+      port: 3306,
+      data_base_type: dbType,
+      data_base_name: localFormData.dbName,
+      description: localFormData.description,
+      str_datas_for_connection: `mysql://${localFormData.user}:${localFormData.password}@${localFormData.host}:${3306}/${localFormData.dbName}`,
+    };
+    onSubmit(formDataToSend);
   };
 
   return (
@@ -192,6 +213,7 @@ CreateDataBaseCard.propTypes = {
     description: PropTypes.string,
     driver: PropTypes.string,
     host: PropTypes.string,
+    url: PropTypes.string,
     port: PropTypes.string,
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
