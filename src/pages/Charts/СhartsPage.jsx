@@ -3,42 +3,36 @@ import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import Query from "../../components/Query/Query";
 import MenuForDataSource from "./menu/MenuForDataSourse";
+import MenuForQuery from "./menu/MenuForQuery";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
 import { v4 as uuid } from "uuid";
-
 import folder from "../../assets/images/icons/common/folder.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
 const ChartsPage = () => {
-  const [foldersTab, setFoldersTab] = useState([
-    {
-      id: uuid(),
-      name: "Query: Untitled 1",
-      icon: folder,
-      isOpen: true,
-      subfolder: []
-    },
-    {
-      id: uuid(),
-      name: "Query: Untitled 2",
-      icon: folder,
-      isOpen: false,
-      subfolder: []
-    }
-  ]);
-
+  const [foldersTab, setFoldersTab] = useState([]);
   const { searchTerm, setSearchTerm } = useSearch();
-  const [activeTab, setActiveTab] = useState(foldersTab[0].id);
+  const [activeTab, setActiveTab] = useState(null);
   const [menuVisible, setMenuVisible] = useState(null);
+  const [queryMenuVisible, setQueryMenuVisible] = useState(null);
+  const [queryMenuPosition, setQueryMenuPosition] = useState({
+    top: 0,
+    left: 0
+  });
   const menuRef = useRef(null);
+  const queryMenuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (
+        (menuRef.current && !menuRef.current.contains(event.target)) ||
+        (queryMenuRef.current && !queryMenuRef.current.contains(event.target))
+      ) {
         setMenuVisible(null);
+        setQueryMenuVisible(null);
       }
     };
 
@@ -66,7 +60,8 @@ const ChartsPage = () => {
       name: name || `Query: Untitled ${foldersTab.length + 1}`,
       icon: folder,
       isOpen: true,
-      subfolder: []
+      subfolder: [],
+      queryText: "" // Добавляем поле для хранения текста запроса
     };
     setFoldersTab((prevTabs) => [...prevTabs, newTab]);
     setActiveTab(newTab.id);
@@ -75,6 +70,19 @@ const ChartsPage = () => {
   const handleContextMenuClick = (action) => {
     console.log("Action:", action);
     setMenuVisible(null);
+    setQueryMenuVisible(null);
+  };
+
+  const handleQueryMenuClick = (e, folderId) => {
+    const { top, left, height } = e.currentTarget.getBoundingClientRect();
+    setQueryMenuPosition({ top: top + height, left: left + 10 });
+    setQueryMenuVisible(folderId === queryMenuVisible ? null : folderId);
+  };
+
+  const updateQueryText = (id, text) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) => (tab.id === id ? { ...tab, queryText: text } : tab))
+    );
   };
 
   return (
@@ -84,7 +92,7 @@ const ChartsPage = () => {
           <SearchBlock
             placeholder="Search Charts"
             onSearch={handleSearch}
-            addNewTab={addNewTab}
+            addNewTab={addNewTab} // Кнопка для добавления новой вкладки
           />
           <div className={commonStyles.tabsWrapper}>
             <ul className={commonStyles.folderWrapper}>
@@ -136,7 +144,7 @@ const ChartsPage = () => {
                     </div>
                     {folder.isOpen && (
                       <div className={commonStyles.folderItem}>
-                        {/* Render subfolders here */}
+                        {/* Здесь можно отобразить дополнительные элементы или подпапки */}
                       </div>
                     )}
                   </div>
@@ -165,9 +173,28 @@ const ChartsPage = () => {
                   >
                     {folder.name}
                   </span>
-                  <button className={commonStyles.tabsTopDots}>
+                  <button
+                    className={commonStyles.tabsTopDots}
+                    onClick={(e) => handleQueryMenuClick(e, folder.id)}
+                  >
                     <img src={dotsSvg} alt={`query_pic`} />
                   </button>
+                  {queryMenuVisible === folder.id && (
+                    <div
+                      className={commonStyles.menuWrapper}
+                      ref={queryMenuRef}
+                      style={{
+                        position: "absolute",
+                        top: `${queryMenuPosition.top}px`,
+                        left: `${queryMenuPosition.left}px`,
+                        zIndex: 1000
+                      }}
+                    >
+                      <MenuForQuery
+                        handleContextMenuClick={handleContextMenuClick}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -186,7 +213,10 @@ const ChartsPage = () => {
             (folder) =>
               activeTab === folder.id && (
                 <div key={folder.id}>
-                  <Query />
+                  <Query
+                    queryText={folder.queryText}
+                    setQueryText={(text) => updateQueryText(folder.id, text)}
+                  />
                 </div>
               )
           )}

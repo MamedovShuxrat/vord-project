@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import SearchBlock from "../SearchBlock/SearchBlock";
 import queryStyles from "./query.module.scss";
 
-const Query = () => {
-  const [queryText, setQueryText] = useState(""); // State for the SQL query text
+const Query = ({ queryText, setQueryText }) => {
+  const [localQueryText, setLocalQueryText] = useState(queryText); // State for the SQL query text
+
+  useEffect(() => {
+    setLocalQueryText(queryText);
+  }, [queryText]);
+
+  const handleEditorChange = (value) => {
+    setLocalQueryText(value || "");
+    setQueryText(value || ""); // Update the query text in the parent component
+  };
 
   return (
     <div className={queryStyles.queryContainer}>
@@ -27,8 +36,8 @@ const Query = () => {
           height="400px" // Можно настроить высоту редактора
           language="sql" // Поддержка синтаксиса SQL
           theme="vs-light" // Темная тема, можно изменить на "light"
-          value={queryText}
-          onChange={(value) => setQueryText(value || "")} // Обновляем состояние при изменении текста
+          value={localQueryText}
+          onChange={handleEditorChange} // Обновляем состояние при изменении текста
           options={{
             lineNumbers: "on", // Включаем нумерацию строк
             automaticLayout: true // Автоматическая настройка размеров редактора
