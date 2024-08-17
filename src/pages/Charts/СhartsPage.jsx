@@ -179,22 +179,6 @@ const ChartsPage = () => {
                   >
                     <img src={dotsSvg} alt={`query_pic`} />
                   </button>
-                  {queryMenuVisible === folder.id && (
-                    <div
-                      className={commonStyles.menuWrapper}
-                      ref={queryMenuRef}
-                      style={{
-                        position: "absolute",
-                        top: `${queryMenuPosition.top}px`,
-                        left: `${queryMenuPosition.left}px`,
-                        zIndex: 1000
-                      }}
-                    >
-                      <MenuForQuery
-                        handleContextMenuClick={handleContextMenuClick}
-                      />
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -222,6 +206,21 @@ const ChartsPage = () => {
           )}
         </div>
       </div>
+      {/* Рендерим MenuForQuery в корне компонента с использованием абсолютного позиционирования */}
+      {queryMenuVisible && (
+        <div
+          className={commonStyles.menuWrapper}
+          ref={queryMenuRef}
+          style={{
+            position: "fixed", // Изменяем на fixed для отображения поверх других элементов
+            top: `${queryMenuPosition.top}px`,
+            left: `${queryMenuPosition.left}px`,
+            zIndex: 1000
+          }}
+        >
+          <MenuForQuery handleContextMenuClick={handleContextMenuClick} />
+        </div>
+      )}
     </div>
   );
 };

@@ -33,14 +33,14 @@ const Query = ({ queryText, setQueryText }) => {
       </div>
       <div className={queryStyles.queryEditor}>
         <MonacoEditor
-          height="400px" // Можно настроить высоту редактора
-          language="sql" // Поддержка синтаксиса SQL
-          theme="vs-light" // Темная тема, можно изменить на "light"
+          height="400px"
+          language="sql"
+          theme="vs-light"
           value={localQueryText}
-          onChange={handleEditorChange} // Обновляем состояние при изменении текста
+          onChange={handleEditorChange}
           options={{
-            lineNumbers: "on", // Включаем нумерацию строк
-            automaticLayout: true // Автоматическая настройка размеров редактора
+            lineNumbers: "on",
+            automaticLayout: true
           }}
         />
       </div>
