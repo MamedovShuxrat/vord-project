@@ -92,7 +92,7 @@ const ChartsPage = () => {
           <SearchBlock
             placeholder="Search Charts"
             onSearch={handleSearch}
-            addNewTab={addNewTab} // Кнопка для добавления новой вкладки
+            addNewTab={addNewTab}
           />
           <div className={commonStyles.tabsWrapper}>
             <ul className={commonStyles.folderWrapper}>
@@ -190,8 +190,6 @@ const ChartsPage = () => {
             <Chat />
           </div>
         </div>
-
-        {/* Отображаем компонент Query внутри активной вкладки */}
         <div className={commonStyles.queryContent}>
           {foldersTab.map(
             (folder) =>
@@ -206,13 +204,12 @@ const ChartsPage = () => {
           )}
         </div>
       </div>
-      {/* Рендерим MenuForQuery в корне компонента с использованием абсолютного позиционирования */}
       {queryMenuVisible && (
         <div
           className={commonStyles.menuWrapper}
           ref={queryMenuRef}
           style={{
-            position: "fixed", // Изменяем на fixed для отображения поверх других элементов
+            position: "fixed",
             top: `${queryMenuPosition.top}px`,
             left: `${queryMenuPosition.left}px`,
             zIndex: 1000

@@ -31,7 +31,9 @@ const Query = ({ queryText, setQueryText }) => {
           showAddButton={false}
         />
       </div>
-      <div className={queryStyles.queryEditor}>
+      <div className={queryStyles.editorContainer}>
+        {" "}
+        {/* Оборачиваем MonacoEditor в div с нужным стилем */}
         <MonacoEditor
           height="400px"
           language="sql"
