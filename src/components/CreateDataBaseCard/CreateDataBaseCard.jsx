@@ -39,31 +39,28 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     handleChange(e);
   };
 
+
   const handleDriverChange = (e) => {
     const value = e.target.value;
     setDriver(value);
     handleChange(e);
   };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   onSubmit(localFormData);
-  // };
-
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const port = localFormData.port ? parseInt(localFormData.port, 10) : null;
     const formDataToSend = {
-      connection_name: localFormData.dbName,
+      connection_name: formData.connectionName,
       user_name: localFormData.user,
       password: localFormData.password,
-      driver: driver,
-      url: localFormData.url,
-      port: 3306,
+      url: connectionMethod === "url" ? localFormData.url : "",
+      host: connectionMethod === "host" ? localFormData.host : "",
+      port: port,
       data_base_type: dbType,
       data_base_name: localFormData.dbName,
       description: localFormData.description,
-      str_datas_for_connection: `mysql://${localFormData.user}:${localFormData.password}@${localFormData.host}:${3306}/${localFormData.dbName}`,
     };
+    console.log(formDataToSend);
     onSubmit(formDataToSend);
   };
 
@@ -154,10 +151,13 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
             onChange={handleDbTypeChange}
           >
             <option value="">Select Database Type</option>
-            <option value="MySQL">MySQL</option>
+            <option value="1">1</option>
+            <option value="MYSQL SQLAlchemy mysql+pymysql">MYSQL SQLAlchemy mysql+pymysql</option>
+            <option value="MARIADB SQLAlchemy mssql+pyodbc">MARIADB SQLAlchemy mssql+pyodbc</option>
+            <option value="POSTGRES SQLAlchemy postgresql+psycopg2">POSTGRES SQLAlchemy postgresql+psycopg2</option>
           </select>
         </div>
-        {dbType === "MySQL" && (
+        {dbType === "MSSQL" && (
           <SimpleInput
             placeholder="URL"
             name="url"
@@ -211,13 +211,11 @@ CreateDataBaseCard.propTypes = {
     dbType: PropTypes.string,
     dbName: PropTypes.string,
     description: PropTypes.string,
-    driver: PropTypes.string,
     host: PropTypes.string,
     url: PropTypes.string,
-    port: PropTypes.string,
+    port: PropTypes.number,
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired // Добавляем пропс onSubmit
+  onSubmit: PropTypes.func.isRequired,
 };
-
 export default CreateDataBaseCard;

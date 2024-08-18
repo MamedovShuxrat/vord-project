@@ -47,6 +47,7 @@ const ConnectionsPage = () => {
     }
   ]);
 
+
   useEffect(() => {
     if (connectionTabs !== null) {
       localStorage.setItem("connectionTabs", JSON.stringify(connectionTabs));
@@ -62,6 +63,7 @@ const ConnectionsPage = () => {
 
   const [activeTab, setActiveTabs] = useState(null);
   const [dotsChange, setDotsChange] = useState({});
+  console.log(connectionTabs);
 
   const handleDotsChange = (id) => {
     const updatedDotsChange = {};
@@ -279,9 +281,10 @@ const ConnectionsPage = () => {
         </div>
         {activeTab && (
           <CreateDataBaseCard
-            formData={
-              connectionTabs.find((tab) => tab.id === activeTab).formData
-            }
+            formData={{
+              ...connectionTabs.find((tab) => tab.id === activeTab).formData,
+              connectionName: connectionTabs.find((tab) => tab.id === activeTab).MySQL
+            }}
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)
             }
