@@ -4,8 +4,48 @@ import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
 import axios from "axios";
 import toast from "react-hot-toast";
-
-const API_URL = "http://81.200.151.85:8000/api/clientdb/";
+const DATABASETYPE = [
+  {
+    "id": 1,
+    "name": "MSSQL SQLAlchemy mssql+pyodbc",
+    "is_available": true,
+    "port": 1433,
+    "driver": "mssql+pyodbc",
+    "driver2": "?driver=ODBC+Driver+17+for+SQL+Server"
+  },
+  {
+    "id": 2,
+    "name": "MYSQL SQLAlchemy mysql+pymysql",
+    "is_available": true,
+    "port": 3306,
+    "driver": "mysql+pymysql",
+    "driver2": "?charset=utf8mb4"
+  },
+  {
+    "id": 3,
+    "name": "MARIADB SQLAlchemy mssql+pyodbc",
+    "is_available": true,
+    "port": 3306,
+    "driver": "mysql+pymysql",
+    "driver2": ""
+  },
+  {
+    "id": 4,
+    "name": "POSTGRES SQLAlchemy postgresql+psycopg2",
+    "is_available": true,
+    "port": 5432,
+    "driver": "postgresql+psycopg2",
+    "driver2": ""
+  },
+  {
+    "id": 5,
+    "name": "MSSQL pyodbc",
+    "is_available": true,
+    "port": 1433,
+    "driver": "",
+    "driver2": ""
+  },
+]
 
 const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   const [localFormData, setLocalFormData] = useState(formData);
@@ -99,6 +139,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           value={localFormData.user || ""}
           className="dataBaseInput"
           onChange={handleChange}
+          required
         />
         <SimpleInput
           placeholder="Password"
@@ -106,6 +147,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           value={localFormData.password || ""}
           className="dataBaseInput"
           onChange={handleChange}
+
         />
         <SimpleInput
           placeholder="Data Base"
@@ -151,10 +193,9 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
             onChange={handleDbTypeChange}
           >
             <option value="">Select Database Type</option>
-            <option value="1">1</option>
-            <option value="MYSQL SQLAlchemy mysql+pymysql">MYSQL SQLAlchemy mysql+pymysql</option>
-            <option value="MARIADB SQLAlchemy mssql+pyodbc">MARIADB SQLAlchemy mssql+pyodbc</option>
-            <option value="POSTGRES SQLAlchemy postgresql+psycopg2">POSTGRES SQLAlchemy postgresql+psycopg2</option>
+            {DATABASETYPE.map((item, key) => (
+              <option key={key} value={item.id}>{item.name}</option>
+            ))}
           </select>
         </div>
         {dbType === "MSSQL" && (

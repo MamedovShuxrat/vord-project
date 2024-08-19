@@ -169,15 +169,22 @@ const ConnectionsPage = () => {
   const handleSubmit = async (formData) => {
     const token = JSON.parse(localStorage.getItem("userToken"));
     try {
-      await axios.post(API_URL, formData, {
-        headers: {
-          Authorization: `Token ${token}`
-        }
-      });
-      toast.success("Data saved successfully!");
+      const response = await toast.promise(
+        axios.post(
+          API_URL, formData,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        ),
+        {
+          loading: "Sending Data...",
+          success: "Data saved successfully!",
+          error: "Error saving data:. Please try again.",
+        })
     } catch (error) {
       console.error("Error saving data:", error);
-      toast.error("Failed to save data");
     }
   };
 
