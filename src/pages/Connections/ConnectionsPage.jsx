@@ -168,6 +168,7 @@ const ConnectionsPage = () => {
   };
 
   const handleSubmit = async (formData) => {
+    const token = JSON.parse(localStorage.getItem("userToken"));
     try {
       const response = await toast.promise(
         axios.post(
