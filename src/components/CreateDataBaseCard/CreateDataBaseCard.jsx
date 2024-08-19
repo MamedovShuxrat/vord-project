@@ -2,6 +2,50 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
+import axios from "axios";
+import toast from "react-hot-toast";
+const DATABASETYPE = [
+  {
+    "id": 1,
+    "name": "MSSQL SQLAlchemy mssql+pyodbc",
+    "is_available": true,
+    "port": 1433,
+    "driver": "mssql+pyodbc",
+    "driver2": "?driver=ODBC+Driver+17+for+SQL+Server"
+  },
+  {
+    "id": 2,
+    "name": "MYSQL SQLAlchemy mysql+pymysql",
+    "is_available": true,
+    "port": 3306,
+    "driver": "mysql+pymysql",
+    "driver2": "?charset=utf8mb4"
+  },
+  {
+    "id": 3,
+    "name": "MARIADB SQLAlchemy mssql+pyodbc",
+    "is_available": true,
+    "port": 3306,
+    "driver": "mysql+pymysql",
+    "driver2": ""
+  },
+  {
+    "id": 4,
+    "name": "POSTGRES SQLAlchemy postgresql+psycopg2",
+    "is_available": true,
+    "port": 5432,
+    "driver": "postgresql+psycopg2",
+    "driver2": ""
+  },
+  {
+    "id": 5,
+    "name": "MSSQL pyodbc",
+    "is_available": true,
+    "port": 1433,
+    "driver": "",
+    "driver2": ""
+  },
+]
 
 const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   const [localFormData, setLocalFormData] = useState(formData);
@@ -35,15 +79,29 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     handleChange(e);
   };
 
+
   const handleDriverChange = (e) => {
     const value = e.target.value;
     setDriver(value);
     handleChange(e);
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(localFormData);
+
+    const port = localFormData.port ? parseInt(localFormData.port, 10) : null;
+    const formDataToSend = {
+      connection_name: formData.connectionName,
+      user_name: localFormData.user,
+      password: localFormData.password,
+      url: connectionMethod === "url" ? localFormData.url : "",
+      host: connectionMethod === "host" ? localFormData.host : "",
+      port: port,
+      data_base_type: dbType,
+      data_base_name: localFormData.dbName,
+      description: localFormData.description,
+    };
+    console.log(formDataToSend);
+    onSubmit(formDataToSend);
   };
 
   return (
@@ -81,6 +139,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           value={localFormData.user || ""}
           className="dataBaseInput"
           onChange={handleChange}
+          required
         />
         <SimpleInput
           placeholder="Password"
@@ -88,6 +147,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           value={localFormData.password || ""}
           className="dataBaseInput"
           onChange={handleChange}
+
         />
         <SimpleInput
           placeholder="Data Base"
@@ -133,10 +193,12 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
             onChange={handleDbTypeChange}
           >
             <option value="">Select Database Type</option>
-            <option value="MySQL">MySQL</option>
+            {DATABASETYPE.map((item, key) => (
+              <option key={key} value={item.id}>{item.name}</option>
+            ))}
           </select>
         </div>
-        {dbType === "MySQL" && (
+        {dbType === "MSSQL" && (
           <SimpleInput
             placeholder="URL"
             name="url"
@@ -190,12 +252,11 @@ CreateDataBaseCard.propTypes = {
     dbType: PropTypes.string,
     dbName: PropTypes.string,
     description: PropTypes.string,
-    driver: PropTypes.string,
     host: PropTypes.string,
-    port: PropTypes.string,
+    url: PropTypes.string,
+    port: PropTypes.number,
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired // Добавляем пропс onSubmit
+  onSubmit: PropTypes.func.isRequired,
 };
-
 export default CreateDataBaseCard;

@@ -48,6 +48,7 @@ const ConnectionsPage = () => {
     }
   ]);
 
+
   useEffect(() => {
     if (connectionTabs !== null) {
       localStorage.setItem("connectionTabs", JSON.stringify(connectionTabs));
@@ -63,6 +64,7 @@ const ConnectionsPage = () => {
 
   const [activeTab, setActiveTabs] = useState(null);
   const [dotsChange, setDotsChange] = useState({});
+  console.log(connectionTabs);
 
   const handleDotsChange = (id) => {
     const updatedDotsChange = {};
@@ -167,27 +169,22 @@ const ConnectionsPage = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      const token = JSON.parse(localStorage.getItem("userToken"));
       const response = await toast.promise(
-        axios.post(connection, formData, {
-          headers: {
-            Authorization: `Token ${token}`
+        axios.post(
+          API_URL, formData,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
           }
-        }),
+        ),
         {
-          loading: "Saving data...",
+          loading: "Sending Data...",
           success: "Data saved successfully!",
-          error: "Failed to save data. Please try again."
-        }
-      );
-      if (response.status === 201) {
-        toast.success("Data saved and connection established!");
-      } else {
-        console.error("Failed to save data. Please try again.");
-      }
+          error: "Error saving data:. Please try again.",
+        })
     } catch (error) {
       console.error("Error saving data:", error);
-      toast.error("Failed to save data. Please try again.");
     }
   };
 
@@ -291,9 +288,10 @@ const ConnectionsPage = () => {
         </div>
         {activeTab && (
           <CreateDataBaseCard
-            formData={
-              connectionTabs.find((tab) => tab.id === activeTab).formData
-            }
+            formData={{
+              ...connectionTabs.find((tab) => tab.id === activeTab).formData,
+              connectionName: connectionTabs.find((tab) => tab.id === activeTab).MySQL
+            }}
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)
             }
