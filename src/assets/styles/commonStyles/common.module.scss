@@ -251,10 +251,11 @@
   padding: 10px;
 }
 
-.folderItem {
+.fileItem {
+  margin-top: 5px;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: space-between; /* Для выравнивания текста и иконки */
+  width: 100%; /* Занимает всю доступную ширину */
 }
 
 .FolderArrowRight {

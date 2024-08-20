@@ -61,11 +61,14 @@ const ChartsPage = () => {
   const addNewTab = (name, queryText = "") => {
     const newTab = {
       id: uuid(),
-      name: name || `Query: Untitled ${foldersTab.length + 1}`,
+      name: name || `Query: Без названия ${foldersTab.length + 1}`,
       icon: folder,
       isOpen: true,
-      subfolder: [],
-      queryText // Добавляем поле для хранения текста запроса
+      subfolder: [
+        { id: uuid(), name: "Chart: 1" },
+        { id: uuid(), name: "Clean Data: 1" }
+      ],
+      queryText
     };
     setFoldersTab((prevTabs) => [...prevTabs, newTab]);
     setActiveTab(newTab.id);
@@ -90,7 +93,7 @@ const ChartsPage = () => {
     );
     if (folderToDuplicate) {
       addNewTab(
-        `${folderToDuplicate.name} (Copy)`,
+        `${folderToDuplicate.name} (Копия)`,
         folderToDuplicate.queryText
       );
     }
@@ -99,7 +102,6 @@ const ChartsPage = () => {
   const deleteTab = (folderId) => {
     setFoldersTab((prevTabs) => prevTabs.filter((tab) => tab.id !== folderId));
 
-    // Если активная вкладка была удалена, нужно переключиться на другую вкладку
     if (activeTab === folderId) {
       const remainingTabs = foldersTab.filter((tab) => tab.id !== folderId);
       setActiveTab(remainingTabs.length ? remainingTabs[0].id : null);
@@ -150,6 +152,7 @@ const ChartsPage = () => {
             placeholder="Search Charts"
             onSearch={handleSearch}
             addNewTab={addNewTab}
+            placeholderText="Введите название нового запроса"
           />
           <div className={commonStyles.tabsWrapper}>
             <ul className={commonStyles.folderWrapper}>
@@ -215,7 +218,14 @@ const ChartsPage = () => {
                     </div>
                     {folder.isOpen && (
                       <div className={commonStyles.folderItem}>
-                        {/* Здесь можно отобразить дополнительные элементы или подпапки */}
+                        {folder.subfolder.map((file) => (
+                          <div key={file.id} className={commonStyles.fileItem}>
+                            <span>{file.name}</span>
+                            <button className={commonStyles.tabsDots}>
+                              <img src={dotsSvg} alt="_pic" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
