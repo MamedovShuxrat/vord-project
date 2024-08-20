@@ -3,7 +3,7 @@ import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import Query from "../../components/Query/Query";
 import MenuForFileCharts from "./menu/MenuForFileCharts";
-import MenuForQuery from "./menu/MenuForQuery";
+import MenuForQueryCharts from "./menu/MenuForQueryCharts";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
@@ -17,26 +17,24 @@ const ChartsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
   const [activeTab, setActiveTab] = useState(null);
   const [menuVisible, setMenuVisible] = useState(null);
-  const [queryMenuVisible, setQueryMenuVisible] = useState(null);
-  const [queryMenuPosition, setQueryMenuPosition] = useState({
+  const [menuPosition, setMenuPosition] = useState({
     top: 0,
     left: 0
   });
+  const [menuType, setMenuType] = useState(null);
   const [renamingTab, setRenamingTab] = useState(null);
   const [newTabName, setNewTabName] = useState("");
+  const [renamingFile, setRenamingFile] = useState(null); // Новый стейт для ID файла, который переименовывается
+  const [newFileName, setNewFileName] = useState(""); // Новый стейт для имени файла
   const menuRef = useRef(null);
-  const queryMenuRef = useRef(null);
   const tabsContainerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        (menuRef.current && !menuRef.current.contains(event.target)) ||
-        (queryMenuRef.current && !queryMenuRef.current.contains(event.target))
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuVisible(null);
-        setQueryMenuVisible(null);
         setRenamingTab(null);
+        setRenamingFile(null); // Сбросить переименовываемый файл при клике вне меню
       }
     };
 
@@ -74,59 +72,68 @@ const ChartsPage = () => {
     setActiveTab(newTab.id);
   };
 
-  const handleContextMenuClick = (action, folderId) => {
-    if (action === "duplicate") {
-      duplicateTab(folderId);
-    } else if (action === "delete") {
-      deleteTab(folderId);
-    } else if (action === "rename") {
-      setRenamingTab(folderId);
-      setNewTabName(foldersTab.find((tab) => tab.id === folderId).name);
+  const handleContextMenuClick = (action, id) => {
+    if (menuType === "folder") {
+      if (action === "duplicate") {
+        duplicateTab(id);
+      } else if (action === "delete") {
+        deleteTab(id);
+      } else if (action === "rename") {
+        setRenamingTab(id);
+        setNewTabName(foldersTab.find((tab) => tab.id === id).name);
+      }
+    } else if (menuType === "file") {
+      if (action === "duplicate") {
+        duplicateFile(id);
+      } else if (action === "delete") {
+        deleteFile(id);
+      } else if (action === "rename") {
+        startRenamingFile(id);
+      }
     }
     setMenuVisible(null);
-    setQueryMenuVisible(null);
   };
 
-  const duplicateTab = (folderId) => {
-    const folderToDuplicate = foldersTab.find(
-      (folder) => folder.id === folderId
+  const duplicateTab = (id) => {
+    const tabToDuplicate = foldersTab.find(
+      (tab) => tab.id === id || tab.subfolder.some((file) => file.id === id)
     );
-    if (folderToDuplicate) {
-      addNewTab(
-        `${folderToDuplicate.name} (Копия)`,
-        folderToDuplicate.queryText
-      );
+    if (tabToDuplicate) {
+      addNewTab(`${tabToDuplicate.name} (Копия)`, tabToDuplicate.queryText);
     }
   };
 
-  const deleteTab = (folderId) => {
-    setFoldersTab((prevTabs) => prevTabs.filter((tab) => tab.id !== folderId));
+  const deleteTab = (id) => {
+    setFoldersTab((prevTabs) => prevTabs.filter((tab) => tab.id !== id));
 
-    if (activeTab === folderId) {
-      const remainingTabs = foldersTab.filter((tab) => tab.id !== folderId);
+    if (activeTab === id) {
+      const remainingTabs = foldersTab.filter((tab) => tab.id !== id);
       setActiveTab(remainingTabs.length ? remainingTabs[0].id : null);
     }
   };
 
-  const renameTab = (folderId, newName) => {
+  const renameTab = (id, newName) => {
     setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) =>
-        tab.id === folderId ? { ...tab, name: newName } : tab
-      )
+      prevTabs.map((tab) => (tab.id === id ? { ...tab, name: newName } : tab))
     );
     setRenamingTab(null);
   };
 
-  const handleRenameKeyPress = (e, folderId) => {
+  const handleRenameKeyPress = (e, id) => {
     if (e.key === "Enter") {
-      renameTab(folderId, newTabName);
+      if (renamingTab) {
+        renameTab(id, newTabName);
+      } else if (renamingFile) {
+        renameFile(id, newFileName);
+      }
     }
   };
 
-  const handleQueryMenuClick = (e, folderId) => {
+  const handleMenuClick = (e, id, type) => {
     const { top, left, height } = e.currentTarget.getBoundingClientRect();
-    setQueryMenuPosition({ top: top + height, left: left + 10 });
-    setQueryMenuVisible(folderId === queryMenuVisible ? null : folderId);
+    setMenuPosition({ top: top + height, left: left + 10 });
+    setMenuVisible(id === menuVisible ? null : id);
+    setMenuType(type);
   };
 
   const updateQueryText = (id, text) => {
@@ -142,6 +149,57 @@ const ChartsPage = () => {
         behavior: "smooth"
       });
     }
+  };
+
+  const duplicateFile = (fileId) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) => {
+        const fileIndex = tab.subfolder.findIndex((file) => file.id === fileId);
+        if (fileIndex !== -1) {
+          const newFile = {
+            ...tab.subfolder[fileIndex],
+            id: uuid(),
+            name: `${tab.subfolder[fileIndex].name} (Копия)`
+          };
+          const updatedSubfolder = [
+            ...tab.subfolder.slice(0, fileIndex + 1),
+            newFile,
+            ...tab.subfolder.slice(fileIndex + 1)
+          ];
+          return { ...tab, subfolder: updatedSubfolder };
+        }
+        return tab;
+      })
+    );
+  };
+
+  const deleteFile = (fileId) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) => ({
+        ...tab,
+        subfolder: tab.subfolder.filter((file) => file.id !== fileId)
+      }))
+    );
+  };
+
+  const startRenamingFile = (fileId) => {
+    setRenamingFile(fileId);
+    const currentFile = foldersTab
+      .flatMap((folder) => folder.subfolder)
+      .find((file) => file.id === fileId);
+    setNewFileName(currentFile.name);
+  };
+
+  const renameFile = (fileId, newName) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) => ({
+        ...tab,
+        subfolder: tab.subfolder.map((file) =>
+          file.id === fileId ? { ...file, name: newName } : file
+        )
+      }))
+    );
+    setRenamingFile(null);
   };
 
   return (
@@ -177,7 +235,9 @@ const ChartsPage = () => {
                             }}
                             className={commonStyles.FolderArrowRight}
                             style={{
-                              transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
+                              transform: `rotate(${
+                                folder.isOpen ? "90deg" : "0deg"
+                              })`
                             }}
                             src={arrowRightSvg}
                             alt="arrow-down"
@@ -203,30 +263,39 @@ const ChartsPage = () => {
                           className={commonStyles.tabsDots}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setMenuVisible(
-                              folder.id === menuVisible ? null : folder.id
-                            );
+                            handleMenuClick(e, folder.id, "folder");
                           }}
                         >
                           <img src={dotsSvg} alt="_pic" />
                         </button>
                       </div>
-                      {menuVisible === folder.id && (
-                        <div className={commonStyles.menuWrapper} ref={menuRef}>
-                          <MenuForFileCharts
-                            handleContextMenuClick={(action) =>
-                              handleContextMenuClick(action, folder.id)
-                            }
-                          />
-                        </div>
-                      )}
                     </div>
                     {folder.isOpen && (
                       <div className={commonStyles.folderSubItems}>
                         {folder.subfolder.map((file) => (
                           <div key={file.id} className={commonStyles.fileItem}>
-                            <span>{file.name}</span>
-                            <button className={commonStyles.tabsDots}>
+                            {renamingFile === file.id ? (
+                              <input
+                                type="text"
+                                value={newFileName}
+                                onChange={(e) => setNewFileName(e.target.value)}
+                                onKeyDown={(e) =>
+                                  handleRenameKeyPress(e, file.id)
+                                }
+                                onBlur={() => renameFile(file.id, newFileName)}
+                                className={commonStyles.renameInput}
+                                autoFocus
+                              />
+                            ) : (
+                              <span>{file.name}</span>
+                            )}
+                            <button
+                              className={commonStyles.tabsDots}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMenuClick(e, file.id, "file");
+                              }}
+                            >
                               <img src={dotsSvg} alt="_pic" />
                             </button>
                           </div>
@@ -267,7 +336,7 @@ const ChartsPage = () => {
                   </span>
                   <button
                     className={commonStyles.tabsTopDots}
-                    onClick={(e) => handleQueryMenuClick(e, folder.id)}
+                    onClick={(e) => handleMenuClick(e, folder.id, "folder")}
                   >
                     <img src={dotsSvg} alt={`query_pic`} />
                   </button>
@@ -299,22 +368,30 @@ const ChartsPage = () => {
           )}
         </div>
       </div>
-      {queryMenuVisible && (
+      {menuVisible && (
         <div
           className={commonStyles.menuWrapper}
-          ref={queryMenuRef}
+          ref={menuRef}
           style={{
             position: "fixed",
-            top: `${queryMenuPosition.top}px`,
-            left: `${queryMenuPosition.left}px`,
+            top: `${menuPosition.top}px`,
+            left: `${menuPosition.left}px`,
             zIndex: 1000
           }}
         >
-          <MenuForQuery
-            handleContextMenuClick={(action) =>
-              handleContextMenuClick(action, queryMenuVisible)
-            }
-          />
+          {menuType === "folder" ? (
+            <MenuForQueryCharts
+              handleContextMenuClick={(action) =>
+                handleContextMenuClick(action, menuVisible)
+              }
+            />
+          ) : (
+            <MenuForFileCharts
+              handleContextMenuClick={(action) =>
+                handleContextMenuClick(action, menuVisible)
+              }
+            />
+          )}
         </div>
       )}
     </div>
