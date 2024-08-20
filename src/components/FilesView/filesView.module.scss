@@ -84,7 +84,7 @@
   cursor: pointer;
   padding: 5px;
   border-radius: 4px;
-  justify-content: space-between; /* Выравниваем содержимое по краям */
+  justify-content: space-between;
 }
 
 .folderHeader img,
@@ -94,8 +94,8 @@
 
 .folderName,
 .fileName {
-  flex-grow: 1; /* Это обеспечит, что текст будет занимать оставшееся пространство */
-  margin-right: 10px; /* Отступ справа перед кнопкой с точками */
+  flex-grow: 1;
+  margin-right: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

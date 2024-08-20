@@ -167,45 +167,50 @@ const ChartsPage = () => {
                         activeTab === folder.id ? commonStyles.activeTab : ""
                       }`}
                       onClick={() => setActiveTab(folder.id)}
-                      style={{ position: "relative" }}
                     >
-                      <img
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFolderRotate(folder.id);
-                        }}
-                        className={commonStyles.FolderArrowRight}
-                        style={{
-                          transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
-                        }}
-                        src={arrowRightSvg}
-                        alt="arrow-down"
-                      />
-                      <img src={folder.icon} alt="folder" />
-                      {renamingTab === folder.id ? (
-                        <input
-                          type="text"
-                          value={newTabName}
-                          onChange={(e) => setNewTabName(e.target.value)}
-                          onKeyDown={(e) => handleRenameKeyPress(e, folder.id)}
-                          onBlur={() => renameTab(folder.id, newTabName)}
-                          className={commonStyles.renameInput}
-                          autoFocus
-                        />
-                      ) : (
-                        <span>{folder.name}</span>
-                      )}
-                      <button
-                        className={commonStyles.tabsDots}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMenuVisible(
-                            folder.id === menuVisible ? null : folder.id
-                          );
-                        }}
-                      >
-                        <img src={dotsSvg} alt="_pic" />
-                      </button>
+                      <div className={commonStyles.folderHeader}>
+                        <div className={commonStyles.folderInfo}>
+                          <img
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFolderRotate(folder.id);
+                            }}
+                            className={commonStyles.FolderArrowRight}
+                            style={{
+                              transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
+                            }}
+                            src={arrowRightSvg}
+                            alt="arrow-down"
+                          />
+                          <img src={folder.icon} alt="folder" />
+                          {renamingTab === folder.id ? (
+                            <input
+                              type="text"
+                              value={newTabName}
+                              onChange={(e) => setNewTabName(e.target.value)}
+                              onKeyDown={(e) =>
+                                handleRenameKeyPress(e, folder.id)
+                              }
+                              onBlur={() => renameTab(folder.id, newTabName)}
+                              className={commonStyles.renameInput}
+                              autoFocus
+                            />
+                          ) : (
+                            <span>{folder.name}</span>
+                          )}
+                        </div>
+                        <button
+                          className={commonStyles.tabsDots}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuVisible(
+                              folder.id === menuVisible ? null : folder.id
+                            );
+                          }}
+                        >
+                          <img src={dotsSvg} alt="_pic" />
+                        </button>
+                      </div>
                       {menuVisible === folder.id && (
                         <div className={commonStyles.menuWrapper} ref={menuRef}>
                           <MenuForFileCharts
@@ -217,7 +222,7 @@ const ChartsPage = () => {
                       )}
                     </div>
                     {folder.isOpen && (
-                      <div className={commonStyles.folderItem}>
+                      <div className={commonStyles.folderSubItems}>
                         {folder.subfolder.map((file) => (
                           <div key={file.id} className={commonStyles.fileItem}>
                             <span>{file.name}</span>
