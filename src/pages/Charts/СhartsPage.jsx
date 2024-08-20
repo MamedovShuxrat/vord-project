@@ -2,43 +2,41 @@ import React, { useState, useEffect, useRef } from "react";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import Query from "../../components/Query/Query";
-import MenuForDataSource from "./menu/MenuForDataSourse";
+import MenuForFileCharts from "./menu/MenuForFileCharts";
+import MenuForQuery from "./menu/MenuForQuery";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
 import { v4 as uuid } from "uuid";
-
 import folder from "../../assets/images/icons/common/folder.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
 const ChartsPage = () => {
-  const [foldersTab, setFoldersTab] = useState([
-    {
-      id: uuid(),
-      name: "Query: Untitled 1",
-      icon: folder,
-      isOpen: true,
-      subfolder: []
-    },
-    {
-      id: uuid(),
-      name: "Query: Untitled 2",
-      icon: folder,
-      isOpen: false,
-      subfolder: []
-    }
-  ]);
-
+  const [foldersTab, setFoldersTab] = useState([]);
   const { searchTerm, setSearchTerm } = useSearch();
-  const [activeTab, setActiveTab] = useState(foldersTab[0].id);
+  const [activeTab, setActiveTab] = useState(null);
   const [menuVisible, setMenuVisible] = useState(null);
+  const [queryMenuVisible, setQueryMenuVisible] = useState(null);
+  const [queryMenuPosition, setQueryMenuPosition] = useState({
+    top: 0,
+    left: 0
+  });
+  const [renamingTab, setRenamingTab] = useState(null);
+  const [newTabName, setNewTabName] = useState("");
   const menuRef = useRef(null);
+  const queryMenuRef = useRef(null);
+  const tabsContainerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (
+        (menuRef.current && !menuRef.current.contains(event.target)) ||
+        (queryMenuRef.current && !queryMenuRef.current.contains(event.target))
+      ) {
         setMenuVisible(null);
+        setQueryMenuVisible(null);
+        setRenamingTab(null);
       }
     };
 
@@ -60,21 +58,88 @@ const ChartsPage = () => {
     setSearchTerm(term);
   };
 
-  const addNewTab = (name) => {
+  const addNewTab = (name, queryText = "") => {
     const newTab = {
       id: uuid(),
       name: name || `Query: Untitled ${foldersTab.length + 1}`,
       icon: folder,
       isOpen: true,
-      subfolder: []
+      subfolder: [],
+      queryText // Добавляем поле для хранения текста запроса
     };
     setFoldersTab((prevTabs) => [...prevTabs, newTab]);
     setActiveTab(newTab.id);
   };
 
-  const handleContextMenuClick = (action) => {
-    console.log("Action:", action);
+  const handleContextMenuClick = (action, folderId) => {
+    if (action === "duplicate") {
+      duplicateTab(folderId);
+    } else if (action === "delete") {
+      deleteTab(folderId);
+    } else if (action === "rename") {
+      setRenamingTab(folderId);
+      setNewTabName(foldersTab.find((tab) => tab.id === folderId).name);
+    }
     setMenuVisible(null);
+    setQueryMenuVisible(null);
+  };
+
+  const duplicateTab = (folderId) => {
+    const folderToDuplicate = foldersTab.find(
+      (folder) => folder.id === folderId
+    );
+    if (folderToDuplicate) {
+      addNewTab(
+        `${folderToDuplicate.name} (Copy)`,
+        folderToDuplicate.queryText
+      );
+    }
+  };
+
+  const deleteTab = (folderId) => {
+    setFoldersTab((prevTabs) => prevTabs.filter((tab) => tab.id !== folderId));
+
+    // Если активная вкладка была удалена, нужно переключиться на другую вкладку
+    if (activeTab === folderId) {
+      const remainingTabs = foldersTab.filter((tab) => tab.id !== folderId);
+      setActiveTab(remainingTabs.length ? remainingTabs[0].id : null);
+    }
+  };
+
+  const renameTab = (folderId, newName) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === folderId ? { ...tab, name: newName } : tab
+      )
+    );
+    setRenamingTab(null);
+  };
+
+  const handleRenameKeyPress = (e, folderId) => {
+    if (e.key === "Enter") {
+      renameTab(folderId, newTabName);
+    }
+  };
+
+  const handleQueryMenuClick = (e, folderId) => {
+    const { top, left, height } = e.currentTarget.getBoundingClientRect();
+    setQueryMenuPosition({ top: top + height, left: left + 10 });
+    setQueryMenuVisible(folderId === queryMenuVisible ? null : folderId);
+  };
+
+  const updateQueryText = (id, text) => {
+    setFoldersTab((prevTabs) =>
+      prevTabs.map((tab) => (tab.id === id ? { ...tab, queryText: text } : tab))
+    );
+  };
+
+  const scrollTabs = (direction) => {
+    if (tabsContainerRef.current) {
+      tabsContainerRef.current.scrollBy({
+        left: direction === "left" ? -200 : 200,
+        behavior: "smooth"
+      });
+    }
   };
 
   return (
@@ -114,7 +179,19 @@ const ChartsPage = () => {
                         alt="arrow-down"
                       />
                       <img src={folder.icon} alt="folder" />
-                      <span>{folder.name}</span>
+                      {renamingTab === folder.id ? (
+                        <input
+                          type="text"
+                          value={newTabName}
+                          onChange={(e) => setNewTabName(e.target.value)}
+                          onKeyDown={(e) => handleRenameKeyPress(e, folder.id)}
+                          onBlur={() => renameTab(folder.id, newTabName)}
+                          className={commonStyles.renameInput}
+                          autoFocus
+                        />
+                      ) : (
+                        <span>{folder.name}</span>
+                      )}
                       <button
                         className={commonStyles.tabsDots}
                         onClick={(e) => {
@@ -128,15 +205,17 @@ const ChartsPage = () => {
                       </button>
                       {menuVisible === folder.id && (
                         <div className={commonStyles.menuWrapper} ref={menuRef}>
-                          <MenuForDataSource
-                            handleContextMenuClick={handleContextMenuClick}
+                          <MenuForFileCharts
+                            handleContextMenuClick={(action) =>
+                              handleContextMenuClick(action, folder.id)
+                            }
                           />
                         </div>
                       )}
                     </div>
                     {folder.isOpen && (
                       <div className={commonStyles.folderItem}>
-                        {/* Render subfolders here */}
+                        {/* Здесь можно отобразить дополнительные элементы или подпапки */}
                       </div>
                     )}
                   </div>
@@ -147,10 +226,16 @@ const ChartsPage = () => {
       </div>
       <div className={commonStyles.sectionMainContent}>
         <div className={commonStyles.tabsTopBlock}>
-          <button className={commonStyles.tabsLeft}>
+          <button
+            className={commonStyles.tabsLeft}
+            onClick={() => scrollTabs("left")}
+          >
             <img src={arrowSvg} alt="arrow-pic" />
           </button>
-          <div className={commonStyles.tabsTopBlockWrapper}>
+          <div
+            className={commonStyles.tabsTopBlockWrapper}
+            ref={tabsContainerRef}
+          >
             <div className={commonStyles.tabsTopWrapper}>
               {foldersTab.map((folder) => (
                 <div
@@ -165,33 +250,58 @@ const ChartsPage = () => {
                   >
                     {folder.name}
                   </span>
-                  <button className={commonStyles.tabsTopDots}>
+                  <button
+                    className={commonStyles.tabsTopDots}
+                    onClick={(e) => handleQueryMenuClick(e, folder.id)}
+                  >
                     <img src={dotsSvg} alt={`query_pic`} />
                   </button>
                 </div>
               ))}
             </div>
           </div>
-          <button className={`${commonStyles.tabsRight}`}>
+          <button
+            className={commonStyles.tabsRight}
+            onClick={() => scrollTabs("right")}
+          >
             <img src={arrowSvg} alt="arrow-pic" />
           </button>
           <div className={commonStyles.chatWrapper}>
             <Chat />
           </div>
         </div>
-
-        {/* Отображаем компонент Query внутри активной вкладки */}
         <div className={commonStyles.queryContent}>
           {foldersTab.map(
             (folder) =>
               activeTab === folder.id && (
                 <div key={folder.id}>
-                  <Query />
+                  <Query
+                    queryText={folder.queryText}
+                    setQueryText={(text) => updateQueryText(folder.id, text)}
+                  />
                 </div>
               )
           )}
         </div>
       </div>
+      {queryMenuVisible && (
+        <div
+          className={commonStyles.menuWrapper}
+          ref={queryMenuRef}
+          style={{
+            position: "fixed",
+            top: `${queryMenuPosition.top}px`,
+            left: `${queryMenuPosition.left}px`,
+            zIndex: 1000
+          }}
+        >
+          <MenuForQuery
+            handleContextMenuClick={(action) =>
+              handleContextMenuClick(action, queryMenuVisible)
+            }
+          />
+        </div>
+      )}
     </div>
   );
 };
