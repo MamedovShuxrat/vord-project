@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import SearchBlock from "../SearchBlock/SearchBlock";
 import queryStyles from "./query.module.scss";
+import DataClean from "../DataClean/DataClean";
 
 const Query = ({ queryText, setQueryText }) => {
   const [localQueryText, setLocalQueryText] = useState(queryText); // State for the SQL query text
@@ -46,6 +47,7 @@ const Query = ({ queryText, setQueryText }) => {
           }}
         />
       </div>
+      <DataClean />
     </div>
   );
 };
