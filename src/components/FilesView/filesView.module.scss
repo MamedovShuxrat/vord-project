@@ -76,3 +76,34 @@
 .selectedItem {
   background-color: #e0d7f9;
 }
+
+.folderHeader,
+.fileHeader {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  justify-content: space-between;
+}
+
+.folderHeader img,
+.fileHeader img {
+  margin-right: 10px;
+}
+
+.folderName,
+.fileName {
+  flex-grow: 1;
+  margin-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabsDots {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+}

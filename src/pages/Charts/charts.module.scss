@@ -52,3 +52,16 @@
   border-radius: 3px;
   box-sizing: border-box;
 }
+
+.folderItem {
+  display: flex;
+  flex-direction: column; /* Вертикальное расположение */
+  margin-left: 20px; /* Отступ для вложенных элементов */
+}
+
+.fileItem {
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between; /* Для выравнивания текста и иконки */
+  width: 100%; /* Занимает всю доступную ширину */
+}

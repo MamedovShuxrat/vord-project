@@ -97,7 +97,7 @@ const FilesPage = () => {
     setContextMenu({
       id,
       visible: true,
-      x: rect.right - 200, // Корректируем положение по оси x, чтобы было левее
+      x: rect.right - 200,
       y: rect.bottom + window.scrollY
     });
   };
@@ -112,11 +112,27 @@ const FilesPage = () => {
     setContextMenu({ id: null, visible: false, x: 0, y: 0 });
   };
 
+  const addNewTab = (name = "Untitled") => {
+    const newTab = {
+      id: uuid(),
+      name,
+      icon: folderIcon,
+      isOpen: true,
+      subfolders: []
+    };
+    setFoldersTab((prevTabs) => [...prevTabs, newTab]);
+    setActiveTabs(newTab.id);
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
         <div className={commonStyles.searchBlock}>
-          <SearchBlock onSearch={handleSearch} placeholder="Search Files" />
+          <SearchBlock
+            onSearch={handleSearch}
+            placeholder="Search Files"
+            addNewTab={addNewTab}
+          />
           <div className={commonStyles.tabsWrapper}>
             <FileView
               foldersTab={foldersTab}

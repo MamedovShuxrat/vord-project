@@ -245,16 +245,11 @@
   margin-left: auto;
 }
 
-.folderItems {
+.fileItem {
+  margin-top: 5px;
   display: flex;
-  flex-direction: column;
-  padding: 10px;
-}
-
-.folderItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .FolderArrowRight {
@@ -267,4 +262,39 @@
   top: 100%;
   left: calc(100% - 150px);
   z-index: 1000;
+}
+
+.folderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.folderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.folderInfo {
+  display: flex;
+  align-items: center;
+}
+
+.folderInfo img {
+  margin-right: 10px;
+}
+
+.tabsDots {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.folderSubItems {
+  padding-left: 20px;
 }

@@ -234,7 +234,7 @@ const FileView = ({
                 alt="arrow-down"
               />
               <img src={subfolder.icon} alt="folder" />
-              <span>{subfolder.name}</span>
+              <span className={styles.folderName}>{subfolder.name}</span>
               <button
                 className={styles.tabsDots}
                 onClick={(e) => handleContextMenu(e, subfolder.id, "folder")}
@@ -273,7 +273,7 @@ const FileView = ({
                   autoFocus
                 />
               ) : (
-                <span>{file.name}</span>
+                <span className={styles.fileName}>{file.name}</span>
               )}
               <button
                 className={styles.tabsDots}
@@ -298,7 +298,6 @@ const FileView = ({
                 selectedItem === folder.id ? styles.selectedItem : ""
               }`}
               onClick={() => handleItemClick(folder.id, folder.name, "folder")}
-              style={{ paddingLeft: "0px" }}
             >
               <img
                 onClick={() =>
@@ -314,7 +313,7 @@ const FileView = ({
                 alt="arrow-down"
               />
               <img src={folder.icon} alt="folder" />
-              <span>{folder.name}</span>
+              <span className={styles.folderName}>{folder.name}</span>
               <button
                 className={styles.tabsDots}
                 onClick={(e) => handleContextMenu(e, folder.id, "folder")}
