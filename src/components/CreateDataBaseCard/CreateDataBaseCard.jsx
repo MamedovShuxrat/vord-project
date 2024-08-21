@@ -4,6 +4,7 @@ import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { resetForm } from "../utils/formUtils";
 const DATABASETYPE = [
   {
     "id": 1,
@@ -51,7 +52,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [dbType, setDbType] = useState(formData.dbType || "");
   const [driver, setDriver] = useState(formData.driver || "");
-
+  const [isFormValid, setIsFormValid] = useState(false);
   const [connectionMethod, setConnectionMethod] = useState("")
 
 
@@ -60,6 +61,20 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     setLocalFormData(formData);
     setDbType(formData.dbType || "");
   }, [formData]);
+
+  useEffect(() => {
+    const checkFormValidity = () => {
+      const isValid =
+        localFormData.user &&
+        localFormData.password &&
+        localFormData.dbName &&
+        (dbType === "MSSQL" ? localFormData.url : true) &&
+        (localFormData.host ? localFormData.port : true);
+      setIsFormValid(isValid);
+    };
+
+    checkFormValidity();
+  }, [localFormData, dbType]);
 
   const handleConnectionChange = (e) => {
     setConnectionMethod(e.target.value)
@@ -85,6 +100,8 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     setDriver(value);
     handleChange(e);
   };
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -102,6 +119,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     };
     console.log(formDataToSend);
     onSubmit(formDataToSend);
+    resetForm(setLocalFormData, setDbType, setDriver, onFormDataChange)
   };
 
   return (
@@ -237,6 +255,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
         <button
           type="submit"
           className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
+          disabled={!isFormValid}
         >
           Connect
         </button>

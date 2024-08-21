@@ -17,7 +17,8 @@ import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
-const connection = `${API_URL}/connection/`;
+const CONNECTION = `${API_URL}/clientdb/`;
+
 
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
@@ -172,7 +173,7 @@ const ConnectionsPage = () => {
     try {
       const response = await toast.promise(
         axios.post(
-          API_URL, formData,
+          CONNECTION, formData,
           {
             headers: {
               Authorization: `Token ${token}`,
