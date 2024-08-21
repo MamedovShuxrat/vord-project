@@ -280,7 +280,7 @@ CreateDataBaseCard.propTypes = {
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  isConnected: PropTypes.bool.isRequired // Новый проп для состояния соединения
+  isConnected: PropTypes.bool.isRequired
 };
 
 export default CreateDataBaseCard;

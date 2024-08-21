@@ -41,7 +41,7 @@ const ConnectionsPage = () => {
 
   const [activeTab, setActiveTab] = useState(null);
   const [dotsChange, setDotsChange] = useState({});
-  const [isConnected, setIsConnected] = useState(false); // Для переключения кнопки
+  const [isConnected, setIsConnected] = useState(false);
 
   const handleDotsChange = (id) => {
     const updatedDotsChange = {};
@@ -106,7 +106,7 @@ const ConnectionsPage = () => {
       formData: {}
     };
     dispatch(addConnection(newTab));
-    setIsConnected(false); // Устанавливаем, что соединение еще не произошло
+    setIsConnected(false);
   };
 
   const activeItemRef = useRef(null);
@@ -144,7 +144,7 @@ const ConnectionsPage = () => {
           error: "Error saving data:. Please try again."
         }
       );
-      setIsConnected(true); // Устанавливаем, что соединение произошло успешно
+      setIsConnected(true);
     } catch (error) {
       console.error("Error saving data:", error);
       setIsConnected(false);
@@ -264,7 +264,7 @@ const ConnectionsPage = () => {
               handleFormDataChange(activeTab, newFormData)
             }
             onSubmit={handleSubmit}
-            isConnected={isConnected} // Передаем состояние соединения
+            isConnected={isConnected}
           />
         )}
       </div>
