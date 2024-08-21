@@ -1,44 +1,59 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { connectClientDB } from "../../api";
-import { toast } from "react-hot-toast";
-
-export const connectDatabase = createAsyncThunk(
-  "connections/connect",
-  async (connectionData, { getState, rejectWithValue }) => {
-    const { token } = getState().user; // Получаем токен из состояния user
-    try {
-      const data = await connectClientDB(connectionData, token);
-      toast.success("Connection successful");
-      return data;
-    } catch (error) {
-      toast.error("Connection failed");
-      return rejectWithValue(error.message || "Connection failed");
-    }
-  }
-);
+import { createSlice } from "@reduxjs/toolkit";
 
 const connectionsSlice = createSlice({
   name: "connections",
   initialState: {
-    connections: [],
-    status: "idle",
-    error: null
+    connections: JSON.parse(localStorage.getItem("connections")) || [
+      {
+        id: "untitled",
+        img: "dataBaseBlackSvg",
+        MySQL: "Untitled",
+        w: "20px",
+        h: "20px",
+        formData: {} // Состояние для CreateDataBaseCard
+      }
+    ]
   },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(connectDatabase.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(connectDatabase.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.connections.push(action.payload);
-      })
-      .addCase(connectDatabase.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      });
+  reducers: {
+    addConnection: (state, action) => {
+      state.connections.push(action.payload);
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+    },
+    updateConnection: (state, action) => {
+      const { id, formData } = action.payload;
+      const connection = state.connections.find((conn) => conn.id === id);
+      if (connection) {
+        connection.formData = formData;
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+      }
+    },
+    renameConnection: (state, action) => {
+      const { id, newName } = action.payload;
+      const connection = state.connections.find((conn) => conn.id === id);
+      if (connection) {
+        connection.MySQL = newName;
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+      }
+    },
+    deleteConnection: (state, action) => {
+      state.connections = state.connections.filter(
+        (connection) => connection.id !== action.payload
+      );
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+    },
+    setConnections: (state, action) => {
+      state.connections = action.payload;
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+    }
   }
 });
+
+export const {
+  addConnection,
+  updateConnection,
+  renameConnection,
+  deleteConnection,
+  setConnections
+} = connectionsSlice.actions;
 
 export default connectionsSlice.reducer;

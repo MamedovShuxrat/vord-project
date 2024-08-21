@@ -1,6 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
+import axios from "axios";
+import {
+  addConnection,
+  updateConnection,
+  renameConnection,
+  deleteConnection,
+  setConnections
+} from "../../core/store/connectionsSlice";
 import useSearch from "../../components/utils/useSearch";
 import toast from "react-hot-toast";
 
@@ -19,53 +27,21 @@ import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
 const CONNECTION = `${API_URL}/clientdb/`;
 
-
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
-  const [connectionTabs, setConnectionTabs] = useState([
-    {
-      id: "magazine1",
-      img: dataBaseRedSvg,
-      MySQL: "Magazine",
-      w: "20px",
-      h: "20px",
-      formData: {} // Состояние для CreateDataBaseCard
-    },
-    {
-      id: "home2",
-      img: dataBaseGreenSvg,
-      MySQL: "Home",
-      w: "20px",
-      h: "20px",
-      formData: {} // Состояние для CreateDataBaseCard
-    },
-    {
-      id: "untilted3",
-      img: dataBaseBlackSvg,
-      MySQL: "Untilted",
-      w: "20px",
-      h: "20px",
-      formData: {} // Состояние для CreateDataBaseCard
-    }
-  ]);
-
+  const connections = useSelector((state) => state.connections.connections);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (connectionTabs !== null) {
-      localStorage.setItem("connectionTabs", JSON.stringify(connectionTabs));
+    const storedConnections = JSON.parse(localStorage.getItem("connections"));
+    if (storedConnections) {
+      dispatch(setConnections(storedConnections));
     }
-  }, [connectionTabs]);
+  }, [dispatch]);
 
-  useEffect(() => {
-    const storedConnectionTabs = localStorage.getItem("connectionTabs");
-    if (storedConnectionTabs) {
-      setConnectionTabs(JSON.parse(storedConnectionTabs));
-    }
-  }, []);
-
-  const [activeTab, setActiveTabs] = useState(null);
+  const [activeTab, setActiveTab] = useState(null);
   const [dotsChange, setDotsChange] = useState({});
-  console.log(connectionTabs);
+  const [isConnected, setIsConnected] = useState(false); // Для переключения кнопки
 
   const handleDotsChange = (id) => {
     const updatedDotsChange = {};
@@ -77,58 +53,46 @@ const ConnectionsPage = () => {
   };
 
   const handleRenameSQLTabs = (itemId) => {
-    const itemToUpdate = connectionTabs.find((item) => item.id === itemId);
-    if (itemToUpdate) {
-      itemToUpdate.MySQL = prompt("Enter the name of the new MySQL");
-      setConnectionTabs([...connectionTabs]);
+    const newName = prompt("Enter the name of the new MySQL");
+    if (newName) {
+      dispatch(renameConnection({ id: itemId, newName }));
     }
   };
 
   const handleDeleteTabs = (itemId) => {
-    const updatedTabs = connectionTabs.filter((item) => item.id !== itemId);
-    setConnectionTabs(updatedTabs);
+    dispatch(deleteConnection(itemId));
     toast("MySQL is deleted!", { icon: "🚨" });
   };
 
   const handleLeftButtonClick = () => {
-    const currentIndex = connectionTabs.findIndex(
-      (item) => item.id === activeTab
-    );
+    const currentIndex = connections.findIndex((item) => item.id === activeTab);
     const newIndex =
-      (currentIndex - 1 + connectionTabs.length) % connectionTabs.length;
-    const newActiveTabId = connectionTabs[newIndex].id;
-    setActiveTabs(newActiveTabId);
+      (currentIndex - 1 + connections.length) % connections.length;
+    setActiveTab(connections[newIndex].id);
   };
 
   const handleRightButtonClick = () => {
-    const currentIndex = connectionTabs.findIndex(
-      (item) => item.id === activeTab
-    );
-    const newIndex = (currentIndex + 1) % connectionTabs.length;
-    const newActiveTabId = connectionTabs[newIndex].id;
-    setActiveTabs(newActiveTabId);
+    const currentIndex = connections.findIndex((item) => item.id === activeTab);
+    const newIndex = (currentIndex + 1) % connections.length;
+    setActiveTab(connections[newIndex].id);
   };
 
   const onSelectTabsItem = (id) => {
-    setActiveTabs(id);
+    setActiveTab(id);
   };
 
   const renderImageOrIcon = (item) => {
     const isSvg = item.img.includes(".svg");
-    if (isSvg) {
-      return (
-        <img
-          width={item.w}
-          height={item.h}
-          src={item.img}
-          alt={`${item.MySQL}_pic`}
-        />
-      );
-    } else {
-      return (
-        <RandomColorIcon color={item.img} width={item.w} height={item.h} />
-      );
-    }
+    return isSvg ? (
+      <img
+        width={item.w}
+        height={item.h}
+        src={item.img}
+        alt={`${item.MySQL}_pic`}
+      />
+    ) : (
+      <RandomColorIcon color={item.img} width={item.w} height={item.h} />
+    );
   };
 
   const addNewSQLTab = (newMySQLValue) => {
@@ -139,9 +103,10 @@ const ConnectionsPage = () => {
       MySQL: newMySQLValue,
       w: "20px",
       h: "20px",
-      formData: {} // Состояние для CreateDataBaseCard
+      formData: {}
     };
-    setConnectionTabs([...connectionTabs, newTab]);
+    dispatch(addConnection(newTab));
+    setIsConnected(false); // Устанавливаем, что соединение еще не произошло
   };
 
   const activeItemRef = useRef(null);
@@ -157,11 +122,7 @@ const ConnectionsPage = () => {
   }, [activeTab]);
 
   const handleFormDataChange = (id, newFormData) => {
-    console.log(`Updating tab ${id} with new formData:`, newFormData);
-    const updatedTabs = connectionTabs.map((item) =>
-      item.id === id ? { ...item, formData: newFormData } : item
-    );
-    setConnectionTabs(updatedTabs);
+    dispatch(updateConnection({ id, formData: newFormData }));
   };
 
   const handleSearch = (term) => {
@@ -172,21 +133,21 @@ const ConnectionsPage = () => {
     const token = JSON.parse(localStorage.getItem("userToken"));
     try {
       const response = await toast.promise(
-        axios.post(
-          CONNECTION, formData,
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
+        axios.post(CONNECTION, formData, {
+          headers: {
+            Authorization: `Token ${token}`
           }
-        ),
+        }),
         {
           loading: "Sending Data...",
           success: "Data saved successfully!",
-          error: "Error saving data:. Please try again.",
-        })
+          error: "Error saving data:. Please try again."
+        }
+      );
+      setIsConnected(true); // Устанавливаем, что соединение произошло успешно
     } catch (error) {
       console.error("Error saving data:", error);
+      setIsConnected(false);
     }
   };
 
@@ -200,7 +161,7 @@ const ConnectionsPage = () => {
             addNewTab={addNewSQLTab}
           />
           <div className={commonStyles.tabsWrapper}>
-            {connectionTabs
+            {connections
               .filter((item) =>
                 item.MySQL.toLowerCase().includes(searchTerm.toLowerCase())
               )
@@ -208,7 +169,9 @@ const ConnectionsPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsItem} ${activeTab === item.id ? commonStyles.active : ""}`}
+                  className={`${commonStyles.tabsItem} ${
+                    activeTab === item.id ? commonStyles.active : ""
+                  }`}
                 >
                   {renderImageOrIcon(item)}
                   <span className={commonStyles.tabsName}>
@@ -259,11 +222,13 @@ const ConnectionsPage = () => {
           </button>
           <div className={commonStyles.tabsTopBlockWrapper}>
             <div className={commonStyles.tabsTopWrapper}>
-              {connectionTabs.map((item) => (
+              {connections.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsTopItem} ${activeTab === item.id ? commonStyles.active : ""}`}
+                  className={`${commonStyles.tabsTopItem} ${
+                    activeTab === item.id ? commonStyles.active : ""
+                  }`}
                   ref={activeTab === item.id ? activeItemRef : null}
                 >
                   <span
@@ -291,13 +256,15 @@ const ConnectionsPage = () => {
         {activeTab && (
           <CreateDataBaseCard
             formData={{
-              ...connectionTabs.find((tab) => tab.id === activeTab).formData,
-              connectionName: connectionTabs.find((tab) => tab.id === activeTab).MySQL
+              ...connections.find((tab) => tab.id === activeTab).formData,
+              connectionName: connections.find((tab) => tab.id === activeTab)
+                .MySQL
             }}
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)
             }
             onSubmit={handleSubmit}
+            isConnected={isConnected} // Передаем состояние соединения
           />
         )}
       </div>
