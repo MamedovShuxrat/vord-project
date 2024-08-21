@@ -51,7 +51,8 @@ const CreateDataBaseCard = ({
   formData,
   onFormDataChange,
   onSubmit,
-  isConnected
+  isConnected,
+  setIsConnected
 }) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [dbType, setDbType] = useState(formData.dbType || "");
@@ -60,8 +61,10 @@ const CreateDataBaseCard = ({
   const [connectionMethod, setConnectionMethod] = useState("");
 
   useEffect(() => {
+    console.log("Received formData: ", formData); // Лог для проверки
     setLocalFormData(formData);
     setDbType(formData.dbType || "");
+    setDriver(formData.driver || "");
   }, [formData]);
 
   useEffect(() => {
@@ -86,6 +89,7 @@ const CreateDataBaseCard = ({
     const { name, value } = e.target;
     const updatedFormData = { ...localFormData, [name]: value };
     setLocalFormData(updatedFormData);
+    console.log("Updated Form Data: ", updatedFormData); // Лог для проверки
     onFormDataChange(updatedFormData);
   };
 
@@ -114,12 +118,17 @@ const CreateDataBaseCard = ({
       port: port,
       data_base_type: dbType,
       data_base_name: localFormData.dbName,
-      description: localFormData.description
+      description: localFormData.description,
+      driver: localFormData.driver
     };
+
+    console.log("Form Data to Send: ", formDataToSend); // Лог для проверки
 
     onSubmit(formDataToSend);
 
-    if (!isConnected) {
+    if (isConnected) {
+      setIsConnected(true);
+    } else {
       resetForm(setLocalFormData, setDbType, setDriver, onFormDataChange);
     }
   };
@@ -280,7 +289,8 @@ CreateDataBaseCard.propTypes = {
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  isConnected: PropTypes.bool.isRequired
+  isConnected: PropTypes.bool.isRequired,
+  setIsConnected: PropTypes.bool.isRequired
 };
 
 export default CreateDataBaseCard;
