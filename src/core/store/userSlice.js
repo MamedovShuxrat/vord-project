@@ -49,6 +49,7 @@ export const performLogout = createAsyncThunk(
       await logoutUser(token);
       localStorage.removeItem("userData");
       localStorage.removeItem("userToken");
+      localStorage.removeItem("connections");
       return null;
     } catch (error) {
       toast.error("Logout failed");
