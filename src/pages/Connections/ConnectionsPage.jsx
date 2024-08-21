@@ -37,6 +37,7 @@ const ConnectionsPage = () => {
     if (storedConnections) {
       dispatch(setConnections(storedConnections));
     }
+    console.log("Loaded connections from localStorage: ", storedConnections); // Лог здесь
   }, [dispatch]);
 
   const [activeTab, setActiveTab] = useState(null);
@@ -122,6 +123,7 @@ const ConnectionsPage = () => {
   }, [activeTab]);
 
   const handleFormDataChange = (id, newFormData) => {
+    console.log("Handling Form Data Change: ", newFormData); // Лог для проверки
     dispatch(updateConnection({ id, formData: newFormData }));
   };
 
@@ -141,10 +143,17 @@ const ConnectionsPage = () => {
         {
           loading: "Sending Data...",
           success: "Data saved successfully!",
-          error: "Error saving data:. Please try again."
+          error: "Error saving data. Please try again."
         }
       );
+
       setIsConnected(true);
+
+      const updatedFormData = {
+        ...formData,
+        connectionName: formData.connection_name
+      };
+      dispatch(updateConnection({ id: activeTab, formData: updatedFormData }));
     } catch (error) {
       console.error("Error saving data:", error);
       setIsConnected(false);
@@ -265,6 +274,7 @@ const ConnectionsPage = () => {
             }
             onSubmit={handleSubmit}
             isConnected={isConnected}
+            setIsConnected={setIsConnected}
           />
         )}
       </div>
