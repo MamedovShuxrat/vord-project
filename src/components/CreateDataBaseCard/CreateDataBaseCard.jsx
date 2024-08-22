@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { resetForm } from "../utils/formUtils";
+import { resetForm, handleFormButtonClick } from "../utils/formUtils";
 const DATABASETYPE = [
   {
     "id": 1,
@@ -57,7 +55,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
 
 
   useEffect(() => {
-    console.log("CreateDataBaseCard rendered with formData:", formData);
     setLocalFormData(formData);
     setDbType(formData.dbType || "");
   }, [formData]);
@@ -84,7 +81,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     const { name, value } = e.target;
     const updatedFormData = { ...localFormData, [name]: value };
     setLocalFormData(updatedFormData);
-    console.log(`handleChange called with name: ${name}, value: ${value}`);
     onFormDataChange(updatedFormData);
   };
 
@@ -104,7 +100,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const port = localFormData.port ? parseInt(localFormData.port, 10) : null;
     const formDataToSend = {
       connection_name: formData.connectionName,
@@ -117,7 +112,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
       data_base_name: localFormData.dbName,
       description: localFormData.description,
     };
-    console.log(formDataToSend);
     onSubmit(formDataToSend);
     resetForm(setLocalFormData, setDbType, setDriver, onFormDataChange)
   };
@@ -255,7 +249,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
         <button
           type="submit"
           className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
-          disabled={!isFormValid}
+          onClick={() => handleFormButtonClick(isFormValid)}
         >
           Connect
         </button>

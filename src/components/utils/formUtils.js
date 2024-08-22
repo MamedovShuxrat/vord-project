@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 export const resetForm = (setLocalFormData, setDbType, setDriver, onFormDataChange) => {
     setLocalFormData({
         user: "",
@@ -13,4 +15,10 @@ export const resetForm = (setLocalFormData, setDbType, setDriver, onFormDataChan
     setDbType("");
     setDriver("");
     onFormDataChange({});
+};
+
+export const handleFormButtonClick = (isFormValid) => {
+    if (!isFormValid) {
+        toast.error("Please fill in all required fields!");
+    }
 };
