@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
-import { resetForm } from "../utils/formUtils";
+import { resetForm, handleFormButtonClick } from "../utils/formUtils";
 
 const DATABASETYPE = [
   {

@@ -1,31 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
-import axios from "axios";
-import {
-  addConnection,
-  updateConnection,
-  renameConnection,
-  deleteConnection,
-  setConnections
-} from "../../core/store/connectionsSlice";
+import { addConnection, updateConnection, setConnections, submitFormData } from "../../core/store/connectionsSlice";
+import { useDotsMenu } from "../../components/utils/useDotsMenu";
+import useTabNavigation from "../../components/utils/useTabNavigation";
+import { renderImageOrIcon } from "../../components/utils/renderImageOrIcon";
 import useSearch from "../../components/utils/useSearch";
-import toast from "react-hot-toast";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/Chat";
 import CreateDataBaseCard from "../../components/CreateDataBaseCard/CreateDataBaseCard";
-import RandomColorIcon from "../../components/ui/CreateDynamicSvgIcon/RandomColorIcon";
 
-import dataBaseRedSvg from "../../assets/images/icons/connection/database-red.svg";
-import dataBaseGreenSvg from "../../assets/images/icons/connection/database-green.svg";
-import dataBaseBlackSvg from "../../assets/images/icons/connection/database-black.svg";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
-
-const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
-const CONNECTION = `${API_URL}/clientdb/`;
 
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
@@ -41,59 +29,18 @@ const ConnectionsPage = () => {
   }, [dispatch]);
 
   const [activeTab, setActiveTab] = useState(null);
-  const [dotsChange, setDotsChange] = useState({});
   const [isConnected, setIsConnected] = useState(false);
 
-  const handleDotsChange = (id) => {
-    const updatedDotsChange = {};
-    Object.keys(dotsChange).forEach((key) => {
-      updatedDotsChange[key] = false;
-    });
-    updatedDotsChange[id] = !dotsChange[id];
-    setDotsChange(updatedDotsChange);
-  };
+  const { dotsChange, handleRenameSQLTabs, handleDeleteTabs, handleDotsChange, wrapperRef, } = useDotsMenu()
 
-  const handleRenameSQLTabs = (itemId) => {
-    const newName = prompt("Enter the name of the new MySQL");
-    if (newName) {
-      dispatch(renameConnection({ id: itemId, newName }));
-    }
-  };
-
-  const handleDeleteTabs = (itemId) => {
-    dispatch(deleteConnection(itemId));
-    toast("MySQL is deleted!", { icon: "🚨" });
-  };
-
-  const handleLeftButtonClick = () => {
-    const currentIndex = connections.findIndex((item) => item.id === activeTab);
-    const newIndex =
-      (currentIndex - 1 + connections.length) % connections.length;
-    setActiveTab(connections[newIndex].id);
-  };
-
-  const handleRightButtonClick = () => {
-    const currentIndex = connections.findIndex((item) => item.id === activeTab);
-    const newIndex = (currentIndex + 1) % connections.length;
-    setActiveTab(connections[newIndex].id);
-  };
+  const { handleLeftButtonClick, handleRightButtonClick } = useTabNavigation(
+    connections,
+    activeTab,
+    setActiveTab
+  );
 
   const onSelectTabsItem = (id) => {
     setActiveTab(id);
-  };
-
-  const renderImageOrIcon = (item) => {
-    const isSvg = item.img.includes(".svg");
-    return isSvg ? (
-      <img
-        width={item.w}
-        height={item.h}
-        src={item.img}
-        alt={`${item.MySQL}_pic`}
-      />
-    ) : (
-      <RandomColorIcon color={item.img} width={item.w} height={item.h} />
-    );
   };
 
   const addNewSQLTab = (newMySQLValue) => {
@@ -132,32 +79,7 @@ const ConnectionsPage = () => {
   };
 
   const handleSubmit = async (formData) => {
-    const token = JSON.parse(localStorage.getItem("userToken"));
-    try {
-      const response = await toast.promise(
-        axios.post(CONNECTION, formData, {
-          headers: {
-            Authorization: `Token ${token}`
-          }
-        }),
-        {
-          loading: "Sending Data...",
-          success: "Data saved successfully!",
-          error: "Error saving data. Please try again."
-        }
-      );
-
-      setIsConnected(true);
-
-      const updatedFormData = {
-        ...formData,
-        connectionName: formData.connection_name
-      };
-      dispatch(updateConnection({ id: activeTab, formData: updatedFormData }));
-    } catch (error) {
-      console.error("Error saving data:", error);
-      setIsConnected(false);
-    }
+    await dispatch(submitFormData({ formData, activeTab }));
   };
 
   return (
@@ -170,6 +92,7 @@ const ConnectionsPage = () => {
             addNewTab={addNewSQLTab}
           />
           <div className={commonStyles.tabsWrapper}>
+
             {connections
               .filter((item) =>
                 item.MySQL.toLowerCase().includes(searchTerm.toLowerCase())
@@ -178,9 +101,8 @@ const ConnectionsPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsItem} ${
-                    activeTab === item.id ? commonStyles.active : ""
-                  }`}
+                  className={`${commonStyles.tabsItem} ${activeTab === item.id ? commonStyles.active : ""
+                    }`}
                 >
                   {renderImageOrIcon(item)}
                   <span className={commonStyles.tabsName}>
@@ -200,7 +122,7 @@ const ConnectionsPage = () => {
                       alt={`${item.MySQL}_pic`}
                     />
                     {dotsChange[item.id] && (
-                      <div className={commonStyles.dotsChangeWrapper}>
+                      <div ref={wrapperRef} className={commonStyles.dotsChangeWrapper}>
                         <span
                           onClick={() => handleRenameSQLTabs(item.id)}
                           className={commonStyles.dotsChangeRename}
@@ -235,9 +157,8 @@ const ConnectionsPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsTopItem} ${
-                    activeTab === item.id ? commonStyles.active : ""
-                  }`}
+                  className={`${commonStyles.tabsTopItem} ${activeTab === item.id ? commonStyles.active : ""
+                    }`}
                   ref={activeTab === item.id ? activeItemRef : null}
                 >
                   <span
@@ -262,12 +183,11 @@ const ConnectionsPage = () => {
             <Chat />
           </div>
         </div>
-        {activeTab && (
+        {activeTab && connections.find((tab) => tab.id === activeTab) && (
           <CreateDataBaseCard
             formData={{
               ...connections.find((tab) => tab.id === activeTab).formData,
-              connectionName: connections.find((tab) => tab.id === activeTab)
-                .MySQL
+              connectionName: connections.find((tab) => tab.id === activeTab).MySQL
             }}
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)

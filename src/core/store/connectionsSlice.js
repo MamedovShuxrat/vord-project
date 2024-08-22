@@ -1,39 +1,61 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
-// const connectionsSlice = createSlice({
-//   name: "connections",
-//   initialState: {
-//     connections: [],
-//     status: "idle",
-//     error: null
-//   },
-//   reducers: {},
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(connectDatabase.pending, (state) => {
-//         state.status = "loading";
-//       })
-//       .addCase(connectDatabase.fulfilled, (state, action) => {
-//         state.status = "succeeded";
-//         state.connections.push(action.payload);
-//       })
-//       .addCase(connectDatabase.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.payload;
-//       });
-//   }
-// });
+import dataBaseBlackSvg from "../../assets/images/icons/connection/database-black.svg";
 
-// export default connectionsSlice.reducer;
+const API_URL = process.env.REACT_APP_API_URL;
+const CONNECTION = `${API_URL}/clientdb/`;
 
+const token = JSON.parse(localStorage.getItem("userToken"));
+
+const sendFormData = async (formData, token) => {
+  try {
+    const response = await axios.post(CONNECTION, formData, {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const submitFormData = createAsyncThunk(
+  "connectionTabs/submitFormData",
+  async ({ formData, activeTab }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await toast.promise(
+        sendFormData(formData, token),
+        {
+          loading: "Sending Data...",
+          success: "Data saved successfully!",
+          error: "Error saving data. Please try again."
+        }
+      );
+
+      const updatedFormData = {
+        ...formData,
+        connectionName: formData.connection_name
+      };
+
+      dispatch(updateConnection({ id: activeTab, formData: updatedFormData }));
+      return response;
+    } catch (error) {
+      console.error("Error saving data:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const connectionTabsSlice = createSlice({
-  name: 'connectionTabs',
+  name: "connectionTabs",
   initialState: {
     connections: JSON.parse(localStorage.getItem("connections")) || [
       {
         id: "untitled",
-        img: "dataBaseBlackSvg",
+        img: dataBaseBlackSvg,
         MySQL: "Untitled",
         w: "20px",
         h: "20px",
@@ -67,6 +89,7 @@ const connectionTabsSlice = createSlice({
         (connection) => connection.id !== action.payload
       );
       localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+
     },
     setConnections: (state, action) => {
       state.connections = action.payload;
@@ -81,6 +104,6 @@ export const {
   renameConnection,
   deleteConnection,
   setConnections
-} = connectionsSlice.actions;
+} = connectionTabsSlice.actions;
 
-export default connectionsSlice.reducer;
+export default connectionTabsSlice.reducer;
