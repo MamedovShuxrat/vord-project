@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./feedback.module.scss";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import FeedbackForm from "../../components/FeedbackForm/FeedbackForm";
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import FileView from "../../components/FilesView/FilesView";
 import MenuForView from "../../components/FilesView/menu/MenuForView";
 

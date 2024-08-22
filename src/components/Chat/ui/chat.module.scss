@@ -137,6 +137,38 @@
   column-gap: 5px;
 }
 
+.chatTabs {
+  padding: 10px;
+  .chatTab {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    &:hover {
+      background-color: #f0f0f0;
+    }
+    &.activeTab {
+      background-color: #d8e3f0;
+    }
+  }
+}
+
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  .chatNameWrapper {
+    cursor: pointer;
+  }
+  .chatNotifyWrapper {
+    display: flex;
+    align-items: center;
+    img {
+      margin-right: 5px;
+    }
+  }
+}
+
 button {
   background: none;
   border: none;

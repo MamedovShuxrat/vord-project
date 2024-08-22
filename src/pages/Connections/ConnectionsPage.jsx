@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import CreateDataBaseCard from "../../components/CreateDataBaseCard/CreateDataBaseCard";
 import RandomColorIcon from "../../components/ui/CreateDynamicSvgIcon/RandomColorIcon";
 

@@ -2,13 +2,13 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 // Устанавливаем URL API
-const API_URL = process.env.REACT_APP_API_URL || "http://vardserver:8000/api";
+const API_URL = process.env.REACT_APP_API_URL
 
 // Определяем эндпоинты для авторизации
-const authRegister = `${API_URL}/register/`;
-const authLogin = `${API_URL}/login/`;
-const getUserInfo = `${API_URL}/user/`;
-const authLogout = `${API_URL}/logout/`;
+const authRegister = `${API_URL}/authregister/`;
+const authLogin = `${API_URL}/auth/login/`;
+const getUserInfo = `${API_URL}/auth/user/`;
+const authLogout = `${API_URL}/auth/logout/`;
 
 // Регистрация пользователя
 export const registerUser = async (name, email, password, confirmPassword) => {

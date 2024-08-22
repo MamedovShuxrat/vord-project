@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
