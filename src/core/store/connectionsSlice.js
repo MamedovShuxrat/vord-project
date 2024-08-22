@@ -1,24 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { connectClientDB } from "../../api";
-import { toast } from "react-hot-toast";
-
-import { v4 as uuid } from "uuid";
-
-
-export const connectDatabase = createAsyncThunk(
-  "connections/connect",
-  async (connectionData, { getState, rejectWithValue }) => {
-    const { token } = getState().user; // Получаем токен из состояния user
-    try {
-      const data = await connectClientDB(connectionData, token);
-      toast.success("Connection successful");
-      return data;
-    } catch (error) {
-      toast.error("Connection failed");
-      return rejectWithValue(error.message || "Connection failed");
-    }
-  }
-);
+import { createSlice } from "@reduxjs/toolkit";
 
 // const connectionsSlice = createSlice({
 //   name: "connections",
@@ -50,61 +30,57 @@ export const connectDatabase = createAsyncThunk(
 const connectionTabsSlice = createSlice({
   name: 'connectionTabs',
   initialState: {
-    tabs: [
+    connections: JSON.parse(localStorage.getItem("connections")) || [
       {
-        id: uuid(),
-        img: randomColor,
-        MySQL: '',
+        id: "untitled",
+        img: "dataBaseBlackSvg",
+        MySQL: "Untitled",
         w: "20px",
         h: "20px",
-        formData: {}
+        formData: {} // Состояние для CreateDataBaseCard
       }
-    ],
-    status: 'idle',
-    error: null
+    ]
   },
   reducers: {
-    addTab: (state, action) => {
-      state.tabs.push(action.payload);
+    addConnection: (state, action) => {
+      state.connections.push(action.payload);
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
     },
-    updateTab: (state, action) => {
-      const { id, updatedData } = action.payload;
-      const index = state.tabs.findIndex(tab => tab.id === id);
-      if (index !== -1) {
-        state.tabs[index] = { ...state.tabs[index], ...updatedData };
+    updateConnection: (state, action) => {
+      const { id, formData } = action.payload;
+      const connection = state.connections.find((conn) => conn.id === id);
+      if (connection) {
+        connection.formData = formData;
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
       }
     },
-    removeTab: (state, action) => {
-      state.tabs = state.tabs.filter(tab => tab.id !== action.payload);
+    renameConnection: (state, action) => {
+      const { id, newName } = action.payload;
+      const connection = state.connections.find((conn) => conn.id === id);
+      if (connection) {
+        connection.MySQL = newName;
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+      }
+    },
+    deleteConnection: (state, action) => {
+      state.connections = state.connections.filter(
+        (connection) => connection.id !== action.payload
+      );
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+    },
+    setConnections: (state, action) => {
+      state.connections = action.payload;
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
     }
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchTabs.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchTabs.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.tabs = action.payload;
-      })
-      .addCase(fetchTabs.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      .addCase(saveTabs.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(saveTabs.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.tabs = action.payload;
-      })
-      .addCase(saveTabs.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      });
   }
 });
 
-export const { addTab, updateTab, removeTab } = connectionTabsSlice.actions;
+export const {
+  addConnection,
+  updateConnection,
+  renameConnection,
+  deleteConnection,
+  setConnections
+} = connectionsSlice.actions;
 
-export default connectionTabsSlice.reducer;
+export default connectionsSlice.reducer;

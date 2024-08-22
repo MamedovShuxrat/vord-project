@@ -2,61 +2,69 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./createDataBaseCard.module.scss";
 import SimpleInput from "../ui/Inputs/SimpleInput";
-import { resetForm, handleFormButtonClick } from "../utils/formUtils";
+import { resetForm } from "../utils/formUtils";
+
 const DATABASETYPE = [
   {
-    "id": 1,
-    "name": "MSSQL SQLAlchemy mssql+pyodbc",
-    "is_available": true,
-    "port": 1433,
-    "driver": "mssql+pyodbc",
-    "driver2": "?driver=ODBC+Driver+17+for+SQL+Server"
+    id: 1,
+    name: "MSSQL SQLAlchemy mssql+pyodbc",
+    is_available: true,
+    port: 1433,
+    driver: "mssql+pyodbc",
+    driver2: "?driver=ODBC+Driver+17+for+SQL+Server"
   },
   {
-    "id": 2,
-    "name": "MYSQL SQLAlchemy mysql+pymysql",
-    "is_available": true,
-    "port": 3306,
-    "driver": "mysql+pymysql",
-    "driver2": "?charset=utf8mb4"
+    id: 2,
+    name: "MYSQL SQLAlchemy mysql+pymysql",
+    is_available: true,
+    port: 3306,
+    driver: "mysql+pymysql",
+    driver2: "?charset=utf8mb4"
   },
   {
-    "id": 3,
-    "name": "MARIADB SQLAlchemy mssql+pyodbc",
-    "is_available": true,
-    "port": 3306,
-    "driver": "mysql+pymysql",
-    "driver2": ""
+    id: 3,
+    name: "MARIADB SQLAlchemy mssql+pyodbc",
+    is_available: true,
+    port: 3306,
+    driver: "mysql+pymysql",
+    driver2: ""
   },
   {
-    "id": 4,
-    "name": "POSTGRES SQLAlchemy postgresql+psycopg2",
-    "is_available": true,
-    "port": 5432,
-    "driver": "postgresql+psycopg2",
-    "driver2": ""
+    id: 4,
+    name: "POSTGRES SQLAlchemy postgresql+psycopg2",
+    is_available: true,
+    port: 5432,
+    driver: "postgresql+psycopg2",
+    driver2: ""
   },
   {
-    "id": 5,
-    "name": "MSSQL pyodbc",
-    "is_available": true,
-    "port": 1433,
-    "driver": "",
-    "driver2": ""
-  },
-]
+    id: 5,
+    name: "MSSQL pyodbc",
+    is_available: true,
+    port: 1433,
+    driver: "",
+    driver2: ""
+  }
+];
 
-const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
+const CreateDataBaseCard = ({
+  formData,
+  onFormDataChange,
+  onSubmit,
+  isConnected,
+  setIsConnected
+}) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [dbType, setDbType] = useState(formData.dbType || "");
   const [driver, setDriver] = useState(formData.driver || "");
   const [isFormValid, setIsFormValid] = useState(false);
-  const [connectionMethod, setConnectionMethod] = useState("")
-
+  const [connectionMethod, setConnectionMethod] = useState("");
 
   useEffect(() => {
+    console.log("Received formData: ", formData); // Лог для проверки
     setLocalFormData(formData);
     setDbType(formData.dbType || "");
+    setDriver(formData.driver || "");
   }, [formData]);
 
   useEffect(() => {
@@ -74,13 +82,14 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
   }, [localFormData, dbType]);
 
   const handleConnectionChange = (e) => {
-    setConnectionMethod(e.target.value)
-  }
+    setConnectionMethod(e.target.value);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedFormData = { ...localFormData, [name]: value };
     setLocalFormData(updatedFormData);
+    console.log("Updated Form Data: ", updatedFormData); // Лог для проверки
     onFormDataChange(updatedFormData);
   };
 
@@ -90,13 +99,11 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
     handleChange(e);
   };
 
-
   const handleDriverChange = (e) => {
     const value = e.target.value;
     setDriver(value);
     handleChange(e);
   };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -111,9 +118,18 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
       data_base_type: dbType,
       data_base_name: localFormData.dbName,
       description: localFormData.description,
+      driver: localFormData.driver
     };
+
+    console.log("Form Data to Send: ", formDataToSend); // Лог для проверки
+
     onSubmit(formDataToSend);
-    resetForm(setLocalFormData, setDbType, setDriver, onFormDataChange)
+
+    if (isConnected) {
+      setIsConnected(true);
+    } else {
+      resetForm(setLocalFormData, setDbType, setDriver, onFormDataChange);
+    }
   };
 
   return (
@@ -159,7 +175,6 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           value={localFormData.password || ""}
           className="dataBaseInput"
           onChange={handleChange}
-
         />
         <SimpleInput
           placeholder="Data Base"
@@ -180,14 +195,14 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
             <SimpleInput
               placeholder="Host"
               name="host"
-              value={formData.host || ""}
+              value={localFormData.host || ""}
               className="dataBaseInput"
               onChange={handleChange}
             />
             <SimpleInput
               placeholder="Port"
               name="port"
-              value={formData.port || ""}
+              value={localFormData.port || ""}
               className="dataBaseInput"
               onChange={handleChange}
             />
@@ -206,7 +221,9 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           >
             <option value="">Select Database Type</option>
             {DATABASETYPE.map((item, key) => (
-              <option key={key} value={item.id}>{item.name}</option>
+              <option key={key} value={item.id}>
+                {item.name}
+              </option>
             ))}
           </select>
         </div>
@@ -238,7 +255,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           <SimpleInput
             placeholder="Driver"
             name="driver"
-            value={localFormData.url || ""}
+            value={localFormData.driver || ""}
             className="dataBaseInput"
             onChange={handleChange}
           />
@@ -251,7 +268,7 @@ const CreateDataBaseCard = ({ formData, onFormDataChange, onSubmit }) => {
           className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
           onClick={() => handleFormButtonClick(isFormValid)}
         >
-          Connect
+          {isConnected ? "Update" : "Connect"}
         </button>
       </form>
     </div>
@@ -267,9 +284,12 @@ CreateDataBaseCard.propTypes = {
     description: PropTypes.string,
     host: PropTypes.string,
     url: PropTypes.string,
-    port: PropTypes.number,
+    port: PropTypes.number
   }).isRequired,
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  setIsConnected: PropTypes.bool.isRequired
 };
+
 export default CreateDataBaseCard;
