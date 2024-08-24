@@ -9,7 +9,7 @@ import useSearch from "../../components/utils/useSearch";
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import CreateDataBaseCard from "../../components/CreateDataBaseCard/CreateDataBaseCard";
 
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";

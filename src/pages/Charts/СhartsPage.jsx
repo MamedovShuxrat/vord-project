@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import Query from "../../components/Query/Query";
 import MenuForFileCharts from "./menu/MenuForFileCharts";
 import MenuForQueryCharts from "./menu/MenuForQueryCharts";

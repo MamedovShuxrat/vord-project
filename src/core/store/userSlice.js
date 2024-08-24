@@ -4,7 +4,7 @@ import {
   loginUser,
   fetchUserData,
   logoutUser
-} from "../../api/api";
+} from "src/api/api";
 import { toast } from "react-hot-toast";
 
 export const register = createAsyncThunk(

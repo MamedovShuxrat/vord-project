@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, performLogout } from "../../core/store/userSlice";
+import { logout } from "../../core/store/userSlice";
 import { toast } from "react-hot-toast";
 
 
@@ -29,7 +29,7 @@ const Header = () => {
   }, [user]);
 
   const handleLogout = () => {
-    dispatch(performLogout());
+    dispatch(logout());
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
   };

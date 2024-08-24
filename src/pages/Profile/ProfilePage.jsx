@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ProfilePage.module.scss";
-import Chat from "../../components/Chat/Chat";
+import Chat from "../../components/Chat/ui/Chat";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import { setUser } from "../../core/store/userSlice"
 import profileImg from "../../assets/images/common/illustration.jpg";
