@@ -2,13 +2,13 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 // Устанавливаем URL API
-const API_URL = process.env.REACT_APP_API_URL
+const API_URL = process.env.REACT_APP_API_URL;
 
 // Определяем эндпоинты для авторизации
-const authRegister = `${API_URL}/authregister/`;
-const authLogin = `${API_URL}/auth/login/`;
-const getUserInfo = `${API_URL}/auth/user/`;
-const authLogout = `${API_URL}/auth/logout/`;
+const authRegister = `${API_URL}/api/register/`;
+const authLogin = `${API_URL}/api/login/`;
+const getUserInfo = `${API_URL}/api/user/`;
+const authLogout = `${API_URL}/api/logout/`;
 
 // Регистрация пользователя
 export const registerUser = async (name, email, password, confirmPassword) => {
