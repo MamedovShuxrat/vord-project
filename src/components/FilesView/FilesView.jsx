@@ -93,7 +93,8 @@ const FileView = ({ foldersTab, handleItemClick, removeTab }) => {
 
   const handleDeleteFolder = (id) => {
     dispatch(removeFolder({ folderId: id }));
-    setSelectedItem(null);
+    removeTab(id); // Закрываем вкладку, связанную с удаленной папкой
+    setSelectedItem(null); // Сбрасываем выделение
     toast.success("Папка удалена успешно");
   };
 
