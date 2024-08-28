@@ -1,10 +1,10 @@
 import React from "react";
 import inputStyles from "./inputs.module.scss";
 
-const SimpleInput = ({ placeholder, name, value, className, onChange }) => {
+const SimpleInput = ({ type = "text", placeholder, name, value, className, onChange }) => {
   return (
     <input
-      type="text"
+      type={type}
       className={`${inputStyles[className]}`}
       placeholder={placeholder}
       name={name}

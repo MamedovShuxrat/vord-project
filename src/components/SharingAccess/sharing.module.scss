@@ -28,20 +28,26 @@
 
 .addRoleName {
     position: relative;
+    display: flex;
+    gap: 15px;
 
     span {
         color: rgb(111, 95, 121);
         font-size: 15px;
         font-weight: 400;
         line-height: 140%;
-        margin-right: 12px;
     }
 
     img {
         transition: all .3s ease-in;
         cursor: pointer;
     }
+
+    .selectedRole {
+        color: #57aae4;
+    }
 }
+
 
 .addRoleDndMenu {
     display: flex;
@@ -120,7 +126,7 @@
 }
 
 .userItem {
-    margin: 10px 0;
+    margin: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -22,7 +22,7 @@
     }
 
     // &:invalid {
-    //     border: 2px solid rgb(215, 48, 38);
+    //     border: 1px solid rgb(215, 48, 38);
     //     border-radius: 5px;
     //     background: rgb(255, 255, 255);
     // }
@@ -81,4 +81,19 @@
     &:focus::placeholder {
         transform: translateY(200%);
     }
+}
+
+.invalidInput {
+    color: #d73026;
+
+    &:focus {
+        border: 1px solid #d730266e;
+        border-radius: 5px;
+        background: rgb(255, 255, 255);
+        color: #d73026;
+    }
+}
+
+.validInput {
+    color: rgb(87, 170, 228);
 }
