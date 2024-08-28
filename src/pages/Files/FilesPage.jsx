@@ -1,94 +1,61 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addFolder,
+  setActiveTab,
+  openTab,
+  closeAllTabs,
+  closeTab
+} from "../../core/store/foldersSlice";
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/ui/Chat";
 import FileView from "../../components/FilesView/FilesView";
 import MenuForView from "../../components/FilesView/menu/MenuForView";
-
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
-
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
-import folderIcon from "../../assets/images/icons/common/folder.svg";
 import useSearch from "../../components/utils/useSearch";
+import folderIcon from "../../assets/images/icons/common/folder.svg";
 
 const FilesPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
-  const [foldersTab, setFoldersTab] = useState([
-    {
-      id: uuid(),
-      name: "Untitled",
-      icon: folderIcon,
-      isOpen: false,
-      subfolders: [
-        {
-          id: uuid(),
-          name: "Untitled",
-          icon: folderIcon,
-          isOpen: false,
-          subfolders: [],
-          files: []
-        }
-      ],
-      files: []
-    }
-  ]);
+  const dispatch = useDispatch();
+  const folders = useSelector((state) => state.folders.folders);
+  const openTabs = useSelector((state) => state.folders.openTabs);
+  const activeTab = useSelector((state) => state.folders.activeTab);
 
-  const [activeTab, setActiveTabs] = useState(null);
-  const [openTabs, setOpenTabs] = useState([]);
   const [contextMenu, setContextMenu] = useState({
     id: null,
     visible: false,
     x: 0,
     y: 0
   });
-
   const contextMenuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(event.target)
-      ) {
-        setContextMenu({ id: null, visible: false, x: 0, y: 0 });
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [contextMenuRef]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
 
   const onSelectTabsItem = (id) => {
-    setActiveTabs(id);
+    dispatch(setActiveTab(id));
   };
 
   const handleItemClick = (id, name, type) => {
-    if (type === "file") {
-      setActiveTabs(id);
-      if (!openTabs.some((tab) => tab.id === id)) {
-        setOpenTabs([...openTabs, { id, name, type }]);
-      }
-    }
-  };
-
-  const updateTabName = (id, newName) => {
-    setOpenTabs((prevTabs) =>
-      prevTabs.map((tab) => (tab.id === id ? { ...tab, name: newName } : tab))
-    );
+    dispatch(openTab({ id, name, type }));
   };
 
   const removeTab = (id) => {
-    setOpenTabs((prevTabs) => prevTabs.filter((tab) => tab.id !== id));
-    if (activeTab === id) {
-      setActiveTabs(null);
+    dispatch(closeTab(id));
+  };
+
+  const handleContextMenuClick = (action) => {
+    if (action === "closeAllTabs") {
+      dispatch(closeAllTabs());
+    } else if (action === "closeSelectedTab") {
+      removeTab(contextMenu.id);
     }
+    setContextMenu({ id: null, visible: false, x: 0, y: 0 });
   };
 
   const handleContextMenu = (e, id) => {
@@ -102,26 +69,17 @@ const FilesPage = () => {
     });
   };
 
-  const handleContextMenuClick = (action) => {
-    if (action === "closeAllTabs") {
-      setOpenTabs([]);
-      setActiveTabs(null);
-    } else if (action === "closeSelectedTab") {
-      removeTab(contextMenu.id);
-    }
-    setContextMenu({ id: null, visible: false, x: 0, y: 0 });
-  };
-
+  // Определение функции для добавления новой вкладки
   const addNewTab = (name = "Untitled") => {
-    const newTab = {
+    const newFolder = {
       id: uuid(),
       name,
-      icon: folderIcon,
+      icon: folderIcon, // Путь к иконке папки
       isOpen: true,
-      subfolders: []
+      subfolders: [],
+      files: []
     };
-    setFoldersTab((prevTabs) => [...prevTabs, newTab]);
-    setActiveTabs(newTab.id);
+    dispatch(addFolder({ parentId: null, folder: newFolder })); // Экшен для добавления новой папки
   };
 
   return (
@@ -135,10 +93,8 @@ const FilesPage = () => {
           />
           <div className={commonStyles.tabsWrapper}>
             <FileView
-              foldersTab={foldersTab}
-              setFoldersTab={setFoldersTab}
+              foldersTab={folders}
               handleItemClick={handleItemClick}
-              updateTabName={updateTabName}
               removeTab={removeTab}
             />
           </div>
