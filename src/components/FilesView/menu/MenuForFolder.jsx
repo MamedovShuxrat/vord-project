@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import styles from "../filesView.module.scss";
 
 const MenuForFolder = ({ handleContextMenuClick }) => {
@@ -18,6 +19,10 @@ const MenuForFolder = ({ handleContextMenuClick }) => {
       </button>
     </div>
   );
+};
+
+MenuForFolder.propTypes = {
+  handleContextMenuClick: PropTypes.func.isRequired
 };
 
 export default MenuForFolder;
