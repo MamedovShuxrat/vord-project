@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import rename from "../../../assets/images/icons/common/rename.svg";
 import path from "../../../assets/images/icons/common/path.svg";
 import download from "../../../assets/images/icons/common/download.svg";
@@ -56,6 +57,10 @@ const MenuForFiles = ({ handleContextMenuClick }) => {
       </button>
     </div>
   );
+};
+
+MenuForFiles.propTypes = {
+  handleContextMenuClick: PropTypes.func.isRequired
 };
 
 export default MenuForFiles;

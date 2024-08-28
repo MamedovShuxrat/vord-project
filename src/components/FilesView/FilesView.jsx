@@ -1,5 +1,15 @@
+// src/components/FilesView/FilesView.jsx
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import {
+  addFolder,
+  addFile,
+  toggleFolderOpen,
+  removeFile,
+  removeFolder,
+  updateFileName
+} from "../../core/store/foldersSlice";
 import { v4 as uuid } from "uuid";
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
@@ -10,13 +20,8 @@ import MenuForFolder from "./menu/MenuForFolder";
 import MenuForFiles from "./menu/MenuForFiles";
 import toast from "react-hot-toast";
 
-const FileView = ({
-  foldersTab,
-  setFoldersTab,
-  handleItemClick,
-  updateTabName,
-  removeTab
-}) => {
+const FileView = ({ foldersTab, handleItemClick, removeTab }) => {
+  const dispatch = useDispatch();
   const [contextMenu, setContextMenu] = useState({
     id: null,
     type: null,
@@ -47,70 +52,6 @@ const FileView = ({
     };
   }, [contextMenuRef]);
 
-  const handleFolderRotate = (folderID, folders) => {
-    return folders.map((folder) => {
-      if (folder.id === folderID) {
-        return { ...folder, isOpen: !folder.isOpen };
-      }
-
-      if (folder.subfolders.length > 0) {
-        return {
-          ...folder,
-          subfolders: handleFolderRotate(folderID, folder.subfolders)
-        };
-      }
-
-      return folder;
-    });
-  };
-
-  const handleAddFolder = (parentId, folders) => {
-    const updatedFolders = folders.map((folder) => {
-      if (folder.id === parentId) {
-        const newFolder = {
-          id: uuid(),
-          name: `New Folder`,
-          icon: folderIcon,
-          isOpen: false,
-          subfolders: [],
-          files: []
-        };
-        toast.success("Folder added successfully");
-        return { ...folder, subfolders: [...folder.subfolders, newFolder] };
-      }
-      if (folder.subfolders.length > 0) {
-        return {
-          ...folder,
-          subfolders: handleAddFolder(parentId, folder.subfolders)
-        };
-      }
-      return folder;
-    });
-    return updatedFolders;
-  };
-
-  const handleAddFile = (parentId, folders) => {
-    const updatedFolders = folders.map((folder) => {
-      if (folder.id === parentId) {
-        const newFile = {
-          id: uuid(),
-          name: `New File`,
-          icon: fileIcon
-        };
-        toast.success("File added successfully");
-        return { ...folder, files: [...folder.files, newFile] };
-      }
-      if (folder.subfolders.length > 0) {
-        return {
-          ...folder,
-          subfolders: handleAddFile(parentId, folder.subfolders)
-        };
-      }
-      return folder;
-    });
-    return updatedFolders;
-  };
-
   const handleContextMenu = (e, id, type) => {
     e.preventDefault();
     const rect = e.target.getBoundingClientRect();
@@ -123,30 +64,57 @@ const FileView = ({
     });
   };
 
-  const handleDeleteFile = (id, folders) => {
-    const updatedFolders = folders.map((folder) => {
-      if (folder.files.find((file) => file.id === id)) {
-        folder.files = folder.files.filter((file) => file.id !== id);
-        toast.success("File deleted successfully");
-      }
-      if (folder.subfolders.length > 0) {
-        folder.subfolders = handleDeleteFile(id, folder.subfolders);
-      }
-      return folder;
-    });
-    return updatedFolders;
+  const handleFolderRotate = (folderID) => {
+    dispatch(toggleFolderOpen({ folderId: folderID }));
+  };
+
+  const handleAddFolder = (parentId) => {
+    const newFolder = {
+      id: uuid(),
+      name: `New Folder`,
+      icon: folderIcon,
+      isOpen: false,
+      subfolders: [],
+      files: []
+    };
+    dispatch(addFolder({ parentId, folder: newFolder }));
+    toast.success("Папка добавлена успешно");
+  };
+
+  const handleAddFile = (parentId) => {
+    const newFile = {
+      id: uuid(),
+      name: `New File`,
+      icon: fileIcon
+    };
+    dispatch(addFile({ parentId, file: newFile }));
+    toast.success("Файл добавлен успешно");
+  };
+
+  const handleDeleteFolder = (id) => {
+    dispatch(removeFolder({ folderId: id }));
+    removeTab(id); // Закрываем вкладку, связанную с удаленной папкой
+    setSelectedItem(null); // Сбрасываем выделение
+    toast.success("Папка удалена успешно");
+  };
+
+  const handleDeleteFile = (id) => {
+    dispatch(removeFile({ fileId: id }));
+    removeTab(id);
+  };
+
+  const handleRename = (id, newName) => {
+    dispatch(updateFileName({ fileId: id, newName }));
   };
 
   const handleContextMenuClick = (action) => {
     if (contextMenu.type === "folder") {
       if (action === "addFolder") {
-        setFoldersTab((prevFolders) =>
-          handleAddFolder(contextMenu.id, prevFolders)
-        );
+        handleAddFolder(contextMenu.id);
       } else if (action === "addFile") {
-        setFoldersTab((prevFolders) =>
-          handleAddFile(contextMenu.id, prevFolders)
-        );
+        handleAddFile(contextMenu.id);
+      } else if (action === "deleteFolder") {
+        handleDeleteFolder(contextMenu.id);
       }
     } else if (contextMenu.type === "file") {
       if (action === "rename") {
@@ -162,38 +130,15 @@ const FileView = ({
             .find((file) => file.id === contextMenu.id)?.name || ""
         );
       } else if (action === "delete") {
-        setFoldersTab((prevFolders) =>
-          handleDeleteFile(contextMenu.id, prevFolders)
-        );
-        setSelectedItem(null);
-        removeTab(contextMenu.id);
+        handleDeleteFile(contextMenu.id);
       }
     }
     setContextMenu({ id: null, type: null, visible: false, x: 0, y: 0 });
   };
 
-  const handleRename = (id, newName, folders) => {
-    const updatedFolders = folders.map((folder) => {
-      if (folder.files.find((file) => file.id === id)) {
-        folder.files = folder.files.map((file) =>
-          file.id === id ? { ...file, name: newName } : file
-        );
-        toast.success("File renamed successfully");
-      }
-      if (folder.subfolders.length > 0) {
-        folder.subfolders = handleRename(id, newName, folder.subfolders);
-      }
-      return folder;
-    });
-    return updatedFolders;
-  };
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && isRenaming && newName.trim()) {
-      setFoldersTab((prevFolders) =>
-        handleRename(selectedItem, newName, prevFolders)
-      );
-      updateTabName(selectedItem, newName);
+      handleRename(selectedItem, newName);
       setIsRenaming(false);
     }
   };
@@ -206,84 +151,84 @@ const FileView = ({
   const renderSubFolders = (subfolders = [], files = [], level = 0) => {
     return (
       <ul className={styles.subFolderList}>
-        {subfolders.map((subfolder) => (
-          <li
-            key={subfolder.id}
-            className={`${styles.folderItem} ${
-              selectedItem === subfolder.id ? styles.selectedItem : ""
-            }`}
-          >
-            <div
-              className={styles.folderHeader}
-              onClick={() =>
-                handleItemClick(subfolder.id, subfolder.name, "folder")
-              }
+        {subfolders.map((subfolder) =>
+          subfolder ? (
+            <li
+              key={subfolder.id}
+              className={`${styles.folderItem} ${
+                selectedItem === subfolder.id ? styles.selectedItem : ""
+              }`}
+            >
+              <div
+                className={styles.folderHeader}
+                onClick={() =>
+                  handleItemClick(subfolder.id, subfolder.name, "folder")
+                }
+                style={{ paddingLeft: `${level * 20}px` }}
+              >
+                <img
+                  onClick={() => handleFolderRotate(subfolder.id)}
+                  className={styles.FolderArrowRight}
+                  style={{
+                    transform: `rotate(${subfolder.isOpen ? "90deg" : "0deg"})`
+                  }}
+                  src={arrowRightSvg}
+                  alt="arrow-down"
+                />
+                <img src={subfolder.icon} alt="folder" />
+                <span className={styles.folderName}>{subfolder.name}</span>
+                <button
+                  className={styles.tabsDots}
+                  onClick={(e) => handleContextMenu(e, subfolder.id, "folder")}
+                >
+                  <img src={dotsSvg} alt="_pic" />
+                </button>
+              </div>
+              {subfolder.isOpen &&
+                renderSubFolders(
+                  subfolder.subfolders,
+                  subfolder.files,
+                  level + 1
+                )}
+            </li>
+          ) : null
+        )}
+        {files.map((file) =>
+          file ? (
+            <li
+              key={file.id}
+              className={`${styles.folderItem} ${
+                selectedItem === file.id ? styles.selectedItem : ""
+              }`}
               style={{ paddingLeft: `${level * 20}px` }}
             >
-              <img
-                onClick={() =>
-                  setFoldersTab((prevFolders) =>
-                    handleFolderRotate(subfolder.id, prevFolders)
-                  )
-                }
-                className={styles.FolderArrowRight}
-                style={{
-                  transform: `rotate(${subfolder.isOpen ? "90deg" : "0deg"})`
-                }}
-                src={arrowRightSvg}
-                alt="arrow-down"
-              />
-              <img src={subfolder.icon} alt="folder" />
-              <span className={styles.folderName}>{subfolder.name}</span>
-              <button
-                className={styles.tabsDots}
-                onClick={(e) => handleContextMenu(e, subfolder.id, "folder")}
+              <div
+                className={styles.fileHeader}
+                onClick={() => handleFileClick(file.id, file.name)}
               >
-                <img src={dotsSvg} alt="_pic" />
-              </button>
-            </div>
-            {subfolder.isOpen &&
-              renderSubFolders(
-                subfolder.subfolders,
-                subfolder.files,
-                level + 1
-              )}
-          </li>
-        ))}
-        {files.map((file) => (
-          <li
-            key={file.id}
-            className={`${styles.folderItem} ${
-              selectedItem === file.id ? styles.selectedItem : ""
-            }`}
-            style={{ paddingLeft: `${level * 20}px` }}
-          >
-            <div
-              className={styles.fileHeader}
-              onClick={() => handleFileClick(file.id, file.name)}
-            >
-              <img src={file.icon} alt="file" />
-              {isRenaming && selectedItem === file.id ? (
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onBlur={() => setIsRenaming(false)}
-                  autoFocus
-                />
-              ) : (
-                <span className={styles.fileName}>{file.name}</span>
-              )}
-              <button
-                className={styles.tabsDots}
-                onClick={(e) => handleContextMenu(e, file.id, "file")}
-              >
-                <img src={dotsSvg} alt="_pic" />
-              </button>
-            </div>
-          </li>
-        ))}
+                <img src={file.icon} alt="file" />
+                {isRenaming && selectedItem === file.id ? (
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onBlur={() => setIsRenaming(false)}
+                    autoFocus
+                  />
+                ) : (
+                  <span className={styles.fileName}>{file.name}</span>
+                )}
+                <button
+                  className={styles.tabsDots}
+                  onClick={(e) => handleContextMenu(e, file.id, "file")}
+                >
+                  <img src={dotsSvg} alt="_pic" />
+                </button>
+              </div>
+            </li>
+          ) : null
+        )}
       </ul>
     );
   };
@@ -291,40 +236,40 @@ const FileView = ({
   return (
     <div className={styles.fileViewWrapper}>
       <div className={styles.folderWrapper}>
-        {foldersTab.map((folder) => (
-          <div key={folder.id} className={styles.folderItems}>
-            <div
-              className={`${styles.folderHeader} ${
-                selectedItem === folder.id ? styles.selectedItem : ""
-              }`}
-              onClick={() => handleItemClick(folder.id, folder.name, "folder")}
-            >
-              <img
+        {foldersTab.map((folder) =>
+          folder ? (
+            <div key={folder.id} className={styles.folderItems}>
+              <div
+                className={`${styles.folderHeader} ${
+                  selectedItem === folder.id ? styles.selectedItem : ""
+                }`}
                 onClick={() =>
-                  setFoldersTab((prevFolders) =>
-                    handleFolderRotate(folder.id, prevFolders)
-                  )
+                  handleItemClick(folder.id, folder.name, "folder")
                 }
-                className={styles.FolderArrowRight}
-                style={{
-                  transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
-                }}
-                src={arrowRightSvg}
-                alt="arrow-down"
-              />
-              <img src={folder.icon} alt="folder" />
-              <span className={styles.folderName}>{folder.name}</span>
-              <button
-                className={styles.tabsDots}
-                onClick={(e) => handleContextMenu(e, folder.id, "folder")}
               >
-                <img src={dotsSvg} alt="_pic" />
-              </button>
+                <img
+                  onClick={() => handleFolderRotate(folder.id)}
+                  className={styles.FolderArrowRight}
+                  style={{
+                    transform: `rotate(${folder.isOpen ? "90deg" : "0deg"})`
+                  }}
+                  src={arrowRightSvg}
+                  alt="arrow-down"
+                />
+                <img src={folder.icon} alt="folder" />
+                <span className={styles.folderName}>{folder.name}</span>
+                <button
+                  className={styles.tabsDots}
+                  onClick={(e) => handleContextMenu(e, folder.id, "folder")}
+                >
+                  <img src={dotsSvg} alt="_pic" />
+                </button>
+              </div>
+              {folder.isOpen &&
+                renderSubFolders(folder.subfolders, folder.files, 1)}
             </div>
-            {folder.isOpen &&
-              renderSubFolders(folder.subfolders, folder.files, 1)}
-          </div>
-        ))}
+          ) : null
+        )}
       </div>
       {contextMenu.visible && (
         <div
@@ -354,9 +299,7 @@ FileView.propTypes = {
       files: PropTypes.array
     })
   ).isRequired,
-  setFoldersTab: PropTypes.func.isRequired,
   handleItemClick: PropTypes.func.isRequired,
-  updateTabName: PropTypes.func.isRequired,
   removeTab: PropTypes.func.isRequired
 };
 
