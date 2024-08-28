@@ -1,19 +1,29 @@
+// src/components/Query/Query.jsx
 import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import SearchBlock from "../SearchBlock/SearchBlock";
 import queryStyles from "./query.module.scss";
 import DataClean from "../DataClean/DataClean";
+import { useDispatch, useSelector } from "react-redux";
+import { updateTabContent } from "../../core/store/chartsSlice";
 
-const Query = ({ queryText, setQueryText }) => {
-  const [localQueryText, setLocalQueryText] = useState(queryText); // State for the SQL query text
+const Query = ({ tabId }) => {
+  const dispatch = useDispatch();
+
+  // Проверка наличия данных в tabContents с использованием optional chaining
+  const tabContent = useSelector(
+    (state) => state.charts.tabContents?.[tabId] || ""
+  );
+
+  const [localQueryText, setLocalQueryText] = useState(tabContent);
 
   useEffect(() => {
-    setLocalQueryText(queryText);
-  }, [queryText]);
+    setLocalQueryText(tabContent);
+  }, [tabContent]);
 
   const handleEditorChange = (value) => {
     setLocalQueryText(value || "");
-    setQueryText(value || ""); // Update the query text in the parent component
+    dispatch(updateTabContent({ tabId, content: value || "" }));
   };
 
   return (
@@ -23,7 +33,6 @@ const Query = ({ queryText, setQueryText }) => {
           <button className={queryStyles.runButton}>Run</button>
           <select className={queryStyles.databaseSelect}>
             <option value="sql">SQL</option>
-            {/* Add more options as necessary */}
           </select>
         </div>
         <SearchBlock
@@ -33,8 +42,6 @@ const Query = ({ queryText, setQueryText }) => {
         />
       </div>
       <div className={queryStyles.editorContainer}>
-        {" "}
-        {/* Оборачиваем MonacoEditor в div с нужным стилем */}
         <MonacoEditor
           height="400px"
           language="sql"
