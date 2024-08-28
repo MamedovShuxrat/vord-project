@@ -7,6 +7,7 @@ import {
   addFile,
   toggleFolderOpen,
   removeFile,
+  removeFolder,
   updateFileName
 } from "../../core/store/foldersSlice";
 import { v4 as uuid } from "uuid";
@@ -90,6 +91,12 @@ const FileView = ({ foldersTab, handleItemClick, removeTab }) => {
     toast.success("Файл добавлен успешно");
   };
 
+  const handleDeleteFolder = (id) => {
+    dispatch(removeFolder({ folderId: id }));
+    setSelectedItem(null);
+    toast.success("Папка удалена успешно");
+  };
+
   const handleDeleteFile = (id) => {
     dispatch(removeFile({ fileId: id }));
     removeTab(id);
@@ -105,6 +112,8 @@ const FileView = ({ foldersTab, handleItemClick, removeTab }) => {
         handleAddFolder(contextMenu.id);
       } else if (action === "addFile") {
         handleAddFile(contextMenu.id);
+      } else if (action === "deleteFolder") {
+        handleDeleteFolder(contextMenu.id);
       }
     } else if (contextMenu.type === "file") {
       if (action === "rename") {

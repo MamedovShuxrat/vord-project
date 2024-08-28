@@ -120,6 +120,25 @@ const foldersSlice = createSlice({
       saveStateToLocalStorage(state); // Сохранение состояния в localStorage
     },
 
+    removeFolder: (state, action) => {
+      const { folderId } = action.payload;
+
+      const findAndRemoveFolder = (folders) => {
+        return folders
+          .filter((f) => f.id !== folderId)
+          .map((f) => {
+            if (f.subfolders.length > 0) {
+              f.subfolders = findAndRemoveFolder(f.subfolders);
+            }
+            return f;
+          });
+      };
+
+      state.folders = findAndRemoveFolder(state.folders);
+
+      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+    },
+
     removeFile: (state, action) => {
       const { fileId } = action.payload;
 
@@ -195,6 +214,7 @@ export const {
   addFolder,
   addFile,
   toggleFolderOpen,
+  removeFolder,
   removeFile,
   updateFileName,
   setActiveTab,
