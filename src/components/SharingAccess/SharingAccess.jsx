@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./sharing.module.scss";
 import checkbox from "../CreateDataBaseCard/createDataBaseCard.module.scss";
 import inputStyles from "../ui/Inputs/inputs.module.scss";
 
-import { handleSendData } from "./api";
+import { handleSendData, fetchInvitedUsers } from "./api";
 import { useToggle } from "../utils/useToggle";
 
 import userAvatarImg from "../../assets/images/icons/common/user-avatar.svg";
+import sendMail from "../../assets/images/common/send-mail.svg";
 import arrowDownSvg from "../../assets/images/icons/shared/iconDown.svg";
 import linkSvg from "../../assets/images/icons/shared/link.svg";
 import lockSvg from "../../assets/images/icons/shared/lock.svg";
+import InvitedUsersLoader from "../utils/InvitedUsersLoader";
 
 const ADDROLE = [
   {
@@ -25,73 +27,39 @@ const ADDROLE = [
     name: "Editor",
   },
 ]
-const FETCHUSERDATA = [
-  {
-    id: 1,
-    name: "Ольга Картункофе",
-    email: "Картункофе23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 2,
-    name: "Азамат Мусагалина",
-    email: "Мусагалина23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 3,
-    name: "Артем Виноводка",
-    email: "Виноводка23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 4,
-    name: "Расул Чутьдаром",
-    email: "Чутьдаром23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 5,
-    name: "John Траволта",
-    email: "Траволта23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 5,
-    name: "John Траволта",
-    email: "Траволта23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 5,
-    name: "John Траволта",
-    email: "Траволта23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 5,
-    name: "John Траволта",
-    email: "Траволта23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-  {
-    id: 5,
-    name: "John Траволта",
-    email: "Траволта23@gmail.com",
-    role: "Owner",
-    avatarSrc: userAvatarImg,
-  },
-];
+
 
 const SharingAccess = () => {
+  const owner = JSON.parse(localStorage.getItem("userData"));
+  const ownerId = owner.pk
+
+  const getRoleName = (access) => {
+    const role = ADDROLE.find((role) => role.id === access)
+    return role ? role.name : "Unknow Role"
+  }
+
+  const [invitedUsers, setInvitedUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (ownerId) {
+      loadInvitedUsers(ownerId);
+    }
+  }, [ownerId]);
+  const loadInvitedUsers = async (ownerId) => {
+    try {
+      const users = await fetchInvitedUsers(ownerId);
+      setInvitedUsers(users);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+    }
+  }
+
   const {
     isOpen: isUserBlockOpen,
     toggle: toggleUserBlock,
@@ -175,41 +143,46 @@ const SharingAccess = () => {
             </div>
           )}
         </div>
-        <label
-          className={checkbox.connectCheckBoxWrapper}
-        >
+        <label className={styles.connectCheckBoxWrapper}>
           <input
             type="checkbox"
             name="Confirm"
-            className={checkbox.checkboxInput}
+            className={styles.checkboxInput}
             checked={isConfirmed}
             onChange={handleCheckboxChange}
           />
-          <span className={checkbox.connectTitle}>Confirm</span>
+          <span className={styles.connectTitle}>Confirm</span>
+          <span className={styles.iconCheck}></span>
         </label>
       </div>
       <div className={styles.userBlock}>
+
         <div className={styles.userTitle}> Users who have access</div>
         <div className={styles.usersWrapper}>
-          {FETCHUSERDATA.map(user => (
-            <div key={user.id} className={styles.userItem}>
-              <div className={styles.userBg}>
-                <img
-                  width={20}
-                  height={20}
-                  src={user.avatarSrc}
-                  alt={`${user.name}"s avatar`}
-                />
+          {loading ? ([...Array(5)].map((_, key) => (
+            <InvitedUsersLoader key={key} />
+          ))
+          ) : (
+            invitedUsers.map(user => (
+              <div key={user.id} className={styles.userItem}>
+                <div className={styles.userBg}>
+                  <img
+                    width={20}
+                    height={20}
+                    src={user.avatarSrc ? user.avatarSrc : userAvatarImg}
+                    alt={`${user.username}'s avatar`}
+                  />
+                </div>
+                <div className={styles.userInfo}>
+                  <p className={styles.userName}>{user.username}</p>
+                  <p className={styles.userMail}>{user.email}</p>
+                </div>
+                <div className={styles.addRoleName}>
+                  <span>{getRoleName(user.access_type_id)}</span>
+                </div>
               </div>
-              <div className={styles.userInfo}>
-                <p className={styles.userName}>{user.name}</p>
-                <p className={styles.userMail}>{user.email}</p>
-              </div>
-              <div className={styles.addRoleName}>
-                <span>{user.role}</span>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
       <div className={styles.restrictedBlock}>
