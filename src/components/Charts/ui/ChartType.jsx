@@ -30,10 +30,10 @@ const ChartType = () => {
     // Здесь должен быть вызов к бэкенду для получения данных для дропдаунов
     // Примерные данные, которые могли бы прийти с сервера
     setClientIds(["Magazine", "Newspaper", "Blog"]);
-    setPlotTypes(["Plot", "Bar", "Line"]);
-    setColors(["Red", "Blue", "Green"]);
-    setImageFormats(["Png", "Jpeg", "Svg"]);
-    setExtensions(["json api", "xml", "csv"]);
+    setPlotTypes(["Plot", "Scatter", "Bar", "Pie", "Stackplot"]);
+    setColors(["Red", "Green", "Blue", "Purple", "Yellow", "Grey"]);
+    setImageFormats(["Png", "Ps", "Pdf", "Svg"]);
+    setExtensions(["json api", "excel xlsx", "csv", "json"]);
   }, []);
 
   // Функция для обработки изменения в полях ввода

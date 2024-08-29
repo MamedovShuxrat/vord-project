@@ -1,11 +1,11 @@
 // src/components/Charts/ui/Chart.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateTabContent } from "../../core/store/chartsSlice";
+import { updateTabContent } from "../../../core/store/chartsSlice";
 import TextArea from "antd/es/input/TextArea";
 import ChartImage from "./ChartImage";
 import ChartType from "./ChartType";
-import styles from "../CreateDataBaseCard/createDataBaseCard.module.scss";
+import styles from "../../CreateDataBaseCard/createDataBaseCard.module.scss";
 
 const Chart = ({ tabId }) => {
   const dispatch = useDispatch();
