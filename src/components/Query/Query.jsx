@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import SearchBlock from "../SearchBlock/SearchBlock";
 import queryStyles from "./query.module.scss";
-import DataClean from "../DataClean/DataClean";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTabContent } from "../../core/store/chartsSlice";
 
@@ -54,7 +53,6 @@ const Query = ({ tabId }) => {
           }}
         />
       </div>
-      <DataClean />
     </div>
   );
 };

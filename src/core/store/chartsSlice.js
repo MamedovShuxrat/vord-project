@@ -125,6 +125,12 @@ const chartsSlice = createSlice({
     },
     updateTabContent: (state, action) => {
       const { tabId, content } = action.payload;
+      if (!state.tabContents) {
+        state.tabContents = {}; // Ensure tabContents is initialized
+      }
+      if (!state.tabContents[tabId]) {
+        state.tabContents[tabId] = ""; // Initialize the tab content if it doesn't exist
+      }
       state.tabContents[tabId] = content;
       saveStateToLocalStorage(state);
     }

@@ -2,6 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTabContent } from "../../core/store/chartsSlice";
+import TextArea from "antd/es/input/TextArea";
+import ChartImage from "./ChartImage";
+import ChartType from "./ChartType";
+import styles from "../CreateDataBaseCard/createDataBaseCard.module.scss";
 
 const Chart = ({ tabId }) => {
   const dispatch = useDispatch();
@@ -21,13 +25,31 @@ const Chart = ({ tabId }) => {
 
   return (
     <div>
-      <h2>Chart Component</h2>
-      <textarea
-        value={localChartContent}
-        onChange={(e) => handleContentChange(e.target.value)}
-        rows={10}
-        cols={50}
+      <div style={{ display: "flex", marginBottom: "20px" }}>
+        <ChartImage />
+        <ChartType />
+      </div>
+      <TextArea
+        rows={4}
+        placeholder="Description"
+        style={{
+          border: "2px solid gray",
+          borderRadius: "8px",
+          padding: "10px",
+          width: "669px",
+          height: "132px",
+          marginLeft: "38px",
+          marginBottom: "20px"
+        }}
+        className="custom-textarea"
       />
+      <button
+        type="submit"
+        className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
+        // onClick={() => handleFormButtonClick(isFormValid)}
+      >
+        Report
+      </button>
     </div>
   );
 };

@@ -216,7 +216,7 @@ const ChartsPage = () => {
                   item.name.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .map((folder) => (
-                  <div key={folder.id} className={commonStyles.folderItems}>
+                  <div key={folder.id} className={commonStyles.tabsItems}>
                     <div
                       className={`${commonStyles.folderItem} ${
                         activeTab === folder.id ? commonStyles.activeTab : ""
@@ -326,7 +326,7 @@ const ChartsPage = () => {
                 <div
                   key={folder.id}
                   className={`${commonStyles.tabsTopItem} ${
-                    activeTab === folder.id ? commonStyles.activeTab : ""
+                    activeTab === folder.id ? commonStyles.active : ""
                   }`}
                   onClick={() => dispatch(setActiveTab(folder.id))}
                 >
@@ -348,7 +348,7 @@ const ChartsPage = () => {
                 <div
                   key={file.id}
                   className={`${commonStyles.tabsTopItem} ${
-                    activeTab === file.id ? commonStyles.activeTab : ""
+                    activeTab === file.id ? commonStyles.active : ""
                   }`}
                   onClick={() => dispatch(setActiveTab(file.id))}
                 >
