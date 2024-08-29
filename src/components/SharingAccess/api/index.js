@@ -2,7 +2,8 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 const API_URL = process.env.REACT_APP_API_URL;
-const INVENT = `${API_URL}/invite/`;
+const INVITE = `${API_URL}/invite/`;
+const INVITED_USERS = `${API_URL}/access/`;
 
 const token = JSON.parse(localStorage.getItem("userToken"));
 
@@ -13,7 +14,7 @@ export const sendRoleData = async (email, access_type_id) => {
 	};
 	try {
 		const response = await toast.promise(
-			axios.post(INVENT, inveteData, {
+			axios.post(INVITE, inveteData, {
 				headers: {
 					Authorization: `Token ${token}`
 				}
@@ -56,3 +57,25 @@ export const handleSendData = async (email, role, setIsConfirmed) => {
 		setIsConfirmed(false);
 	}
 };
+
+export const fetchInvitedUsers = async (ownerId) => {
+	try {
+		const response = await toast.promise(
+			axios.get(`${INVITED_USERS}?user_id__id=&owner_id__id=${ownerId}`, {
+				headers: {
+					Authorization: `Token ${token}`
+				}
+			}),
+			{
+				loading: "Loading invited users...",
+				success: "Users loaded successfully!",
+				error: "Failed to load users. Please try again."
+			}
+		)
+		return response.data
+	} catch (error) {
+		console.error("Error fetching invited users:", error);
+		throw new Error(error.message);
+	}
+}
+

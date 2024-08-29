@@ -70,7 +70,6 @@ const ConnectionsPage = () => {
   }, [activeTab]);
 
   const handleFormDataChange = (id, newFormData) => {
-    console.log("Handling Form Data Change: ", newFormData); // Лог для проверки
     dispatch(updateConnection({ id, formData: newFormData }));
   };
 

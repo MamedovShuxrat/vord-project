@@ -61,7 +61,6 @@ const CreateDataBaseCard = ({
   const [connectionMethod, setConnectionMethod] = useState("");
 
   useEffect(() => {
-    console.log("Received formData: ", formData); // Лог для проверки
     setLocalFormData(formData);
     setDbType(formData.dbType || "");
     setDriver(formData.driver || "");
@@ -87,9 +86,9 @@ const CreateDataBaseCard = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Updating field ${name} with value ${value}`);
     const updatedFormData = { ...localFormData, [name]: value };
     setLocalFormData(updatedFormData);
-    console.log("Updated Form Data: ", updatedFormData); // Лог для проверки
     onFormDataChange(updatedFormData);
   };
 
@@ -104,12 +103,14 @@ const CreateDataBaseCard = ({
     setDriver(value);
     handleChange(e);
   };
+  console.log("  localFormData: ", localFormData); // Лог для проверки
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const port = localFormData.port ? parseInt(localFormData.port, 10) : null;
     const formDataToSend = {
-      connection_name: formData.connectionName,
+      connection_name: localFormData.connectionName,
       user_name: localFormData.user,
       password: localFormData.password,
       url: connectionMethod === "url" ? localFormData.url : "",
@@ -118,20 +119,22 @@ const CreateDataBaseCard = ({
       data_base_type: dbType,
       data_base_name: localFormData.dbName,
       description: localFormData.description,
-      driver: localFormData.driver
+      driver: driver,
     };
 
-    console.log("Form Data to Send: ", formDataToSend); // Лог для проверки
+    console.log("Form Data to Send: ", formDataToSend);
 
     onSubmit(formDataToSend);
 
-    if (isConnected) {
-      setIsConnected(true);
-    } else {
-      resetForm(setLocalFormData, setDbType, setDriver, onFormDataChange);
-    }
-  };
+    setLocalFormData(prevData => ({
+      ...prevData,
+      ...formDataToSend,
+    }));
 
+    if (!isConnected) {
+      setIsConnected(true);
+    }
+  }
   return (
     <div className={styles.CardWrapper}>
       <div className={styles.connectMenu}>
@@ -170,6 +173,7 @@ const CreateDataBaseCard = ({
           required
         />
         <SimpleInput
+          type={"password"}
           placeholder="Password"
           name="password"
           value={localFormData.password || ""}
