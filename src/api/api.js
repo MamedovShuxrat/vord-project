@@ -5,10 +5,10 @@ import { toast } from "react-hot-toast";
 const API_URL = process.env.REACT_APP_API_URL;
 
 // Определяем эндпоинты для авторизации
-const authRegister = `${API_URL}/api/register/`;
-const authLogin = `${API_URL}/api/login/`;
-const getUserInfo = `${API_URL}/api/user/`;
-const authLogout = `${API_URL}/api/logout/`;
+const authRegister = `${API_URL}/register/`;
+const authLogin = `${API_URL}/login/`;
+const getUserInfo = `${API_URL}/user/`;
+const authLogout = `${API_URL}/logout/`;
 
 // Регистрация пользователя
 export const registerUser = async (name, email, password, confirmPassword) => {
