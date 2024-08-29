@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "./sharing.module.scss";
-import checkbox from "../CreateDataBaseCard/createDataBaseCard.module.scss";
 import inputStyles from "../ui/Inputs/inputs.module.scss";
+import { toast } from "react-hot-toast";
 
 import { handleSendData, fetchInvitedUsers } from "./api";
 import { useToggle } from "../utils/useToggle";
 
 import userAvatarImg from "../../assets/images/icons/common/user-avatar.svg";
-import sendMail from "../../assets/images/common/send-mail.svg";
 import arrowDownSvg from "../../assets/images/icons/shared/iconDown.svg";
 import linkSvg from "../../assets/images/icons/shared/link.svg";
 import lockSvg from "../../assets/images/icons/shared/lock.svg";
@@ -35,12 +34,11 @@ const SharingAccess = () => {
 
   const getRoleName = (access) => {
     const role = ADDROLE.find((role) => role.id === access)
-    return role ? role.name : "Unknow Role"
+    return role ? role.name : "Unknown Role"
   }
 
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (ownerId) {
@@ -52,7 +50,7 @@ const SharingAccess = () => {
       const users = await fetchInvitedUsers(ownerId);
       setInvitedUsers(users);
     } catch (error) {
-      setError(error.message);
+      console.error(error.message);
     } finally {
       setTimeout(() => {
         setLoading(false);
@@ -72,10 +70,13 @@ const SharingAccess = () => {
     ref: restrickedBlockRef,
   } = useToggle();
 
+  console.log(isUserBlockOpen);
+
   const [role, setRole] = useState(null)
   const [email, setEmail] = useState("")
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [newRole, setNewRole] = useState({});
 
   const handleCheckboxChange = async (e) => {
     const checked = e.target.checked;
@@ -86,6 +87,7 @@ const SharingAccess = () => {
     }
     setRole(null)
   };
+
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
@@ -93,6 +95,23 @@ const SharingAccess = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setIsEmailValid(emailPattern.test(value));
   }
+
+  const handleSubmitChanges = async () => {
+    try {
+      for (const userId in newRole) {
+        const email = invitedUsers.find(user => user.id === parseInt(userId))?.email;
+        const role = newRole[userId];
+
+        if (email && role) {
+          await handleSendData(email, role, setIsConfirmed);
+        }
+      }
+      loadInvitedUsers(ownerId);
+      setNewRole({});
+    } catch (error) {
+      console.error("Failed to update user roles", error);
+    }
+  };
 
 
   return (
@@ -115,7 +134,7 @@ const SharingAccess = () => {
             style={{
               transform: `rotate(${isUserBlockOpen ? "180deg" : "0deg"})`
             }}
-            onClick={toggleUserBlock}
+            onClick={() => toggleUserBlock}
             src={arrowDownSvg}
             alt="Icon-down"
           />
@@ -178,7 +197,35 @@ const SharingAccess = () => {
                   <p className={styles.userMail}>{user.email}</p>
                 </div>
                 <div className={styles.addRoleName}>
-                  <span>{getRoleName(user.access_type_id)}</span>
+                  <span className={styles.selectedRole}>
+                    {newRole[user.id]
+                      ? ADDROLE.find(item => item.id === newRole[user.id])?.name
+                      : getRoleName(user.access_type_id)}
+                  </span>
+                  {isUserBlockOpen[user.id] && (
+                    <div className={styles.addRoleDndMenu} ref={userBlockRef}>
+                      {ADDROLE.map((item, key) => (
+                        <span
+                          key={key}
+                          className={styles.addRoleDndItem}
+                          onClick={() => {
+                            setNewRole({ ...newRole, [user.id]: item.id });
+                            toggleUserBlock(user.id);
+                          }}
+                        >
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <img
+                    style={{
+                      transform: `rotate(${isUserBlockOpen[user.id] ? "180deg" : "0deg"})`,
+                    }}
+                    onClick={() => toggleUserBlock(user.id)}
+                    src={arrowDownSvg}
+                    alt="Icon-down"
+                  />
                 </div>
               </div>
             ))
@@ -219,11 +266,15 @@ const SharingAccess = () => {
           <button className={styles.accessBtnItem}>
             <img src={linkSvg} alt="link" /> Copy link
           </button>
-          <button className={styles.accessBtnItem}>Done</button>
+          <button className={styles.accessBtnItem} onClick={handleSubmitChanges}>Done</button>
         </div>
       </div>
     </div>
   );
+
+
 };
+
+
 
 export default SharingAccess;
