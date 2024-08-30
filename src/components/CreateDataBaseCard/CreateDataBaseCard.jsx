@@ -236,7 +236,7 @@ const CreateDataBaseCard = ({
             onChange={handleChange}
           />
         )}
-        <div className={`${styles.selectWrapper} driverInput`}>
+        {/* <div className={`${styles.selectWrapper} driverInput`}>
           <label htmlFor="driver" className={styles.selectLabel}>
             Data Base Type
           </label>
@@ -250,7 +250,7 @@ const CreateDataBaseCard = ({
             <option value="">Select Driver</option>
             <option value="SQL Alchemy">sql alchemy mssql+pyodbc</option>
           </select>
-        </div>
+        </div> */}
         {dbType === "SQL Alchemy" && (
           <SimpleInput
             placeholder="Driver"

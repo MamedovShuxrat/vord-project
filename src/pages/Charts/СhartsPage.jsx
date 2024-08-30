@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/ui/Chat";
-import Query from "../../components/Query/Query";
+import Query from "./Query/Query";
 import Chart from "../../components/Charts/ui/Chart";
 import CleanData from "../../components/Charts/ui/CleanData";
 import MenuForFileCharts from "./menu/MenuForFileCharts";
