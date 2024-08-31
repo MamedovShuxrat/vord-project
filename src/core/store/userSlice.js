@@ -3,8 +3,10 @@ import {
   registerUser,
   loginUser,
   fetchUserData,
+  fetchUserConnections,
   logoutUser
-} from "src/api/api";
+} from "../../api/api";
+import { setConnections } from "./connectionsSlice";
 import { toast } from "react-hot-toast";
 
 export const register = createAsyncThunk(
@@ -24,7 +26,7 @@ export const register = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "user/login",
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password }, { dispatch, rejectWithValue }) => {
     try {
       const data = await loginUser(email, password);
       const token = data.key;
@@ -32,6 +34,11 @@ export const login = createAsyncThunk(
       console.log("LoggiN with token:", token);
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(user));
+
+      // Загрузите соединения пользователя после успешного входа
+      const connections = await fetchUserConnections(token);
+      dispatch(setConnections(connections)); // Сохраняем данные в Redux Store и в localStorage
+
       return { token, user };
     } catch (error) {
       return rejectWithValue(error.message || "Login failed");

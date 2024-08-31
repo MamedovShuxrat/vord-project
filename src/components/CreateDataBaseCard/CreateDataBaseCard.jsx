@@ -119,22 +119,22 @@ const CreateDataBaseCard = ({
       data_base_type: dbType,
       data_base_name: localFormData.dbName,
       description: localFormData.description,
-      driver: driver,
+      driver: driver
     };
 
     console.log("Form Data to Send: ", formDataToSend);
 
     onSubmit(formDataToSend);
 
-    setLocalFormData(prevData => ({
+    setLocalFormData((prevData) => ({
       ...prevData,
-      ...formDataToSend,
+      ...formDataToSend
     }));
 
     if (!isConnected) {
       setIsConnected(true);
     }
-  }
+  };
   return (
     <div className={styles.CardWrapper}>
       <div className={styles.connectMenu}>
@@ -293,7 +293,7 @@ CreateDataBaseCard.propTypes = {
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  setIsConnected: PropTypes.func.isRequired // Измените здесь
+  setIsConnected: PropTypes.func.isRequired
 };
 
 export default CreateDataBaseCard;

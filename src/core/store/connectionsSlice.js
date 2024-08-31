@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-
-import dataBaseBlackSvg from "../../assets/images/icons/connection/database-black.svg";
+import { fetchUserConnections } from "../../api/api";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const CONNECTION = `${API_URL}/clientdb/`;
@@ -25,7 +24,7 @@ const sendFormData = async (formData, token) => {
 export const submitFormData = createAsyncThunk(
   "connectionTabs/submitFormData",
   async ({ formData, activeTab }, { dispatch, rejectWithValue }) => {
-    const token = JSON.parse(localStorage.getItem("userToken")); // Fetch token from localStorage here
+    const token = JSON.parse(localStorage.getItem("userToken"));
     if (!token) {
       return rejectWithValue("No valid token found");
     }
@@ -50,31 +49,44 @@ export const submitFormData = createAsyncThunk(
   }
 );
 
+// Thunk for fetching user databases from the server
+export const fetchUserDatabases = createAsyncThunk(
+  "connectionTabs/fetchUserDatabases",
+  async (_, { rejectWithValue }) => {
+    const token = JSON.parse(localStorage.getItem("userToken"));
+    if (!token) {
+      return rejectWithValue("No valid token found");
+    }
+
+    try {
+      const response = await fetchUserConnections(token);
+      console.log("Fetched user databases: ", response); // Logging fetched data
+      return response;
+    } catch (error) {
+      console.error("Error fetching user databases:", error);
+      return rejectWithValue(error.message || "Failed to fetch databases.");
+    }
+  }
+);
+
 const connectionTabsSlice = createSlice({
   name: "connectionTabs",
   initialState: {
-    connections: JSON.parse(localStorage.getItem("connections")) || [
-      {
-        id: "untitled",
-        img: dataBaseBlackSvg,
-        MySQL: "Untitled",
-        w: "20px",
-        h: "20px",
-        formData: {} // State for CreateDataBaseCard
-      }
-    ]
+    connections: [],
+    status: "idle",
+    error: null
   },
   reducers: {
     addConnection: (state, action) => {
-      state.connections.push(action.payload);
-      localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
+      state.connections.push(action.payload); // Добавляем новое соединение в конец списка
+      localStorage.setItem("connections", JSON.stringify(state.connections));
     },
     updateConnection: (state, action) => {
       const { id, formData } = action.payload;
       const connection = state.connections.find((conn) => conn.id === id);
       if (connection) {
         connection.formData = formData;
-        localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
+        localStorage.setItem("connections", JSON.stringify(state.connections));
       }
     },
     renameConnection: (state, action) => {
@@ -82,19 +94,41 @@ const connectionTabsSlice = createSlice({
       const connection = state.connections.find((conn) => conn.id === id);
       if (connection) {
         connection.MySQL = newName;
-        localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
+        localStorage.setItem("connections", JSON.stringify(state.connections));
       }
     },
     deleteConnection: (state, action) => {
       state.connections = state.connections.filter(
         (connection) => connection.id !== action.payload
       );
-      localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
+      localStorage.setItem("connections", JSON.stringify(state.connections));
     },
     setConnections: (state, action) => {
       state.connections = action.payload;
-      localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
+      localStorage.setItem("connections", JSON.stringify(state.connections));
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserDatabases.pending, (state) => {
+        state.status = "loading"; // Устанавливаем статус загрузки
+      })
+      .addCase(fetchUserDatabases.fulfilled, (state, action) => {
+        state.status = "succeeded"; // Устанавливаем статус успеха
+
+        // Проверка на дублирование данных перед добавлением
+        const newConnections = action.payload.filter(
+          (newConn) => !state.connections.some((conn) => conn.id === newConn.id)
+        );
+
+        // Добавляем только новые уникальные соединения
+        state.connections = [...state.connections, ...newConnections];
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохраняем в localStorage
+      })
+      .addCase(fetchUserDatabases.rejected, (state, action) => {
+        state.status = "failed"; // Устанавливаем статус ошибки
+        state.error = action.payload; // Сохраняем сообщение об ошибке
+      });
   }
 });
 

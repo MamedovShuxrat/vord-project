@@ -9,6 +9,7 @@ const authRegister = `${API_URL}/register/`;
 const authLogin = `${API_URL}/login/`;
 const getUserInfo = `${API_URL}/user/`;
 const authLogout = `${API_URL}/logout/`;
+const clientDbUrl = `${API_URL}/clientdb/`;
 
 // Регистрация пользователя
 export const registerUser = async (name, email, password, confirmPassword) => {
@@ -68,6 +69,22 @@ export const fetchUserData = async (token) => {
   } catch (error) {
     console.error("Error fetching user data:", error);
     throw new Error("Failed to fetch user data");
+  }
+};
+
+// Получение баз данных пользователя
+export const fetchUserConnections = async (token) => {
+  try {
+    const response = await axios.get(clientDbUrl, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-type": "application/json"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user databases:", error);
+    throw new Error("Failed to fetch user databases");
   }
 };
 
