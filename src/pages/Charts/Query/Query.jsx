@@ -14,10 +14,15 @@ const Query = ({ tabId }) => {
   const [databases, setDatabases] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDatabase, setSelectedDatabase] = useState(null);
-  const [userId, setUserId] = useState(null); // Для хранения текущего user_id
 
-  // Получение токена доступа из localStorage
+  // Получение токена доступа и данных пользователя из localStorage
   const accessToken = JSON.parse(localStorage.getItem("userToken"));
+  const userData = JSON.parse(localStorage.getItem("userData")); // Данные пользователя
+  const userId = userData ? userData.pk : null; // Извлекаем user_id из данных пользователя
+
+  console.log("Access Token:", accessToken);
+  console.log("User Data from localStorage:", userData);
+  console.log("Extracted User ID:", userId);
 
   // Проверка наличия данных в tabContents с использованием optional chaining
   const tabContent = useSelector(
@@ -30,29 +35,13 @@ const Query = ({ tabId }) => {
     setLocalQueryText(tabContent);
   }, [tabContent]);
 
-  // Получение user_id текущего пользователя
+  // Функция для получения списка баз данных, принадлежащих текущему пользователю
   useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const response = await axios.get("http://varddev.tech:8000/api/user/", {
-          headers: {
-            Authorization: `Token ${accessToken}`,
-            "Content-Type": "application/json"
-          }
-        });
-        setUserId(response.data.id); // Сохраняем user_id
-      } catch (error) {
-        console.error("Failed to fetch user ID:", error);
-      }
-    };
+    if (!userId) {
+      console.warn("User ID is not available. Skipping fetch.");
+      return; // Ждем, пока userId не будет установлен
+    }
 
-    fetchUserId();
-  }, [accessToken]);
-
-  useEffect(() => {
-    if (!userId) return; // Ждем, пока userId не будет установлен
-
-    // Функция для получения списка баз данных, принадлежащих текущему пользователю
     const fetchDatabases = async () => {
       setLoading(true);
       try {
@@ -66,10 +55,14 @@ const Query = ({ tabId }) => {
           }
         );
 
+        console.log("Fetched Databases Response:", response.data);
+
         // Фильтрация баз данных по текущему user_id
         const userDatabases = response.data.filter(
           (db) => db.user_id === userId
         );
+
+        console.log("Filtered Databases for User:", userDatabases);
 
         // Извлечение названий баз данных из отфильтрованного списка
         setDatabases(userDatabases.map((db) => db.connection_name));

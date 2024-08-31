@@ -46,12 +46,20 @@ export const performLogout = createAsyncThunk(
       return rejectWithValue("No token found for logout");
     }
     try {
+      console.log("Attempting to log out with token:", token);
       await logoutUser(token);
+      console.log("Logout successful, clearing localStorage");
+
+      // Очистка всех данных пользователя из localStorage
       localStorage.removeItem("userData");
       localStorage.removeItem("userToken");
       localStorage.removeItem("connections");
+      localStorage.removeItem("databases");
+
+      console.log("LocalStorage cleared successfully");
       return null;
     } catch (error) {
+      console.error("Logout failed:", error);
       toast.error("Logout failed");
       return rejectWithValue(error.message || "Logout failed");
     }
