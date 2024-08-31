@@ -38,26 +38,30 @@ export const login = createAsyncThunk(
     }
   }
 );
+
 export const performLogout = createAsyncThunk(
   "user/logout",
   async (_, { getState, rejectWithValue }) => {
     const token = getState().user.token;
+    console.log("Attempting to logout with token:", token);
+
     if (!token) {
+      console.log("No token found for logout");
       return rejectWithValue("No token found for logout");
     }
-    try {
-      console.log("Attempting to log out with token:", token);
-      await logoutUser(token);
-      console.log("Logout successful, clearing localStorage");
 
-      // Очистка всех данных пользователя из localStorage
+    try {
+      await logoutUser(token);
+      console.log("Logout successful, clearing localStorage...");
+
+      // Clear localStorage
       localStorage.removeItem("userData");
       localStorage.removeItem("userToken");
       localStorage.removeItem("connections");
-      localStorage.removeItem("databases");
 
-      console.log("LocalStorage cleared successfully");
-      return null;
+      console.log("localStorage after clearing:", localStorage);
+
+      return null; // возвращаем null, чтобы явно указать, что пользователь вышел из системы
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Logout failed");
@@ -90,6 +94,7 @@ const userSlice = createSlice({
     logout(state) {
       state.user = null;
       state.token = null;
+      console.log("User state after logout:", state); // Log to check state
     }
   },
   extraReducers: (builder) => {
@@ -113,7 +118,7 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
-        console.log("Token:", state.token);
+        console.log("Token after login:", state.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
@@ -126,6 +131,7 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = null;
         state.token = null;
+        console.log("User state and token after logout:", state); // Log to check state
       })
       .addCase(performLogout.rejected, (state, action) => {
         state.status = "failed";
