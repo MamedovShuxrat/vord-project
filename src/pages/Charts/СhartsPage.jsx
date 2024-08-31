@@ -1,21 +1,41 @@
-import React, { useState, useEffect, useRef } from "react";
+// src/pages/Charts/ChartsPage.jsx
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/ui/Chat";
-import Query from "../../components/Query/Query";
+import Query from "./Query/Query";
+import Chart from "../../components/Charts/ui/Chart";
+import CleanData from "../../components/Charts/ui/CleanData";
 import MenuForFileCharts from "./menu/MenuForFileCharts";
 import MenuForQueryCharts from "./menu/MenuForQueryCharts";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
-import { v4 as uuid } from "uuid";
 import folder from "../../assets/images/icons/common/folder.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
+import {
+  addFolder,
+  removeFolder,
+  updateFolder,
+  toggleFolderOpen,
+  addFileToFolder,
+  removeFileFromFolder,
+  renameFileInFolder,
+  updateFileText,
+  setActiveTab,
+  openFile,
+  closeFile,
+  updateTabContent
+} from "../../core/store/chartsSlice";
 
 const ChartsPage = () => {
-  const [foldersTab, setFoldersTab] = useState([]);
+  const dispatch = useDispatch();
+  const foldersTab = useSelector((state) => state.charts.foldersTab);
+  const activeTab = useSelector((state) => state.charts.activeTab);
+  const openedFiles = useSelector((state) => state.charts.openedFiles);
   const { searchTerm, setSearchTerm } = useSearch();
-  const [activeTab, setActiveTab] = useState(null);
   const [menuVisible, setMenuVisible] = useState(null);
   const [menuPosition, setMenuPosition] = useState({
     top: 0,
@@ -24,8 +44,8 @@ const ChartsPage = () => {
   const [menuType, setMenuType] = useState(null);
   const [renamingTab, setRenamingTab] = useState(null);
   const [newTabName, setNewTabName] = useState("");
-  const [renamingFile, setRenamingFile] = useState(null); // Новый стейт для ID файла, который переименовывается
-  const [newFileName, setNewFileName] = useState(""); // Новый стейт для имени файла
+  const [renamingFile, setRenamingFile] = useState(null);
+  const [newFileName, setNewFileName] = useState("");
   const menuRef = useRef(null);
   const tabsContainerRef = useRef(null);
 
@@ -34,7 +54,7 @@ const ChartsPage = () => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuVisible(null);
         setRenamingTab(null);
-        setRenamingFile(null); // Сбросить переименовываемый файл при клике вне меню
+        setRenamingFile(null);
       }
     };
 
@@ -45,11 +65,7 @@ const ChartsPage = () => {
   }, []);
 
   const handleFolderRotate = (id) => {
-    setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) =>
-        tab.id === id ? { ...tab, isOpen: !tab.isOpen } : tab
-      )
-    );
+    dispatch(toggleFolderOpen(id));
   };
 
   const handleSearch = (term) => {
@@ -57,19 +73,22 @@ const ChartsPage = () => {
   };
 
   const addNewTab = (name, queryText = "") => {
+    const newTabId = uuid();
     const newTab = {
       id: uuid(),
       name: name || `Query: Без названия ${foldersTab.length + 1}`,
       icon: folder,
       isOpen: true,
       subfolder: [
-        { id: uuid(), name: "Chart: 1" },
-        { id: uuid(), name: "Clean Data: 1" }
+        { id: uuid(), name: "Chart: 1", type: "chart" },
+        { id: uuid(), name: "Clean Data: 1", type: "clean Data" }
       ],
       queryText
     };
-    setFoldersTab((prevTabs) => [...prevTabs, newTab]);
-    setActiveTab(newTab.id);
+    dispatch(addFolder(newTab));
+    dispatch(setActiveTab(newTabId));
+
+    dispatch(updateTabContent({ tabId: newTabId, content: queryText }));
   };
 
   const handleContextMenuClick = (action, id) => {
@@ -77,7 +96,7 @@ const ChartsPage = () => {
       if (action === "duplicate") {
         duplicateTab(id);
       } else if (action === "delete") {
-        deleteTab(id);
+        dispatch(removeFolder(id));
       } else if (action === "rename") {
         setRenamingTab(id);
         setNewTabName(foldersTab.find((tab) => tab.id === id).name);
@@ -86,7 +105,12 @@ const ChartsPage = () => {
       if (action === "duplicate") {
         duplicateFile(id);
       } else if (action === "delete") {
-        deleteFile(id);
+        dispatch(
+          removeFileFromFolder({
+            folderId: findFolderByFileId(id).id,
+            fileId: id
+          })
+        );
       } else if (action === "rename") {
         startRenamingFile(id);
       }
@@ -103,19 +127,8 @@ const ChartsPage = () => {
     }
   };
 
-  const deleteTab = (id) => {
-    setFoldersTab((prevTabs) => prevTabs.filter((tab) => tab.id !== id));
-
-    if (activeTab === id) {
-      const remainingTabs = foldersTab.filter((tab) => tab.id !== id);
-      setActiveTab(remainingTabs.length ? remainingTabs[0].id : null);
-    }
-  };
-
   const renameTab = (id, newName) => {
-    setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) => (tab.id === id ? { ...tab, name: newName } : tab))
-    );
+    dispatch(updateFolder({ id, newName }));
     setRenamingTab(null);
   };
 
@@ -137,9 +150,7 @@ const ChartsPage = () => {
   };
 
   const updateQueryText = (id, text) => {
-    setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) => (tab.id === id ? { ...tab, queryText: text } : tab))
-    );
+    dispatch(updateFileText({ fileId: id, newText: text }));
   };
 
   const scrollTabs = (direction) => {
@@ -152,33 +163,21 @@ const ChartsPage = () => {
   };
 
   const duplicateFile = (fileId) => {
-    setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) => {
-        const fileIndex = tab.subfolder.findIndex((file) => file.id === fileId);
-        if (fileIndex !== -1) {
-          const newFile = {
-            ...tab.subfolder[fileIndex],
-            id: uuid(),
-            name: `${tab.subfolder[fileIndex].name} (Копия)`
-          };
-          const updatedSubfolder = [
-            ...tab.subfolder.slice(0, fileIndex + 1),
-            newFile,
-            ...tab.subfolder.slice(fileIndex + 1)
-          ];
-          return { ...tab, subfolder: updatedSubfolder };
-        }
-        return tab;
-      })
-    );
+    const folder = findFolderByFileId(fileId);
+    const fileIndex = folder.subfolder.findIndex((file) => file.id === fileId);
+    if (fileIndex !== -1) {
+      const newFile = {
+        ...folder.subfolder[fileIndex],
+        id: uuid(),
+        name: `${folder.subfolder[fileIndex].name} (Копия)`
+      };
+      dispatch(addFileToFolder({ folderId: folder.id, file: newFile }));
+    }
   };
 
-  const deleteFile = (fileId) => {
-    setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) => ({
-        ...tab,
-        subfolder: tab.subfolder.filter((file) => file.id !== fileId)
-      }))
+  const findFolderByFileId = (fileId) => {
+    return foldersTab.find((tab) =>
+      tab.subfolder.some((file) => file.id === fileId)
     );
   };
 
@@ -191,15 +190,13 @@ const ChartsPage = () => {
   };
 
   const renameFile = (fileId, newName) => {
-    setFoldersTab((prevTabs) =>
-      prevTabs.map((tab) => ({
-        ...tab,
-        subfolder: tab.subfolder.map((file) =>
-          file.id === fileId ? { ...file, name: newName } : file
-        )
-      }))
-    );
+    const folder = findFolderByFileId(fileId);
+    dispatch(renameFileInFolder({ folderId: folder.id, fileId, newName }));
     setRenamingFile(null);
+  };
+
+  const handleFileClick = (file) => {
+    dispatch(openFile(file));
   };
 
   return (
@@ -219,12 +216,12 @@ const ChartsPage = () => {
                   item.name.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .map((folder) => (
-                  <div key={folder.id} className={commonStyles.folderItems}>
+                  <div key={folder.id} className={commonStyles.tabsItems}>
                     <div
                       className={`${commonStyles.folderItem} ${
                         activeTab === folder.id ? commonStyles.activeTab : ""
                       }`}
-                      onClick={() => setActiveTab(folder.id)}
+                      onClick={() => dispatch(setActiveTab(folder.id))}
                     >
                       <div className={commonStyles.folderHeader}>
                         <div className={commonStyles.folderInfo}>
@@ -273,7 +270,11 @@ const ChartsPage = () => {
                     {folder.isOpen && (
                       <div className={commonStyles.folderSubItems}>
                         {folder.subfolder.map((file) => (
-                          <div key={file.id} className={commonStyles.fileItem}>
+                          <div
+                            key={file.id}
+                            className={commonStyles.fileItem}
+                            onClick={() => handleFileClick(file)}
+                          >
                             {renamingFile === file.id ? (
                               <input
                                 type="text"
@@ -325,9 +326,9 @@ const ChartsPage = () => {
                 <div
                   key={folder.id}
                   className={`${commonStyles.tabsTopItem} ${
-                    activeTab === folder.id ? commonStyles.activeTab : ""
+                    activeTab === folder.id ? commonStyles.active : ""
                   }`}
-                  onClick={() => setActiveTab(folder.id)}
+                  onClick={() => dispatch(setActiveTab(folder.id))}
                 >
                   <span
                     className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
@@ -339,6 +340,28 @@ const ChartsPage = () => {
                     onClick={(e) => handleMenuClick(e, folder.id, "folder")}
                   >
                     <img src={dotsSvg} alt={`query_pic`} />
+                  </button>
+                </div>
+              ))}
+              {/* Открытые вкладки для файлов */}
+              {openedFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className={`${commonStyles.tabsTopItem} ${
+                    activeTab === file.id ? commonStyles.active : ""
+                  }`}
+                  onClick={() => dispatch(setActiveTab(file.id))}
+                >
+                  <span
+                    className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
+                  >
+                    {file.name}
+                  </span>
+                  <button
+                    className={commonStyles.tabsTopDots}
+                    onClick={(e) => handleMenuClick(e, file.id, "file")}
+                  >
+                    <img src={dotsSvg} alt={`file_pic`} />
                   </button>
                 </div>
               ))}
@@ -359,10 +382,17 @@ const ChartsPage = () => {
             (folder) =>
               activeTab === folder.id && (
                 <div key={folder.id}>
-                  <Query
-                    queryText={folder.queryText}
-                    setQueryText={(text) => updateQueryText(folder.id, text)}
-                  />
+                  <Query tabId={folder.id} />
+                </div>
+              )
+          )}
+          {/* Отображение контента файлов */}
+          {openedFiles.map(
+            (file) =>
+              activeTab === file.id && (
+                <div key={file.id}>
+                  {file.type === "chart" && <Chart tabId={file.id} />}
+                  {file.type === "cleanData" && <CleanData tabId={file.id} />}
                 </div>
               )
           )}

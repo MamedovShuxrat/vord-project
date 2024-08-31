@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
-import { addConnection, updateConnection, setConnections, submitFormData } from "../../core/store/connectionsSlice";
+import {
+  addConnection,
+  updateConnection,
+  setConnections,
+  submitFormData
+} from "../../core/store/connectionsSlice";
 import { useDotsMenu } from "../../components/utils/useDotsMenu";
 import useTabNavigation from "../../components/utils/useTabNavigation";
 import { renderImageOrIcon } from "../../components/utils/renderImageOrIcon";
@@ -18,20 +23,35 @@ import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
   const connections = useSelector((state) => state.connections.connections);
+  const userToken = useSelector((state) => state.user.token); // Получаем токен пользователя
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (!userToken) {
+      console.log("User is not logged in, clearing connections.");
+      dispatch(setConnections([])); // Установите пустой массив, если пользователь не авторизован
+      return;
+    }
+
     const storedConnections = JSON.parse(localStorage.getItem("connections"));
     if (storedConnections) {
       dispatch(setConnections(storedConnections));
+      console.log("Loaded connections from localStorage: ", storedConnections);
+    } else {
+      console.log("No stored connections found.");
     }
-    console.log("Loaded connections from localStorage: ", storedConnections); // Лог здесь
-  }, [dispatch]);
+  }, [dispatch, userToken]); // Добавили userToken в зависимости, чтобы обновлять при изменении токена
 
   const [activeTab, setActiveTab] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const { dotsChange, handleRenameSQLTabs, handleDeleteTabs, handleDotsChange, wrapperRef, } = useDotsMenu()
+  const {
+    dotsChange,
+    handleRenameSQLTabs,
+    handleDeleteTabs,
+    handleDotsChange,
+    wrapperRef
+  } = useDotsMenu();
 
   const { handleLeftButtonClick, handleRightButtonClick } = useTabNavigation(
     connections,
@@ -91,7 +111,6 @@ const ConnectionsPage = () => {
             addNewTab={addNewSQLTab}
           />
           <div className={commonStyles.tabsWrapper}>
-
             {connections
               .filter((item) =>
                 item.MySQL.toLowerCase().includes(searchTerm.toLowerCase())
@@ -100,8 +119,9 @@ const ConnectionsPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsItem} ${activeTab === item.id ? commonStyles.active : ""
-                    }`}
+                  className={`${commonStyles.tabsItem} ${
+                    activeTab === item.id ? commonStyles.active : ""
+                  }`}
                 >
                   {renderImageOrIcon(item)}
                   <span className={commonStyles.tabsName}>
@@ -121,7 +141,10 @@ const ConnectionsPage = () => {
                       alt={`${item.MySQL}_pic`}
                     />
                     {dotsChange[item.id] && (
-                      <div ref={wrapperRef} className={commonStyles.dotsChangeWrapper}>
+                      <div
+                        ref={wrapperRef}
+                        className={commonStyles.dotsChangeWrapper}
+                      >
                         <span
                           onClick={() => handleRenameSQLTabs(item.id)}
                           className={commonStyles.dotsChangeRename}
@@ -156,8 +179,9 @@ const ConnectionsPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsTopItem} ${activeTab === item.id ? commonStyles.active : ""
-                    }`}
+                  className={`${commonStyles.tabsTopItem} ${
+                    activeTab === item.id ? commonStyles.active : ""
+                  }`}
                   ref={activeTab === item.id ? activeItemRef : null}
                 >
                   <span
@@ -186,7 +210,8 @@ const ConnectionsPage = () => {
           <CreateDataBaseCard
             formData={{
               ...connections.find((tab) => tab.id === activeTab).formData,
-              connectionName: connections.find((tab) => tab.id === activeTab).MySQL
+              connectionName: connections.find((tab) => tab.id === activeTab)
+                .MySQL
             }}
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)

@@ -7,8 +7,7 @@ import dataBaseBlackSvg from "../../assets/images/icons/connection/database-blac
 const API_URL = process.env.REACT_APP_API_URL;
 const CONNECTION = `${API_URL}/clientdb/`;
 
-const token = JSON.parse(localStorage.getItem("userToken"));
-
+// Function to send form data to the backend
 const sendFormData = async (formData, token) => {
   try {
     const response = await axios.post(CONNECTION, formData, {
@@ -22,18 +21,20 @@ const sendFormData = async (formData, token) => {
   }
 };
 
+// Redux thunk for submitting form data
 export const submitFormData = createAsyncThunk(
   "connectionTabs/submitFormData",
   async ({ formData, activeTab }, { dispatch, rejectWithValue }) => {
+    const token = JSON.parse(localStorage.getItem("userToken")); // Fetch token from localStorage here
+    if (!token) {
+      return rejectWithValue("No valid token found");
+    }
     try {
-      const response = await toast.promise(
-        sendFormData(formData, token),
-        {
-          loading: "Sending Data...",
-          success: "Data saved successfully!",
-          error: "Error saving data. Please try again."
-        }
-      );
+      const response = await toast.promise(sendFormData(formData, token), {
+        loading: "Sending Data...",
+        success: "Data saved successfully!",
+        error: "Error saving data. Please try again."
+      });
 
       const updatedFormData = {
         ...formData,
@@ -59,21 +60,21 @@ const connectionTabsSlice = createSlice({
         MySQL: "Untitled",
         w: "20px",
         h: "20px",
-        formData: {} // Состояние для CreateDataBaseCard
+        formData: {} // State for CreateDataBaseCard
       }
     ]
   },
   reducers: {
     addConnection: (state, action) => {
       state.connections.push(action.payload);
-      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
     },
     updateConnection: (state, action) => {
       const { id, formData } = action.payload;
       const connection = state.connections.find((conn) => conn.id === id);
       if (connection) {
         connection.formData = formData;
-        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
       }
     },
     renameConnection: (state, action) => {
@@ -81,19 +82,18 @@ const connectionTabsSlice = createSlice({
       const connection = state.connections.find((conn) => conn.id === id);
       if (connection) {
         connection.MySQL = newName;
-        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+        localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
       }
     },
     deleteConnection: (state, action) => {
       state.connections = state.connections.filter(
         (connection) => connection.id !== action.payload
       );
-      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
-
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
     },
     setConnections: (state, action) => {
       state.connections = action.payload;
-      localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохранение в localStorage
+      localStorage.setItem("connections", JSON.stringify(state.connections)); // Save to localStorage
     }
   }
 });

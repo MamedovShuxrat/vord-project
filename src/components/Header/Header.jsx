@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../core/store/userSlice";
+import { performLogout } from "../../core/store/userSlice";
 import { toast } from "react-hot-toast";
-
 
 import HeaderStyles from "./header.module.scss";
 
@@ -15,6 +14,7 @@ import mainLogoSvg from "../../assets/images/icons/common/main-logo.svg";
 
 const Header = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Используем useNavigate вместо useHistory
   const user = useSelector((state) => state.user.user);
 
   const [isUserAuth, setIsUserAuth] = useState(false);
@@ -28,10 +28,15 @@ const Header = () => {
     }
   }, [user]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("userData");
+  const handleLogout = async () => {
+    try {
+      // Явно вызвать промис и дождаться завершения
+      await Promise.resolve(dispatch(performLogout()));
+      console.log("Redirecting to login page...");
+      navigate("/login"); // Используем navigate вместо history.push
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -42,23 +47,24 @@ const Header = () => {
             <img width={32} height={32} src={mainLogoSvg} alt="main logo" />
           </Link>
           <div className={HeaderStyles.userMenu}>
-            {user && (<>
-              <Link to="/feedback">
-                <button>
-                  <img width={24} height={24} src={faqSvg} alt="faq" />
-                </button>
-              </Link>
-              <Link to="/profile">
-                <button className={HeaderStyles.userSetting}>
-                  <img
-                    width={24}
-                    height={24}
-                    src={settingSvg}
-                    alt="user settings"
-                  />
-                </button>
-              </Link>
-            </>
+            {user && (
+              <>
+                <Link to="/feedback">
+                  <button>
+                    <img width={24} height={24} src={faqSvg} alt="faq" />
+                  </button>
+                </Link>
+                <Link to="/profile">
+                  <button className={HeaderStyles.userSetting}>
+                    <img
+                      width={24}
+                      height={24}
+                      src={settingSvg}
+                      alt="user settings"
+                    />
+                  </button>
+                </Link>
+              </>
             )}
             {isUserAuth ? (
               <div className={HeaderStyles.user}>

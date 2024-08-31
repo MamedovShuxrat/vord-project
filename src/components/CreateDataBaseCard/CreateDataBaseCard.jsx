@@ -240,7 +240,7 @@ const CreateDataBaseCard = ({
             onChange={handleChange}
           />
         )}
-        <div className={`${styles.selectWrapper} driverInput`}>
+        {/* <div className={`${styles.selectWrapper} driverInput`}>
           <label htmlFor="driver" className={styles.selectLabel}>
             Data Base Type
           </label>
@@ -254,7 +254,7 @@ const CreateDataBaseCard = ({
             <option value="">Select Driver</option>
             <option value="SQL Alchemy">sql alchemy mssql+pyodbc</option>
           </select>
-        </div>
+        </div> */}
         {dbType === "SQL Alchemy" && (
           <SimpleInput
             placeholder="Driver"
@@ -293,7 +293,7 @@ CreateDataBaseCard.propTypes = {
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  setIsConnected: PropTypes.bool.isRequired
+  setIsConnected: PropTypes.func.isRequired // Измените здесь
 };
 
 export default CreateDataBaseCard;
