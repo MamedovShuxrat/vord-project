@@ -79,3 +79,31 @@ export const fetchInvitedUsers = async (ownerId) => {
 	}
 }
 
+export const updateUserRole = async (selectEmail, newRole, ownerId) => {
+	try {
+		const response = await toast.promise(
+			axios.post(
+				`${INVITED_USERS}?user_id__id=&owner_id__id=${ownerId}&user_id__email=${selectEmail}`,
+				{
+					access_type_id: newRole,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Token ${token}`
+					},
+				}
+			),
+			{
+				loading: "Updating the role of the invitee...",
+				success: "Successful update of the invitee role!",
+				error: "Error updating the role of the invitee.",
+			}
+		);
+		fetchInvitedUsers(ownerId)
+		return response.data;
+	} catch (error) {
+		console.error("Error updating user role:", error);
+		throw error;
+	}
+};

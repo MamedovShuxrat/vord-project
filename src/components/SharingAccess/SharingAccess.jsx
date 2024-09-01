@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./sharing.module.scss";
 import inputStyles from "../ui/Inputs/inputs.module.scss";
 import { toast } from "react-hot-toast";
 
-import { handleSendData, fetchInvitedUsers } from "./api";
-import { useToggle } from "../utils/useToggle";
+import { handleSendData, fetchInvitedUsers, updateUserRole } from "./api";
+import { useToggleByID as useToggleByID } from "../utils/useToggleByID";
+import { useClickToggle } from "../utils/useClickOutside";
 
 import userAvatarImg from "../../assets/images/icons/common/user-avatar.svg";
 import arrowDownSvg from "../../assets/images/icons/shared/iconDown.svg";
@@ -29,8 +30,25 @@ const ADDROLE = [
 
 
 const SharingAccess = () => {
-  const owner = JSON.parse(localStorage.getItem("userData"));
-  const ownerId = owner.pk
+  const ownerData = localStorage.getItem("userData");
+
+  // Инициализируем переменную ownerId как null
+  let ownerId = null;
+  if (ownerData) {
+    try {
+      const owner = JSON.parse(ownerData);
+      if (owner && owner.pk) {
+        ownerId = owner.pk;
+      } else {
+        console.error("User data is missing the 'pk' property.");
+      }
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+    }
+  } else {
+    console.error("No user data found in localStorage.");
+  }
+
 
   const getRoleName = (access) => {
     const role = ADDROLE.find((role) => role.id === access)
@@ -39,12 +57,20 @@ const SharingAccess = () => {
 
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState(null)
+  const [email, setEmail] = useState("")
+  const [isConfirmed, setIsConfirmed] = useState(false)
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [newRole, setNewRole] = useState({});
+  const [selectedUserEmail, setSelectedUserEmail] = useState(null);
+  const [selectedNewRole, setSelectedNewRole] = useState(null)
 
   useEffect(() => {
     if (ownerId) {
       loadInvitedUsers(ownerId);
     }
   }, [ownerId]);
+
   const loadInvitedUsers = async (ownerId) => {
     try {
       const users = await fetchInvitedUsers(ownerId);
@@ -59,24 +85,23 @@ const SharingAccess = () => {
   }
 
   const {
+    isOpen: userAddRole,
+    toggle: closeUserAddBlock,
+    ref: userAddRoleRef,
+  } = useClickToggle("userAddRole");
+
+  const {
     isOpen: isUserBlockOpen,
     toggle: toggleUserBlock,
     ref: userBlockRef,
-  } = useToggle();
+  } = useToggleByID();
 
   const {
     isOpen: isRestrictedBlockOpen,
     toggle: toggleRestrictedBlock,
     ref: restrickedBlockRef,
-  } = useToggle();
+  } = useClickToggle("isRestrictedBlockOpen");
 
-  console.log(isUserBlockOpen);
-
-  const [role, setRole] = useState(null)
-  const [email, setEmail] = useState("")
-  const [isConfirmed, setIsConfirmed] = useState(false)
-  const [isEmailValid, setIsEmailValid] = useState(true);
-  const [newRole, setNewRole] = useState({});
 
   const handleCheckboxChange = async (e) => {
     const checked = e.target.checked;
@@ -96,23 +121,23 @@ const SharingAccess = () => {
     setIsEmailValid(emailPattern.test(value));
   }
 
-  const handleSubmitChanges = async () => {
+  const handleUpdateRole = async () => {
     try {
-      for (const userId in newRole) {
-        const email = invitedUsers.find(user => user.id === parseInt(userId))?.email;
-        const role = newRole[userId];
-
-        if (email && role) {
-          await handleSendData(email, role, setIsConfirmed);
-        }
+      if (!selectedUserEmail || !selectedNewRole) {
+        throw new Error("Please select a user and a role");
       }
-      loadInvitedUsers(ownerId);
-      setNewRole({});
+
+      await updateUserRole(selectedUserEmail, selectedNewRole, ownerId);
     } catch (error) {
-      console.error("Failed to update user roles", error);
+      console.error("Error updating user role:", error);
     }
+
   };
 
+
+  console.log(selectedNewRole, "senewROle");
+  console.log(selectedUserEmail, "selectedUserEmail");
+  console.log(ownerId, "ownerId");
 
   return (
     <div className={styles.access}>
@@ -132,9 +157,9 @@ const SharingAccess = () => {
           <span>Add role</span>
           <img
             style={{
-              transform: `rotate(${isUserBlockOpen ? "180deg" : "0deg"})`
+              transform: `rotate(${userAddRole ? "180deg" : "0deg"})`
             }}
-            onClick={() => toggleUserBlock}
+            onClick={closeUserAddBlock}
             src={arrowDownSvg}
             alt="Icon-down"
           />
@@ -145,15 +170,15 @@ const SharingAccess = () => {
           ) : (
             <span >Select role</span>
           )}
-          {isUserBlockOpen && (
-            <div className={styles.addRoleDndMenu} ref={userBlockRef}>
+          {userAddRole && (
+            <div className={styles.addRoleDndMenu} ref={userAddRoleRef}>
               {ADDROLE.map((item, key) => (
                 <span
                   key={key}
                   className={styles.addRoleDndItem}
                   onClick={() => {
                     setRole(item.id)
-                    toggleUserBlock()
+                    closeUserAddBlock();
                   }}
                 >
                   {item.name}
@@ -209,8 +234,10 @@ const SharingAccess = () => {
                           key={key}
                           className={styles.addRoleDndItem}
                           onClick={() => {
-                            setNewRole({ ...newRole, [user.id]: item.id });
-                            toggleUserBlock(user.id);
+                            setNewRole({ [user.id]: item.id });
+                            toggleUserBlock(user.id)
+                            setSelectedNewRole(item.id)
+                            setSelectedUserEmail(user.email)
                           }}
                         >
                           {item.name}
@@ -266,7 +293,7 @@ const SharingAccess = () => {
           <button className={styles.accessBtnItem}>
             <img src={linkSvg} alt="link" /> Copy link
           </button>
-          <button className={styles.accessBtnItem} onClick={handleSubmitChanges}>Done</button>
+          <button className={styles.accessBtnItem} onClick={handleUpdateRole} >Done</button>
         </div>
       </div>
     </div>

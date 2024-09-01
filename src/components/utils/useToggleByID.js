@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
-export const useToggle = (initialValue = false) => {
+export const useToggleByID = (initialValue = false) => {
     const [isOpen, setIsOpen] = useState({});
     const ref = useRef(null);
 
@@ -33,3 +33,4 @@ export const useToggle = (initialValue = false) => {
 
     return { isOpen, toggle, close, ref };
 };
+
