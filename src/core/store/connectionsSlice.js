@@ -35,12 +35,12 @@ export const submitFormData = createAsyncThunk(
         error: "Error saving data. Please try again."
       });
 
-      const updatedFormData = {
-        ...formData,
-        connectionName: formData.connection_name
-      };
+      // После успешного добавления соединения на бэкенд, удаляем его из локального состояния
+      dispatch(deleteConnection(activeTab));
 
-      dispatch(updateConnection({ id: activeTab, formData: updatedFormData }));
+      // Перезагружаем соединения с бэкенда
+      dispatch(fetchUserDatabases());
+
       return response;
     } catch (error) {
       console.error("Error saving data:", error);
@@ -95,9 +95,11 @@ const connectionTabsSlice = createSlice({
   },
   reducers: {
     addConnection: (state, action) => {
-      // Проверяем, существует ли уже соединение с таким же ID
+      // Проверяем, существует ли уже соединение с таким же ID или connection_name
       const existingConnection = state.connections.find(
-        (conn) => conn.id === action.payload.id
+        (conn) =>
+          conn.id === action.payload.id ||
+          conn.connection_name === action.payload.connection_name
       );
       if (!existingConnection) {
         state.connections.push(action.payload);
@@ -126,8 +128,18 @@ const connectionTabsSlice = createSlice({
       localStorage.setItem("connections", JSON.stringify(state.connections));
     },
     setConnections: (state, action) => {
-      state.connections = action.payload;
-      localStorage.setItem("connections", JSON.stringify(state.connections));
+      // Очищаем соединения перед добавлением новых
+      state.connections = [];
+
+      // Добавляем соединения, только если они уникальны
+      action.payload.forEach((newConn) => {
+        const existingConnection = state.connections.find(
+          (conn) => conn.id === newConn.id
+        );
+        if (!existingConnection) {
+          state.connections.push(newConn);
+        }
+      });
     }
   },
   extraReducers: (builder) => {

@@ -280,7 +280,7 @@ CreateDataBaseCard.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   isConnected: PropTypes.bool.isRequired,
   setIsConnected: PropTypes.func.isRequired,
-  isNewConnection: PropTypes.bool.isRequired // Добавьте новый prop
+  isNewConnection: PropTypes.bool.isRequired
 };
 
 export default CreateDataBaseCard;

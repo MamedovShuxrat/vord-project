@@ -71,7 +71,12 @@ const ConnectionsPage = () => {
       h: "20px",
       formData: {}
     };
-    dispatch(addConnection(newTab));
+
+    // Проверка на дублирование соединений
+    if (!connections.some((conn) => conn.connection_name === newMySQLValue)) {
+      dispatch(addConnection(newTab));
+    }
+
     setActiveTab(newTab.id); // Устанавливаем новый активный таб
     setIsConnected(false);
   };
