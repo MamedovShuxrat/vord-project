@@ -60,7 +60,6 @@ export const fetchUserDatabases = createAsyncThunk(
 
     try {
       const response = await fetchUserConnections(token);
-      console.log("Fetched user databases: ", response); // Logging fetched data
       return response;
     } catch (error) {
       console.error("Error fetching user databases:", error);
@@ -78,8 +77,13 @@ const connectionTabsSlice = createSlice({
   },
   reducers: {
     addConnection: (state, action) => {
-      state.connections.push(action.payload); // Добавляем новое соединение в конец списка
-      localStorage.setItem("connections", JSON.stringify(state.connections));
+      const existingConnection = state.connections.find(
+        (conn) => conn.id === action.payload.id
+      );
+      if (!existingConnection) {
+        state.connections.push(action.payload);
+        localStorage.setItem("connections", JSON.stringify(state.connections));
+      }
     },
     updateConnection: (state, action) => {
       const { id, formData } = action.payload;
@@ -111,23 +115,23 @@ const connectionTabsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserDatabases.pending, (state) => {
-        state.status = "loading"; // Устанавливаем статус загрузки
+        state.status = "loading";
       })
       .addCase(fetchUserDatabases.fulfilled, (state, action) => {
-        state.status = "succeeded"; // Устанавливаем статус успеха
-
-        // Проверка на дублирование данных перед добавлением
-        const newConnections = action.payload.filter(
-          (newConn) => !state.connections.some((conn) => conn.id === newConn.id)
+        state.status = "succeeded";
+        // Проверяем дублирование соединений
+        const uniqueConnections = action.payload.filter(
+          (newConnection) =>
+            !state.connections.some(
+              (existingConnection) => existingConnection.id === newConnection.id
+            )
         );
-
-        // Добавляем только новые уникальные соединения
-        state.connections = [...state.connections, ...newConnections];
-        localStorage.setItem("connections", JSON.stringify(state.connections)); // Сохраняем в localStorage
+        state.connections = [...state.connections, ...uniqueConnections];
+        localStorage.setItem("connections", JSON.stringify(state.connections));
       })
       .addCase(fetchUserDatabases.rejected, (state, action) => {
-        state.status = "failed"; // Устанавливаем статус ошибки
-        state.error = action.payload; // Сохраняем сообщение об ошибке
+        state.status = "failed";
+        state.error = action.payload;
       });
   }
 });

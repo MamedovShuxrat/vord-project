@@ -52,7 +52,8 @@ const CreateDataBaseCard = ({
   onFormDataChange,
   onSubmit,
   isConnected,
-  setIsConnected
+  setIsConnected,
+  isNewConnection
 }) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [dbType, setDbType] = useState(formData.dbType || "");
@@ -103,7 +104,6 @@ const CreateDataBaseCard = ({
     setDriver(value);
     handleChange(e);
   };
-  console.log("  localFormData: ", localFormData); // Лог для проверки
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -135,6 +135,7 @@ const CreateDataBaseCard = ({
       setIsConnected(true);
     }
   };
+
   return (
     <div className={styles.CardWrapper}>
       <div className={styles.connectMenu}>
@@ -240,21 +241,6 @@ const CreateDataBaseCard = ({
             onChange={handleChange}
           />
         )}
-        {/* <div className={`${styles.selectWrapper} driverInput`}>
-          <label htmlFor="driver" className={styles.selectLabel}>
-            Data Base Type
-          </label>
-          <select
-            id="driver"
-            name="driver"
-            value={driver}
-            className={styles.selectInput}
-            onChange={handleDriverChange}
-          >
-            <option value="">Select Driver</option>
-            <option value="SQL Alchemy">sql alchemy mssql+pyodbc</option>
-          </select>
-        </div> */}
         {dbType === "SQL Alchemy" && (
           <SimpleInput
             placeholder="Driver"
@@ -272,7 +258,7 @@ const CreateDataBaseCard = ({
           className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
           onClick={() => handleFormButtonClick(isFormValid)}
         >
-          {isConnected ? "Update" : "Connect"}
+          {isNewConnection ? "Connect" : "Update"}
         </button>
       </form>
     </div>
@@ -293,7 +279,8 @@ CreateDataBaseCard.propTypes = {
   onFormDataChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  setIsConnected: PropTypes.func.isRequired
+  setIsConnected: PropTypes.func.isRequired,
+  isNewConnection: PropTypes.bool.isRequired // Добавьте новый prop
 };
 
 export default CreateDataBaseCard;

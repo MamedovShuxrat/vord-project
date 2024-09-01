@@ -31,6 +31,7 @@ const ConnectionsPage = () => {
 
   const [activeTab, setActiveTab] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isNewConnection, setIsNewConnection] = useState(false); // Новый стейт
 
   useEffect(() => {
     if (!userToken) {
@@ -58,24 +59,25 @@ const ConnectionsPage = () => {
 
   const onSelectTabsItem = (id) => {
     setActiveTab(id);
+    const connection = connections.find((tab) => tab.id === id);
+    setIsConnected(connection?.isNew ? false : true); // Изменяет `isConnected` в зависимости от состояния соединения
+    setIsNewConnection(connection?.isNew || false); // Устанавливает флаг `isNewConnection`
   };
 
   const addNewSQLTab = (newMySQLValue) => {
     const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     const newTab = {
-      id: uuid(), // генерируем уникальный ID для нового соединения
+      id: uuid(),
       img: randomColor,
-      connection_name: newMySQLValue, // используем имя соединения
-      w: 20,
-      h: 20,
-      formData: {} // создаем пустой объект formData
+      connection_name: newMySQLValue,
+      w: "20px",
+      h: "20px",
+      formData: {},
+      isNew: true // Добавляем флаг, чтобы идентифицировать новое соединение
     };
-
-    // Проверка на дублирование перед добавлением
-    if (!connections.some((conn) => conn.id === newTab.id)) {
-      dispatch(addConnection(newTab));
-    }
-
+    dispatch(addConnection(newTab));
+    setActiveTab(newTab.id);
+    setIsNewConnection(true);
     setIsConnected(false);
   };
 
@@ -104,6 +106,7 @@ const ConnectionsPage = () => {
     try {
       await dispatch(submitFormData({ formData, activeTab })).unwrap();
       console.log("Data submitted successfully!");
+      setIsNewConnection(false); // После успешной отправки формы меняем состояние на false
     } catch (error) {
       console.error("Failed to submit data: ", error);
     }
@@ -237,6 +240,7 @@ const ConnectionsPage = () => {
             onSubmit={handleSubmit}
             isConnected={isConnected}
             setIsConnected={setIsConnected}
+            isNewConnection={isNewConnection} // Передаем в компонент
           />
         )}
       </div>
