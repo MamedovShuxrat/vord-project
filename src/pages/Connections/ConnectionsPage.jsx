@@ -5,7 +5,9 @@ import {
   addConnection,
   updateConnection,
   setConnections,
-  submitFormData
+  submitFormData,
+  fetchUserDatabases,
+  removeUserConnection
 } from "../../core/store/connectionsSlice";
 import { useDotsMenu } from "../../components/utils/useDotsMenu";
 import useTabNavigation from "../../components/utils/useTabNavigation";
@@ -23,24 +25,20 @@ import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
 const ConnectionsPage = () => {
   const { searchTerm, setSearchTerm } = useSearch();
   const connections = useSelector((state) => state.connections.connections);
-  const userToken = useSelector((state) => state.user.token); // Получаем токен пользователя
+  const userToken = useSelector((state) => state.user.token);
   const dispatch = useDispatch();
+  const status = useSelector((state) => state.connections.status);
+  const error = useSelector((state) => state.connections.error);
 
   useEffect(() => {
     if (!userToken) {
       console.log("User is not logged in, clearing connections.");
-      dispatch(setConnections([])); // Установите пустой массив, если пользователь не авторизован
-      return;
-    }
-
-    const storedConnections = JSON.parse(localStorage.getItem("connections"));
-    if (storedConnections) {
-      dispatch(setConnections(storedConnections));
-      console.log("Loaded connections from localStorage: ", storedConnections);
+      dispatch(setConnections([]));
     } else {
-      console.log("No stored connections found.");
+      console.log("User is logged in, fetching connections.");
+      dispatch(fetchUserDatabases());
     }
-  }, [dispatch, userToken]); // Добавили userToken в зависимости, чтобы обновлять при изменении токена
+  }, [dispatch, userToken]);
 
   const [activeTab, setActiveTab] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -68,13 +66,23 @@ const ConnectionsPage = () => {
     const newTab = {
       id: uuid(),
       img: randomColor,
-      MySQL: newMySQLValue,
+      connection_name: newMySQLValue,
       w: "20px",
       h: "20px",
       formData: {}
     };
-    dispatch(addConnection(newTab));
+
+    // Проверка на дублирование соединений
+    if (!connections.some((conn) => conn.connection_name === newMySQLValue)) {
+      dispatch(addConnection(newTab));
+    }
+
+    setActiveTab(newTab.id); // Устанавливаем новый активный таб
     setIsConnected(false);
+  };
+
+  const handleDeleteConnection = (id) => {
+    dispatch(removeUserConnection(id)); // Вызываем новый thunk для удаления соединения
   };
 
   const activeItemRef = useRef(null);
@@ -90,6 +98,7 @@ const ConnectionsPage = () => {
   }, [activeTab]);
 
   const handleFormDataChange = (id, newFormData) => {
+    console.log("Handling Form Data Change: ", newFormData);
     dispatch(updateConnection({ id, formData: newFormData }));
   };
 
@@ -98,7 +107,12 @@ const ConnectionsPage = () => {
   };
 
   const handleSubmit = async (formData) => {
-    await dispatch(submitFormData({ formData, activeTab }));
+    try {
+      await dispatch(submitFormData({ formData, activeTab })).unwrap();
+      console.log("Data submitted successfully!");
+    } catch (error) {
+      console.error("Failed to submit data: ", error);
+    }
   };
 
   return (
@@ -110,59 +124,69 @@ const ConnectionsPage = () => {
             placeholder="Search Connection"
             addNewTab={addNewSQLTab}
           />
-          <div className={commonStyles.tabsWrapper}>
-            {connections
-              .filter((item) =>
-                item.MySQL.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsItem} ${
-                    activeTab === item.id ? commonStyles.active : ""
-                  }`}
-                >
-                  {renderImageOrIcon(item)}
-                  <span className={commonStyles.tabsName}>
-                    MySQL: {item.MySQL}
-                  </span>
-                  <button
-                    className={commonStyles.tabsDots}
-                    onClick={() => handleDotsChange(item.id)}
+          {status === "loading" ? (
+            <p>Loading...</p>
+          ) : status === "failed" ? (
+            <p>Error: {error}</p>
+          ) : (
+            <div className={commonStyles.tabsWrapper}>
+              {connections
+                .filter(
+                  (item) =>
+                    item.connection_name &&
+                    item.connection_name
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase())
+                )
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => onSelectTabsItem(item.id)}
+                    className={`${commonStyles.tabsItem} ${
+                      activeTab === item.id ? commonStyles.active : ""
+                    }`}
                   >
-                    <img
-                      style={{
-                        transform: dotsChange[item.id]
-                          ? "rotate(360deg)"
-                          : "none"
-                      }}
-                      src={dotsSvg}
-                      alt={`${item.MySQL}_pic`}
-                    />
-                    {dotsChange[item.id] && (
-                      <div
-                        ref={wrapperRef}
-                        className={commonStyles.dotsChangeWrapper}
-                      >
-                        <span
-                          onClick={() => handleRenameSQLTabs(item.id)}
-                          className={commonStyles.dotsChangeRename}
+                    {renderImageOrIcon(item)}
+                    <span className={commonStyles.tabsName}>
+                      {item.connection_name}
+                    </span>
+                    <button
+                      className={commonStyles.tabsDots}
+                      onClick={() => handleDotsChange(item.id)}
+                    >
+                      <img
+                        style={{
+                          transform: dotsChange[item.id]
+                            ? "rotate(360deg)"
+                            : "none"
+                        }}
+                        src={dotsSvg}
+                        alt={`${item.connection_name}_pic`}
+                      />
+                      {dotsChange[item.id] && (
+                        <div
+                          ref={wrapperRef}
+                          className={commonStyles.dotsChangeWrapper}
                         >
-                          Rename
-                        </span>
-                        <span
-                          onClick={() => handleDeleteTabs(item.id)}
-                          className={commonStyles.dotsChangeDelete}
-                        >
-                          Delete
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                </div>
-              ))}
-          </div>
+                          <span
+                            onClick={() => handleRenameSQLTabs(item.id)}
+                            className={commonStyles.dotsChangeRename}
+                          >
+                            Rename
+                          </span>
+                          <span
+                            onClick={() => handleDeleteConnection(item.id)} // Используем новый обработчик удаления
+                            className={commonStyles.dotsChangeDelete}
+                          >
+                            Delete
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </div>
       <div className={commonStyles.sectionMainContent}>
@@ -187,10 +211,10 @@ const ConnectionsPage = () => {
                   <span
                     className={`${commonStyles.tabsName} ${commonStyles.tabsTopName}`}
                   >
-                    {item.MySQL}
+                    {item.connection_name}
                   </span>
                   <button className={commonStyles.tabsTopDots}>
-                    <img src={dotsSvg} alt={`${item.MySQL}_pic`} />
+                    <img src={dotsSvg} alt={`${item.connection_name}_pic`} />
                   </button>
                 </div>
               ))}
@@ -211,7 +235,7 @@ const ConnectionsPage = () => {
             formData={{
               ...connections.find((tab) => tab.id === activeTab).formData,
               connectionName: connections.find((tab) => tab.id === activeTab)
-                .MySQL
+                .connection_name
             }}
             onFormDataChange={(newFormData) =>
               handleFormDataChange(activeTab, newFormData)
@@ -219,6 +243,9 @@ const ConnectionsPage = () => {
             onSubmit={handleSubmit}
             isConnected={isConnected}
             setIsConnected={setIsConnected}
+            isNewConnection={
+              !connections.find((tab) => tab.id === activeTab).isFromBackend
+            }
           />
         )}
       </div>
