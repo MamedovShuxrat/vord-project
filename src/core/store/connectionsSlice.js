@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { fetchUserConnections } from "../../api/api";
+import { fetchUserConnections, deleteUserConnection } from "../../api/api";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const CONNECTION = `${API_URL}/clientdb/`;
@@ -68,6 +68,24 @@ export const fetchUserDatabases = createAsyncThunk(
   }
 );
 
+export const removeUserConnection = createAsyncThunk(
+  "connectionTabs/removeUserConnection",
+  async (id, { rejectWithValue }) => {
+    const token = JSON.parse(localStorage.getItem("userToken"));
+    if (!token) {
+      return rejectWithValue("No valid token found");
+    }
+
+    try {
+      await deleteUserConnection(id, token); // Удаляем с сервера
+      return id; // Возвращаем id удаленного соединения для последующего удаления из состояния
+    } catch (error) {
+      console.error("Error deleting user connection:", error);
+      return rejectWithValue(error.message || "Failed to delete connection.");
+    }
+  }
+);
+
 const connectionTabsSlice = createSlice({
   name: "connectionTabs",
   initialState: {
@@ -77,12 +95,12 @@ const connectionTabsSlice = createSlice({
   },
   reducers: {
     addConnection: (state, action) => {
+      // Проверяем, существует ли уже соединение с таким же ID
       const existingConnection = state.connections.find(
         (conn) => conn.id === action.payload.id
       );
       if (!existingConnection) {
         state.connections.push(action.payload);
-        localStorage.setItem("connections", JSON.stringify(state.connections));
       }
     },
     updateConnection: (state, action) => {
@@ -119,19 +137,28 @@ const connectionTabsSlice = createSlice({
       })
       .addCase(fetchUserDatabases.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Проверяем дублирование соединений
-        const uniqueConnections = action.payload.filter(
-          (newConnection) =>
-            !state.connections.some(
-              (existingConnection) => existingConnection.id === newConnection.id
-            )
-        );
-        state.connections = [...state.connections, ...uniqueConnections];
-        localStorage.setItem("connections", JSON.stringify(state.connections));
+        // Обновляем состояние только если данные уникальны
+        action.payload.forEach((newConn) => {
+          if (!state.connections.some((conn) => conn.id === newConn.id)) {
+            state.connections.push(newConn);
+          }
+        });
       })
       .addCase(fetchUserDatabases.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(removeUserConnection.fulfilled, (state, action) => {
+        state.connections = state.connections.filter(
+          (connection) => connection.id !== action.payload
+        );
+        toast.success("Connection removed successfully.");
+        localStorage.setItem("connections", JSON.stringify(state.connections));
+      })
+      .addCase(removeUserConnection.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        toast.error(action.payload);
       });
   }
 });

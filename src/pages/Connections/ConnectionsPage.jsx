@@ -6,7 +6,8 @@ import {
   updateConnection,
   setConnections,
   submitFormData,
-  fetchUserDatabases
+  fetchUserDatabases,
+  removeUserConnection
 } from "../../core/store/connectionsSlice";
 import { useDotsMenu } from "../../components/utils/useDotsMenu";
 import useTabNavigation from "../../components/utils/useTabNavigation";
@@ -29,10 +30,6 @@ const ConnectionsPage = () => {
   const status = useSelector((state) => state.connections.status);
   const error = useSelector((state) => state.connections.error);
 
-  const [activeTab, setActiveTab] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isNewConnection, setIsNewConnection] = useState(false); // Новый стейт
-
   useEffect(() => {
     if (!userToken) {
       console.log("User is not logged in, clearing connections.");
@@ -42,6 +39,9 @@ const ConnectionsPage = () => {
       dispatch(fetchUserDatabases());
     }
   }, [dispatch, userToken]);
+
+  const [activeTab, setActiveTab] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   const {
     dotsChange,
@@ -59,9 +59,6 @@ const ConnectionsPage = () => {
 
   const onSelectTabsItem = (id) => {
     setActiveTab(id);
-    const connection = connections.find((tab) => tab.id === id);
-    setIsConnected(connection?.isNew ? false : true); // Изменяет `isConnected` в зависимости от состояния соединения
-    setIsNewConnection(connection?.isNew || false); // Устанавливает флаг `isNewConnection`
   };
 
   const addNewSQLTab = (newMySQLValue) => {
@@ -72,13 +69,15 @@ const ConnectionsPage = () => {
       connection_name: newMySQLValue,
       w: "20px",
       h: "20px",
-      formData: {},
-      isNew: true // Добавляем флаг, чтобы идентифицировать новое соединение
+      formData: {}
     };
     dispatch(addConnection(newTab));
-    setActiveTab(newTab.id);
-    setIsNewConnection(true);
+    setActiveTab(newTab.id); // Устанавливаем новый активный таб
     setIsConnected(false);
+  };
+
+  const handleDeleteConnection = (id) => {
+    dispatch(removeUserConnection(id)); // Вызываем новый thunk для удаления соединения
   };
 
   const activeItemRef = useRef(null);
@@ -106,7 +105,6 @@ const ConnectionsPage = () => {
     try {
       await dispatch(submitFormData({ formData, activeTab })).unwrap();
       console.log("Data submitted successfully!");
-      setIsNewConnection(false); // После успешной отправки формы меняем состояние на false
     } catch (error) {
       console.error("Failed to submit data: ", error);
     }
@@ -172,7 +170,7 @@ const ConnectionsPage = () => {
                             Rename
                           </span>
                           <span
-                            onClick={() => handleDeleteTabs(item.id)}
+                            onClick={() => handleDeleteConnection(item.id)} // Используем новый обработчик удаления
                             className={commonStyles.dotsChangeDelete}
                           >
                             Delete
@@ -240,7 +238,9 @@ const ConnectionsPage = () => {
             onSubmit={handleSubmit}
             isConnected={isConnected}
             setIsConnected={setIsConnected}
-            isNewConnection={isNewConnection} // Передаем в компонент
+            isNewConnection={
+              !connections.find((tab) => tab.id === activeTab).isFromBackend
+            }
           />
         )}
       </div>

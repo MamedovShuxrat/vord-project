@@ -23,7 +23,7 @@ export const registerUser = async (name, email, password, confirmPassword) => {
       }),
       {
         loading: "Registering...",
-        success: <b>Registration successful</b>,
+        success: "Registration successful",
         error: "Registration failed"
       }
     );
@@ -43,8 +43,8 @@ export const loginUser = async (email, password) => {
       axios.post(authLogin, { email, password }),
       {
         loading: "Logging in...",
-        success: <b>Success login!</b>,
-        error: <b>Login failed: invalid username or password</b>
+        success: "Success login!",
+        error: "Login failed: invalid username or password"
       }
     );
     return response.data;
@@ -101,8 +101,8 @@ export const logoutUser = async (token) => {
       }),
       {
         loading: "Logging out...",
-        success: <b>Logout successful!</b>,
-        error: <b>Logout failed: an error occurred</b>
+        success: "Logout successful!",
+        error: "Logout failed: an error occurred"
       }
     );
     console.log("Logout response:", response.data);
@@ -126,6 +126,29 @@ export const connectClientDB = async (formData) => {
   } catch (error) {
     console.error("Connection to client DB failed:", error);
     throw new Error("Failed to connect to client DB");
+  }
+};
+
+// Функция для удаления базы данных пользователя
+export const deleteUserConnection = async (id, token) => {
+  try {
+    const response = await toast.promise(
+      axios.delete(`${clientDbUrl}${id}/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json"
+        }
+      }),
+      {
+        loading: "Deleting connection...",
+        success: "Connection deleted successfully!",
+        error: "Error deleting connection. Please try again."
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user connection:", error);
+    throw new Error("Failed to delete user connection.");
   }
 };
 
