@@ -44,6 +44,13 @@ const chartsSlice = createSlice({
       state.foldersTab = state.foldersTab.filter(
         (folder) => folder.id !== action.payload
       );
+      // Удаляем также все файлы, связанные с удаленной папкой
+      state.openedFiles = state.openedFiles.filter(
+        (file) =>
+          !state.foldersTab.some((folder) =>
+            folder.subfolder.some((subFile) => subFile.id === file.id)
+          )
+      );
       saveStateToLocalStorage(state);
     },
     updateFolder: (state, action) => {
@@ -117,9 +124,8 @@ const chartsSlice = createSlice({
       }
     },
     closeFile: (state, action) => {
-      const fileId = action.payload;
       state.openedFiles = state.openedFiles.filter(
-        (file) => file.id !== fileId
+        (file) => file.id !== action.payload
       );
       saveStateToLocalStorage(state);
     },

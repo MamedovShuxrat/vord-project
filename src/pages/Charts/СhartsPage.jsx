@@ -91,12 +91,34 @@ const ChartsPage = () => {
     dispatch(updateTabContent({ tabId: newTabId, content: queryText }));
   };
 
+  const closeRelatedTabs = (id) => {
+    // Находим все вкладки, связанные с папкой или файлом
+    const relatedFiles = openedFiles.filter((file) => {
+      const folder = findFolderByFileId(file.id);
+      return file.id === id || (folder && folder.id === id);
+    });
+
+    // Закрываем найденные вкладки
+    relatedFiles.forEach((file) => {
+      dispatch(closeFile(file.id));
+    });
+
+    // Закрываем активную вкладку, если она связана с удаляемым элементом
+    if (
+      activeTab === id ||
+      relatedFiles.some((file) => file.id === activeTab)
+    ) {
+      dispatch(setActiveTab(null)); // Или переключить на другую доступную вкладку
+    }
+  };
+
   const handleContextMenuClick = (action, id) => {
     if (menuType === "folder") {
       if (action === "duplicate") {
         duplicateTab(id);
       } else if (action === "delete") {
         dispatch(removeFolder(id));
+        closeRelatedTabs(id); // Закрываем связанные вкладки
       } else if (action === "rename") {
         setRenamingTab(id);
         setNewTabName(foldersTab.find((tab) => tab.id === id).name);
@@ -105,12 +127,17 @@ const ChartsPage = () => {
       if (action === "duplicate") {
         duplicateFile(id);
       } else if (action === "delete") {
-        dispatch(
-          removeFileFromFolder({
-            folderId: findFolderByFileId(id).id,
-            fileId: id
-          })
-        );
+        const folder = findFolderByFileId(id);
+        if (folder) {
+          // Проверяем наличие папки перед удалением файла
+          dispatch(
+            removeFileFromFolder({
+              folderId: folder.id,
+              fileId: id
+            })
+          );
+        }
+        closeRelatedTabs(id); // Закрываем связанные вкладки
       } else if (action === "rename") {
         startRenamingFile(id);
       }

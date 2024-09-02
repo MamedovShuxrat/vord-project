@@ -105,11 +105,11 @@ const Query = ({ tabId }) => {
             ))}
           </Select>
         </div>
-        <SearchBlock
+        {/* <SearchBlock
           placeholder="Search connection"
           onSearch={() => {}}
           showAddButton={false}
-        />
+        /> */}
       </div>
       <div className={queryStyles.editorContainer}>
         <MonacoEditor
