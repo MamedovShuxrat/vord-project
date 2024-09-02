@@ -95,3 +95,30 @@ export const deleteChart = async (chartId) => {
     throw error;
   }
 };
+
+// Функция для выполнения запроса
+export const executeQuery = async (clientdb_id, str_query, extension) => {
+  try {
+    const res = await axios({
+      url: `${API}/charts/`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${access}`
+      },
+      data: {
+        clientdb_id, // Убедитесь, что это значение корректно и существует в базе данных
+        str_query, // SQL запрос в виде строки
+        extension // Расширение (формат) вывода
+      }
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Failed to execute query:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+    }
+    throw error;
+  }
+};

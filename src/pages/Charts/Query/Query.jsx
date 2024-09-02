@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
-import SearchBlock from "../../../components/SearchBlock/SearchBlock";
 import queryStyles from "./query.module.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTabContent } from "../../../core/store/chartsSlice";
-import { Select, Spin } from "antd";
+import { Select, Spin, message } from "antd";
 import axios from "axios";
 
 const { Option } = Select;
@@ -14,17 +13,13 @@ const Query = ({ tabId }) => {
   const [databases, setDatabases] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDatabase, setSelectedDatabase] = useState(null);
+  const [selectedExtension, setSelectedExtension] = useState("json"); // Значение по умолчанию
 
   // Получение токена доступа и данных пользователя из localStorage
   const accessToken = JSON.parse(localStorage.getItem("userToken"));
   const userData = JSON.parse(localStorage.getItem("userData")); // Данные пользователя
   const userId = userData ? userData.pk : null; // Извлекаем user_id из данных пользователя
 
-  console.log("Access Token:", accessToken);
-  console.log("User Data from localStorage:", userData);
-  console.log("Extracted User ID:", userId);
-
-  // Проверка наличия данных в tabContents с использованием optional chaining
   const tabContent = useSelector(
     (state) => state.charts.tabContents?.[tabId] || ""
   );
@@ -35,11 +30,10 @@ const Query = ({ tabId }) => {
     setLocalQueryText(tabContent);
   }, [tabContent]);
 
-  // Функция для получения списка баз данных, принадлежащих текущему пользователю
   useEffect(() => {
     if (!userId) {
       console.warn("User ID is not available. Skipping fetch.");
-      return; // Ждем, пока userId не будет установлен
+      return;
     }
 
     const fetchDatabases = async () => {
@@ -55,17 +49,13 @@ const Query = ({ tabId }) => {
           }
         );
 
-        console.log("Fetched Databases Response:", response.data);
-
-        // Фильтрация баз данных по текущему user_id
         const userDatabases = response.data.filter(
           (db) => db.user_id === userId
         );
 
-        console.log("Filtered Databases for User:", userDatabases);
-
-        // Извлечение названий баз данных из отфильтрованного списка
-        setDatabases(userDatabases.map((db) => db.connection_name));
+        setDatabases(
+          userDatabases.map((db) => ({ id: db.id, name: db.connection_name }))
+        );
       } catch (error) {
         console.error("Failed to fetch databases:", error);
       } finally {
@@ -85,11 +75,53 @@ const Query = ({ tabId }) => {
     setSelectedDatabase(value);
   };
 
+  const handleExtensionChange = (value) => {
+    setSelectedExtension(value);
+  };
+
+  const handleRun = async () => {
+    if (!selectedDatabase || !localQueryText || !selectedExtension) {
+      message.error(
+        "Выберите базу данных, введите запрос и выберите расширение."
+      );
+      return;
+    }
+
+    const requestData = {
+      clientdb_id: selectedDatabase,
+      str_query: localQueryText,
+      extension: selectedExtension
+    };
+
+    try {
+      const response = await axios.post(
+        "http://varddev.tech:8000/api/charts/",
+        requestData,
+        {
+          headers: {
+            Authorization: `Token ${accessToken}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      console.log("Ответ от сервера:", response.data);
+      // Обработка данных ответа
+    } catch (error) {
+      console.error("Не удалось выполнить запрос:", error);
+      if (error.response) {
+        console.error("Данные ответа:", error.response.data);
+      }
+    }
+  };
+
   return (
     <div className={queryStyles.queryContainer}>
       <div className={queryStyles.tabsActions}>
         <div className={queryStyles.actionsBlock}>
-          <button className={queryStyles.runButton}>Run</button>
+          <button className={queryStyles.runButton} onClick={handleRun}>
+            Run
+          </button>
           <Select
             className={queryStyles.databaseSelect}
             value={selectedDatabase}
@@ -98,18 +130,24 @@ const Query = ({ tabId }) => {
             style={{ width: 200 }}
             loading={loading}
           >
-            {databases.map((dbName) => (
-              <Option key={dbName} value={dbName}>
-                {dbName}
+            {databases.map((db) => (
+              <Option key={db.id} value={db.id}>
+                {db.name}
               </Option>
             ))}
           </Select>
+          <Select
+            className={queryStyles.extensionSelect}
+            value={selectedExtension}
+            onChange={handleExtensionChange}
+            placeholder="Select an extension"
+            style={{ width: 150, marginLeft: 10 }}
+          >
+            <Option value="json">json</Option>
+            <Option value="xlsx">excel xlsx</Option>
+            <Option value="csv">csv</Option>
+          </Select>
         </div>
-        {/* <SearchBlock
-          placeholder="Search connection"
-          onSearch={() => {}}
-          showAddButton={false}
-        /> */}
       </div>
       <div className={queryStyles.editorContainer}>
         <MonacoEditor

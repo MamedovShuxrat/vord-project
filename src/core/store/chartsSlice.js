@@ -29,7 +29,7 @@ const initialState = loadStateFromLocalStorage() || {
   foldersTab: [],
   activeTab: null,
   openedFiles: [],
-  tabContents: {} // Добавлено поле для хранения состояния вкладок
+  tabContents: {}
 };
 
 const chartsSlice = createSlice({
@@ -108,7 +108,7 @@ const chartsSlice = createSlice({
         .flatMap((folder) => folder.subfolder)
         .find((file) => file.id === fileId);
       if (file) {
-        file.queryText = newText; // Обновление только текста файла
+        file.queryText = newText;
         saveStateToLocalStorage(state);
       }
     },
@@ -132,10 +132,10 @@ const chartsSlice = createSlice({
     updateTabContent: (state, action) => {
       const { tabId, content } = action.payload;
       if (!state.tabContents) {
-        state.tabContents = {}; // Ensure tabContents is initialized
+        state.tabContents = {};
       }
       if (!state.tabContents[tabId]) {
-        state.tabContents[tabId] = ""; // Initialize the tab content if it doesn't exist
+        state.tabContents[tabId] = "";
       }
       state.tabContents[tabId] = content;
       saveStateToLocalStorage(state);
