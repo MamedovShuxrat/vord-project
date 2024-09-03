@@ -107,9 +107,9 @@ export const executeQuery = async (clientdb_id, str_query, extension) => {
         Authorization: `Token ${access}`
       },
       data: {
-        clientdb_id, // Убедитесь, что это значение корректно и существует в базе данных
-        str_query, // SQL запрос в виде строки
-        extension // Расширение (формат) вывода
+        clientdb_id,
+        str_query,
+        extension
       }
     });
     return res.data;

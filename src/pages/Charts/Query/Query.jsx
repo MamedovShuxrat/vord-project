@@ -8,17 +8,26 @@ import axios from "axios";
 
 const { Option } = Select;
 
+// Предопределенный список расширений
+const EXTENSIONS = [
+  { id: 1, extension: false, name: "json api" },
+  { id: 3, extension: "xlsx", name: "excel xlsx" },
+  { id: 5, extension: "csv", name: "csv" },
+  { id: 6, extension: "json", name: "json" }
+];
+
 const Query = ({ tabId }) => {
   const dispatch = useDispatch();
   const [databases, setDatabases] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDatabase, setSelectedDatabase] = useState(null);
-  const [selectedExtension, setSelectedExtension] = useState("json"); // Значение по умолчанию
+  const [selectedExtensionId, setSelectedExtensionId] = useState(null);
+  const [showSQL, setShowSQL] = useState(true);
+  const [result, setResult] = useState("");
 
-  // Получение токена доступа и данных пользователя из localStorage
   const accessToken = JSON.parse(localStorage.getItem("userToken"));
-  const userData = JSON.parse(localStorage.getItem("userData")); // Данные пользователя
-  const userId = userData ? userData.pk : null; // Извлекаем user_id из данных пользователя
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const userId = userData ? userData.pk : null;
 
   const tabContent = useSelector(
     (state) => state.charts.tabContents?.[tabId] || ""
@@ -76,11 +85,11 @@ const Query = ({ tabId }) => {
   };
 
   const handleExtensionChange = (value) => {
-    setSelectedExtension(value);
+    setSelectedExtensionId(value);
   };
 
   const handleRun = async () => {
-    if (!selectedDatabase || !localQueryText || !selectedExtension) {
+    if (!selectedDatabase || !localQueryText || selectedExtensionId === null) {
       message.error(
         "Выберите базу данных, введите запрос и выберите расширение."
       );
@@ -90,7 +99,7 @@ const Query = ({ tabId }) => {
     const requestData = {
       clientdb_id: selectedDatabase,
       str_query: localQueryText,
-      extension: selectedExtension
+      extension: selectedExtensionId
     };
 
     try {
@@ -106,7 +115,8 @@ const Query = ({ tabId }) => {
       );
 
       console.log("Ответ от сервера:", response.data);
-      // Обработка данных ответа
+      setResult(response.data.result);
+      setShowSQL(false);
     } catch (error) {
       console.error("Не удалось выполнить запрос:", error);
       if (error.response) {
@@ -138,29 +148,51 @@ const Query = ({ tabId }) => {
           </Select>
           <Select
             className={queryStyles.extensionSelect}
-            value={selectedExtension}
+            value={selectedExtensionId}
             onChange={handleExtensionChange}
             placeholder="Select an extension"
             style={{ width: 150, marginLeft: 10 }}
           >
-            <Option value="json">json</Option>
-            <Option value="xlsx">excel xlsx</Option>
-            <Option value="csv">csv</Option>
+            {EXTENSIONS.map((ext) => (
+              <Option key={ext.id} value={ext.id}>
+                {ext.name}
+              </Option>
+            ))}
           </Select>
+        </div>
+        <div className={queryStyles.switchBlock}>
+          <button
+            onClick={() => setShowSQL(true)}
+            className={showSQL ? queryStyles.activeTab : ""}
+          >
+            SQL
+          </button>
+          <button
+            onClick={() => setShowSQL(false)}
+            className={!showSQL ? queryStyles.activeTab : ""}
+          >
+            Result
+          </button>
         </div>
       </div>
       <div className={queryStyles.editorContainer}>
-        <MonacoEditor
-          height="400px"
-          language="sql"
-          theme="vs-light"
-          value={localQueryText}
-          onChange={handleEditorChange}
-          options={{
-            lineNumbers: "on",
-            automaticLayout: true
-          }}
-        />
+        {showSQL ? (
+          <MonacoEditor
+            height="400px"
+            language="sql"
+            theme="vs-light"
+            value={localQueryText}
+            onChange={handleEditorChange}
+            options={{
+              lineNumbers: "on",
+              automaticLayout: true
+            }}
+          />
+        ) : (
+          <div className={queryStyles.resultContainer}>
+            {loading ? <Spin /> : <pre>{result}</pre>}
+          </div>
+        )}
       </div>
     </div>
   );
