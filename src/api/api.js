@@ -47,6 +47,7 @@ export const loginUser = async (email, password) => {
         error: "Login failed: invalid username or password"
       }
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {

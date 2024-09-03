@@ -162,6 +162,7 @@ const Query = ({ tabId }) => {
         </div>
         <div className={queryStyles.switchBlock}>
           <button
+            style={{ marginRight: "20px" }}
             onClick={() => setShowSQL(true)}
             className={showSQL ? queryStyles.activeTab : ""}
           >
