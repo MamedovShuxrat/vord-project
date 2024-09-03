@@ -5,6 +5,7 @@ import { updateTabContent } from "../../../core/store/chartsSlice";
 import TextArea from "antd/es/input/TextArea";
 import ChartImage from "./ChartImage";
 import ChartType from "./ChartType";
+import { Button } from "antd";
 import styles from "../../CreateDataBaseCard/createDataBaseCard.module.scss";
 
 const Chart = ({ tabId }) => {
@@ -29,7 +30,13 @@ const Chart = ({ tabId }) => {
         <ChartImage />
         <ChartType />
       </div>
-      <TextArea
+      <div style={{ textAlign: "center" }}>
+        <Button type="primary" size="small">
+          {" "}
+          Send{" "}
+        </Button>
+      </div>
+      {/* <TextArea
         rows={4}
         placeholder="Description"
         style={{
@@ -46,10 +53,10 @@ const Chart = ({ tabId }) => {
       <button
         type="submit"
         className={`${styles.formDataBtn} ${styles.formDataBtnBlue}`}
-        // onClick={() => handleFormButtonClick(isFormValid)}
+        onClick={() => handleFormButtonClick(isFormValid)}
       >
         Report
-      </button>
+      </button> */}
     </div>
   );
 };
