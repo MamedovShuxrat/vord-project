@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./sharing.module.scss";
 import inputStyles from "../ui/Inputs/inputs.module.scss";
-import { toast } from "react-hot-toast";
 
 import { handleSendData, fetchInvitedUsers, updateUserRole } from "./api";
 import { useToggleByID as useToggleByID } from "../utils/useToggleByID";
@@ -32,7 +31,6 @@ const ADDROLE = [
 const SharingAccess = () => {
   const ownerData = localStorage.getItem("userData");
 
-  // Инициализируем переменную ownerId как null
   let ownerId = null;
   if (ownerData) {
     try {
@@ -62,7 +60,7 @@ const SharingAccess = () => {
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [newRole, setNewRole] = useState({});
-  const [selectedUserEmail, setSelectedUserEmail] = useState(null);
+  const [selectedUserById, setSelectedUserById] = useState(null);
   const [selectedNewRole, setSelectedNewRole] = useState(null)
 
   useEffect(() => {
@@ -123,21 +121,16 @@ const SharingAccess = () => {
 
   const handleUpdateRole = async () => {
     try {
-      if (!selectedUserEmail || !selectedNewRole) {
+      if (!selectedUserById || !selectedNewRole) {
         throw new Error("Please select a user and a role");
       }
 
-      await updateUserRole(selectedUserEmail, selectedNewRole, ownerId);
+      await updateUserRole(selectedUserById, selectedNewRole, ownerId);
     } catch (error) {
       console.error("Error updating user role:", error);
     }
 
   };
-
-
-  console.log(selectedNewRole, "senewROle");
-  console.log(selectedUserEmail, "selectedUserEmail");
-  console.log(ownerId, "ownerId");
 
   return (
     <div className={styles.access}>
@@ -237,7 +230,7 @@ const SharingAccess = () => {
                             setNewRole({ [user.id]: item.id });
                             toggleUserBlock(user.id)
                             setSelectedNewRole(item.id)
-                            setSelectedUserEmail(user.email)
+                            setSelectedUserById(user.id)
                           }}
                         >
                           {item.name}
