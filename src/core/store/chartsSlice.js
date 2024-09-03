@@ -29,7 +29,7 @@ const initialState = loadStateFromLocalStorage() || {
   foldersTab: [],
   activeTab: null,
   openedFiles: [],
-  tabContents: {} // Добавлено поле для хранения состояния вкладок
+  tabContents: {}
 };
 
 const chartsSlice = createSlice({
@@ -43,6 +43,13 @@ const chartsSlice = createSlice({
     removeFolder: (state, action) => {
       state.foldersTab = state.foldersTab.filter(
         (folder) => folder.id !== action.payload
+      );
+      // Удаляем также все файлы, связанные с удаленной папкой
+      state.openedFiles = state.openedFiles.filter(
+        (file) =>
+          !state.foldersTab.some((folder) =>
+            folder.subfolder.some((subFile) => subFile.id === file.id)
+          )
       );
       saveStateToLocalStorage(state);
     },
@@ -101,7 +108,7 @@ const chartsSlice = createSlice({
         .flatMap((folder) => folder.subfolder)
         .find((file) => file.id === fileId);
       if (file) {
-        file.queryText = newText; // Обновление только текста файла
+        file.queryText = newText;
         saveStateToLocalStorage(state);
       }
     },
@@ -117,19 +124,18 @@ const chartsSlice = createSlice({
       }
     },
     closeFile: (state, action) => {
-      const fileId = action.payload;
       state.openedFiles = state.openedFiles.filter(
-        (file) => file.id !== fileId
+        (file) => file.id !== action.payload
       );
       saveStateToLocalStorage(state);
     },
     updateTabContent: (state, action) => {
       const { tabId, content } = action.payload;
       if (!state.tabContents) {
-        state.tabContents = {}; // Ensure tabContents is initialized
+        state.tabContents = {};
       }
       if (!state.tabContents[tabId]) {
-        state.tabContents[tabId] = ""; // Initialize the tab content if it doesn't exist
+        state.tabContents[tabId] = "";
       }
       state.tabContents[tabId] = content;
       saveStateToLocalStorage(state);

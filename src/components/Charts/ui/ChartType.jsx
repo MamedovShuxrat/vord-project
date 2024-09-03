@@ -3,38 +3,43 @@ import { Table, Select, Input, Row, Col } from "antd";
 
 const { Option } = Select;
 
-const ChartType = () => {
-  // Состояния для хранения данных, полученных с бэкенда
-  const [clientIds, setClientIds] = useState([]);
-  const [plotTypes, setPlotTypes] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [imageFormats, setImageFormats] = useState([]);
-  const [extensions, setExtensions] = useState([]);
+// Словари для значений
+const plotTypes = [
+  { id: 1, label: "Plot" },
+  { id: 2, label: "Scatter" },
+  { id: 3, label: "Bar" },
+  { id: 4, label: "Pie" },
+  { id: 5, label: "Stackplot" }
+];
 
+const colors = [
+  { value: "#F15C3C", label: "Red" },
+  { value: "#8FC73C", label: "Green" },
+  { value: "#26ADE1", label: "Blue" },
+  { value: "#DE4AF0", label: "Purple" },
+  { value: "#FCD205", label: "Yellow" },
+  { value: "#6C6C6C", label: "Grey" }
+];
+
+const imageFormats = [
+  { id: 1, label: "Png" },
+  { id: 2, label: "Ps" },
+  { id: 3, label: "Pdf" },
+  { id: 4, label: "Svg" }
+];
+
+const ChartType = () => {
   // Состояния для хранения значений полей ввода
   const [formData, setFormData] = useState({
-    clientId: "",
-    query: "",
+    title: "",
     xData: "",
     yData: "",
     xLabel: "",
     yLabel: "",
-    title: "",
-    plotType: "",
-    color: "",
-    imageFormat: "",
-    extension: ""
+    plotType: null,
+    color: null,
+    imageFormat: null
   });
-
-  useEffect(() => {
-    // Здесь должен быть вызов к бэкенду для получения данных для дропдаунов
-    // Примерные данные, которые могли бы прийти с сервера
-    setClientIds(["Magazine", "Newspaper", "Blog"]);
-    setPlotTypes(["Plot", "Scatter", "Bar", "Pie", "Stackplot"]);
-    setColors(["Red", "Green", "Blue", "Purple", "Yellow", "Grey"]);
-    setImageFormats(["Png", "Ps", "Pdf", "Svg"]);
-    setExtensions(["json api", "excel xlsx", "csv", "json"]);
-  }, []);
 
   // Функция для обработки изменения в полях ввода
   const handleChange = (field, value) => {
@@ -64,34 +69,16 @@ const ChartType = () => {
   const dataFirstColumn = [
     {
       key: "1",
-      field: "Clientdb id",
+      field: "Title",
       input: (
-        <Select
-          value={formData.clientId}
-          onChange={(value) => handleChange("clientId", value)}
-          style={{ width: "100%" }}
-        >
-          {clientIds.map((id) => (
-            <Option key={id} value={id}>
-              {id}
-            </Option>
-          ))}
-        </Select>
-      )
-    },
-    {
-      key: "2",
-      field: "Query",
-      input: (
-        <Input.TextArea
-          value={formData.query}
-          onChange={(e) => handleChange("query", e.target.value)}
-          rows={2}
+        <Input
+          value={formData.title}
+          onChange={(e) => handleChange("title", e.target.value)}
         />
       )
     },
     {
-      key: "3",
+      key: "2",
       field: "X data",
       input: (
         <Input
@@ -101,7 +88,7 @@ const ChartType = () => {
       )
     },
     {
-      key: "4",
+      key: "3",
       field: "Y data",
       input: (
         <Input
@@ -111,7 +98,7 @@ const ChartType = () => {
       )
     },
     {
-      key: "5",
+      key: "4",
       field: "X label",
       input: (
         <Input
@@ -125,7 +112,7 @@ const ChartType = () => {
   // Данные для второй таблицы (вторая колонка)
   const dataSecondColumn = [
     {
-      key: "6",
+      key: "5",
       field: "Y label",
       input: (
         <Input
@@ -135,78 +122,54 @@ const ChartType = () => {
       )
     },
     {
-      key: "7",
-      field: "Title",
-      input: (
-        <Input
-          value={formData.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-        />
-      )
-    },
-    {
-      key: "8",
+      key: "6",
       field: "Plot type",
       input: (
         <Select
+          placeholder="Select Plot Type"
           value={formData.plotType}
           onChange={(value) => handleChange("plotType", value)}
           style={{ width: "100%" }}
         >
-          {plotTypes.map((type) => (
-            <Option key={type} value={type}>
-              {type}
+          {plotTypes.map((plot) => (
+            <Option key={plot.id} value={plot.id}>
+              {plot.label}
             </Option>
           ))}
         </Select>
       )
     },
     {
-      key: "9",
+      key: "7",
       field: "Color",
       input: (
         <Select
+          placeholder="Select Color"
           value={formData.color}
           onChange={(value) => handleChange("color", value)}
           style={{ width: "100%" }}
         >
           {colors.map((color) => (
-            <Option key={color} value={color}>
-              {color}
+            <Option key={color.value} value={color.value}>
+              {color.label}
             </Option>
           ))}
         </Select>
       )
     },
     {
-      key: "10",
+      key: "8",
       field: "Image format",
       input: (
         <Select
+          placeholder="Select Image Format"
           value={formData.imageFormat}
           onChange={(value) => handleChange("imageFormat", value)}
           style={{ width: "100%" }}
         >
           {imageFormats.map((format) => (
-            <Option key={format} value={format}>
-              {format}
-            </Option>
-          ))}
-        </Select>
-      )
-    },
-    {
-      key: "11",
-      field: "Extension",
-      input: (
-        <Select
-          value={formData.extension}
-          onChange={(value) => handleChange("extension", value)}
-          style={{ width: "100%" }}
-        >
-          {extensions.map((ext) => (
-            <Option key={ext} value={ext}>
-              {ext}
+            <Option key={format.id} value={format.id}>
+              {format.label}
             </Option>
           ))}
         </Select>
