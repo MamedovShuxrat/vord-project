@@ -1,22 +1,28 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
-export const useToggle = (initialValue = false) => {
-    const [isOpen, setIsOpen] = useState(initialValue);
+export const useToggleByID = (initialValue = false) => {
+    const [isOpen, setIsOpen] = useState({});
     const ref = useRef(null);
 
-    const toggle = useCallback(() => {
-        setIsOpen((prevState) => !prevState);
+    const toggle = useCallback((id) => {
+        setIsOpen((prevState) => ({
+            ...prevState,
+            [id]: !prevState[id],
+        }));
     }, []);
 
-    const close = useCallback(() => {
-        setIsOpen(false);
+    const close = useCallback((id) => {
+        setIsOpen((prevState) => ({
+            ...prevState,
+            [id]: false,
+        }));
     }, []);
 
     const handleClickOutside = useCallback((event) => {
         if (ref.current && !ref.current.contains(event.target)) {
-            close();
+            setIsOpen({});
         }
-    }, [close]);
+    }, []);
 
     useEffect(() => {
         document.addEventListener("mousedown", handleClickOutside);
@@ -27,3 +33,4 @@ export const useToggle = (initialValue = false) => {
 
     return { isOpen, toggle, close, ref };
 };
+

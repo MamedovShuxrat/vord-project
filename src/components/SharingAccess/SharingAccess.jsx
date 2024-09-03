@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./sharing.module.scss";
-import checkbox from "../CreateDataBaseCard/createDataBaseCard.module.scss";
 import inputStyles from "../ui/Inputs/inputs.module.scss";
 
-import { handleSendData, fetchInvitedUsers } from "./api";
-import { useToggle } from "../utils/useToggle";
+import { handleSendData, fetchInvitedUsers, updateUserRole } from "./api";
+import { useToggleByID as useToggleByID } from "../utils/useToggleByID";
+import { useClickToggle } from "../utils/useClickOutside";
 
 import userAvatarImg from "../../assets/images/icons/common/user-avatar.svg";
-import sendMail from "../../assets/images/common/send-mail.svg";
 import arrowDownSvg from "../../assets/images/icons/shared/iconDown.svg";
 import linkSvg from "../../assets/images/icons/shared/link.svg";
 import lockSvg from "../../assets/images/icons/shared/lock.svg";
@@ -30,29 +29,52 @@ const ADDROLE = [
 
 
 const SharingAccess = () => {
-  const owner = JSON.parse(localStorage.getItem("userData"));
-  const ownerId = owner.pk
+  const ownerData = localStorage.getItem("userData");
+
+  let ownerId = null;
+  if (ownerData) {
+    try {
+      const owner = JSON.parse(ownerData);
+      if (owner && owner.pk) {
+        ownerId = owner.pk;
+      } else {
+        console.error("User data is missing the 'pk' property.");
+      }
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+    }
+  } else {
+    console.error("No user data found in localStorage.");
+  }
+
 
   const getRoleName = (access) => {
     const role = ADDROLE.find((role) => role.id === access)
-    return role ? role.name : "Unknow Role"
+    return role ? role.name : "Unknown Role"
   }
 
   const [invitedUsers, setInvitedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [role, setRole] = useState(null)
+  const [email, setEmail] = useState("")
+  const [isConfirmed, setIsConfirmed] = useState(false)
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [newRole, setNewRole] = useState({});
+  const [selectedUserById, setSelectedUserById] = useState(null);
+  const [selectedNewRole, setSelectedNewRole] = useState(null)
 
   useEffect(() => {
     if (ownerId) {
       loadInvitedUsers(ownerId);
     }
   }, [ownerId]);
+
   const loadInvitedUsers = async (ownerId) => {
     try {
       const users = await fetchInvitedUsers(ownerId);
       setInvitedUsers(users);
     } catch (error) {
-      setError(error.message);
+      console.error(error.message);
     } finally {
       setTimeout(() => {
         setLoading(false);
@@ -61,21 +83,23 @@ const SharingAccess = () => {
   }
 
   const {
+    isOpen: userAddRole,
+    toggle: closeUserAddBlock,
+    ref: userAddRoleRef,
+  } = useClickToggle("userAddRole");
+
+  const {
     isOpen: isUserBlockOpen,
     toggle: toggleUserBlock,
     ref: userBlockRef,
-  } = useToggle();
+  } = useToggleByID();
 
   const {
     isOpen: isRestrictedBlockOpen,
     toggle: toggleRestrictedBlock,
     ref: restrickedBlockRef,
-  } = useToggle();
+  } = useClickToggle("isRestrictedBlockOpen");
 
-  const [role, setRole] = useState(null)
-  const [email, setEmail] = useState("")
-  const [isConfirmed, setIsConfirmed] = useState(false)
-  const [isEmailValid, setIsEmailValid] = useState(true);
 
   const handleCheckboxChange = async (e) => {
     const checked = e.target.checked;
@@ -86,6 +110,7 @@ const SharingAccess = () => {
     }
     setRole(null)
   };
+
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
@@ -94,6 +119,18 @@ const SharingAccess = () => {
     setIsEmailValid(emailPattern.test(value));
   }
 
+  const handleUpdateRole = async () => {
+    try {
+      if (!selectedUserById || !selectedNewRole) {
+        throw new Error("Please select a user and a role");
+      }
+
+      await updateUserRole(selectedUserById, selectedNewRole, ownerId);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+    }
+
+  };
 
   return (
     <div className={styles.access}>
@@ -113,9 +150,9 @@ const SharingAccess = () => {
           <span>Add role</span>
           <img
             style={{
-              transform: `rotate(${isUserBlockOpen ? "180deg" : "0deg"})`
+              transform: `rotate(${userAddRole ? "180deg" : "0deg"})`
             }}
-            onClick={toggleUserBlock}
+            onClick={closeUserAddBlock}
             src={arrowDownSvg}
             alt="Icon-down"
           />
@@ -126,15 +163,15 @@ const SharingAccess = () => {
           ) : (
             <span >Select role</span>
           )}
-          {isUserBlockOpen && (
-            <div className={styles.addRoleDndMenu} ref={userBlockRef}>
+          {userAddRole && (
+            <div className={styles.addRoleDndMenu} ref={userAddRoleRef}>
               {ADDROLE.map((item, key) => (
                 <span
                   key={key}
                   className={styles.addRoleDndItem}
                   onClick={() => {
                     setRole(item.id)
-                    toggleUserBlock()
+                    closeUserAddBlock();
                   }}
                 >
                   {item.name}
@@ -178,7 +215,37 @@ const SharingAccess = () => {
                   <p className={styles.userMail}>{user.email}</p>
                 </div>
                 <div className={styles.addRoleName}>
-                  <span>{getRoleName(user.access_type_id)}</span>
+                  <span className={styles.selectedRole}>
+                    {newRole[user.id]
+                      ? ADDROLE.find(item => item.id === newRole[user.id])?.name
+                      : getRoleName(user.access_type_id)}
+                  </span>
+                  {isUserBlockOpen[user.id] && (
+                    <div className={styles.addRoleDndMenu} ref={userBlockRef}>
+                      {ADDROLE.map((item, key) => (
+                        <span
+                          key={key}
+                          className={styles.addRoleDndItem}
+                          onClick={() => {
+                            setNewRole({ [user.id]: item.id });
+                            toggleUserBlock(user.id)
+                            setSelectedNewRole(item.id)
+                            setSelectedUserById(user.id)
+                          }}
+                        >
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <img
+                    style={{
+                      transform: `rotate(${isUserBlockOpen[user.id] ? "180deg" : "0deg"})`,
+                    }}
+                    onClick={() => toggleUserBlock(user.id)}
+                    src={arrowDownSvg}
+                    alt="Icon-down"
+                  />
                 </div>
               </div>
             ))
@@ -219,11 +286,15 @@ const SharingAccess = () => {
           <button className={styles.accessBtnItem}>
             <img src={linkSvg} alt="link" /> Copy link
           </button>
-          <button className={styles.accessBtnItem}>Done</button>
+          <button className={styles.accessBtnItem} onClick={handleUpdateRole} >Done</button>
         </div>
       </div>
     </div>
   );
+
+
 };
+
+
 
 export default SharingAccess;

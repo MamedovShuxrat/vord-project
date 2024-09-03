@@ -61,6 +61,7 @@ export const handleSendData = async (email, role, setIsConfirmed) => {
 export const fetchInvitedUsers = async (ownerId) => {
 	try {
 		const response = await toast.promise(
+
 			axios.get(`${INVITED_USERS}?user_id__id=&owner_id__id=${ownerId}`, {
 				headers: {
 					Authorization: `Token ${token}`
@@ -72,10 +73,41 @@ export const fetchInvitedUsers = async (ownerId) => {
 				error: "Failed to load users. Please try again."
 			}
 		)
+		console.log(response.data, "serv");
 		return response.data
 	} catch (error) {
 		console.error("Error fetching invited users:", error);
 		throw new Error(error.message);
 	}
 }
+
+export const updateUserRole = async (selectedUserById, newRole, ownerId) => {
+	try {
+		const response = await toast.promise(
+			axios.patch(
+				`${INVITED_USERS}${selectedUserById}/`,
+				{
+					access_type_id: newRole,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Token ${token}`
+					},
+				}
+			),
+			{
+				loading: "Updating the role of the invitee...",
+				success: "Successful update of the invitee role!",
+				error: "Error updating the role of the invitee.",
+			}
+		);
+		fetchInvitedUsers(ownerId)
+		return response.data;
+	} catch (error) {
+		console.error("Error updating user role:", error);
+		throw error;
+	}
+};
+
 
