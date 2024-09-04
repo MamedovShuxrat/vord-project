@@ -1,5 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchUserDatabases, runQuery } from "../../pages/Charts/api/index";
+import {
+  fetchUserDatabases,
+  runQuery,
+  fetchQueryResult
+} from "../../pages/Charts/api/index";
 import { v4 as uuid } from "uuid";
 
 // Функции для работы с localStorage
@@ -53,10 +57,19 @@ export const loadUserDatabases = createAsyncThunk(
 // Асинхронное действие для выполнения SQL-запроса
 export const executeQuery = createAsyncThunk(
   "charts/executeQuery",
-  async ({ token, requestData }, { rejectWithValue }) => {
+  async ({ token, requestData }, { rejectWithValue, dispatch }) => {
     try {
       const result = await runQuery(token, requestData);
-      return result;
+      if (result.clientdata) {
+        // Если клиентские данные получены, выполнить дополнительный запрос, чтобы получить результат
+        const clientDataResult = await fetchQueryResult(
+          token,
+          result.clientdata
+        );
+        return clientDataResult;
+      } else {
+        return rejectWithValue("Clientdata not found in response");
+      }
     } catch (error) {
       return rejectWithValue("Failed to execute query");
     }

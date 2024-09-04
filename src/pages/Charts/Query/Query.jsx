@@ -140,7 +140,15 @@ const Query = ({ tabId }) => {
           />
         ) : (
           <div className={queryStyles.resultContainer}>
-            {loading ? <Spin /> : <pre>{queryResult}</pre>}
+            {loading ? (
+              <Spin />
+            ) : (
+              <pre>
+                {queryResult
+                  ? JSON.stringify(queryResult, null, 2)
+                  : "No results"}
+              </pre>
+            )}
           </div>
         )}
       </div>

@@ -36,3 +36,19 @@ export const runQuery = async (token, requestData) => {
     throw error; // Пробрасываем ошибку дальше для обработки в компоненте
   }
 };
+
+// Функция для получения результата из clientdata
+export const fetchQueryResult = async (token, clientdataId) => {
+  try {
+    const response = await axios.get(`${API_URL}/clientdata/${clientdataId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch query result:", error);
+    throw new Error("Failed to fetch query result.");
+  }
+};
