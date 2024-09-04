@@ -81,7 +81,7 @@ const ChartsPage = () => {
       isOpen: true,
       subfolder: [
         { id: uuid(), name: "Chart: 1", type: "chart" },
-        { id: uuid(), name: "Clean Data: 1", type: "clean Data" }
+        { id: uuid(), name: "Clean Data: 1", type: "cleanData" }
       ],
       queryText
     };
