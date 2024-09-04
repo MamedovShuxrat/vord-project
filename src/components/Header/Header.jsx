@@ -28,6 +28,7 @@ const Header = () => {
     }
   }, [user]);
 
+
   const handleLogout = async () => {
     try {
       // Явно вызвать промис и дождаться завершения

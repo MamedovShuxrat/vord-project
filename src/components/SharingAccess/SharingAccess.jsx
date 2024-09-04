@@ -109,6 +109,8 @@ const SharingAccess = () => {
       await handleSendData(email, role, setIsConfirmed);
     }
     setRole(null)
+    setEmail("")
+    setIsConfirmed(false)
   };
 
   const handleEmailChange = (e) => {
