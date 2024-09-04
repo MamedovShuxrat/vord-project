@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { fetchUserDatabases, runQuery } from "../../pages/Charts/api/index";
 import { v4 as uuid } from "uuid";
 
 // Функции для работы с localStorage
@@ -29,8 +30,38 @@ const initialState = loadStateFromLocalStorage() || {
   foldersTab: [],
   activeTab: null,
   openedFiles: [],
-  tabContents: {}
+  tabContents: {},
+  databases: [], // Для хранения баз данных
+  queryResult: "", // Для хранения результата запроса
+  loading: false,
+  error: null
 };
+
+// Асинхронное действие для получения баз данных пользователя
+export const loadUserDatabases = createAsyncThunk(
+  "charts/loadUserDatabases",
+  async (token, { rejectWithValue }) => {
+    try {
+      const databases = await fetchUserDatabases(token);
+      return databases;
+    } catch (error) {
+      return rejectWithValue("Failed to load databases");
+    }
+  }
+);
+
+// Асинхронное действие для выполнения SQL-запроса
+export const executeQuery = createAsyncThunk(
+  "charts/executeQuery",
+  async ({ token, requestData }, { rejectWithValue }) => {
+    try {
+      const result = await runQuery(token, requestData);
+      return result;
+    } catch (error) {
+      return rejectWithValue("Failed to execute query");
+    }
+  }
+);
 
 const chartsSlice = createSlice({
   name: "charts",
@@ -41,16 +72,28 @@ const chartsSlice = createSlice({
       saveStateToLocalStorage(state);
     },
     removeFolder: (state, action) => {
+      const folderId = action.payload;
+
+      // Удаляем папку
       state.foldersTab = state.foldersTab.filter(
-        (folder) => folder.id !== action.payload
+        (folder) => folder.id !== folderId
       );
-      // Удаляем также все файлы, связанные с удаленной папкой
+
+      // Удаляем файлы, связанные с удаленной папкой
       state.openedFiles = state.openedFiles.filter(
         (file) =>
           !state.foldersTab.some((folder) =>
             folder.subfolder.some((subFile) => subFile.id === file.id)
           )
       );
+
+      // Удаляем контент вкладок, связанных с удаленной папкой
+      Object.keys(state.tabContents).forEach((key) => {
+        if (state.tabContents[key].folderId === folderId) {
+          delete state.tabContents[key];
+        }
+      });
+
       saveStateToLocalStorage(state);
     },
     updateFolder: (state, action) => {
@@ -140,6 +183,33 @@ const chartsSlice = createSlice({
       state.tabContents[tabId] = content;
       saveStateToLocalStorage(state);
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadUserDatabases.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loadUserDatabases.fulfilled, (state, action) => {
+        state.loading = false;
+        state.databases = action.payload;
+      })
+      .addCase(loadUserDatabases.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(executeQuery.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(executeQuery.fulfilled, (state, action) => {
+        state.loading = false;
+        state.queryResult = action.payload.result;
+      })
+      .addCase(executeQuery.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   }
 });
 

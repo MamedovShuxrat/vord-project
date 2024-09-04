@@ -1,0 +1,38 @@
+// src/api/index.js
+import axios from "axios";
+
+const API_URL = "http://varddev.tech:8000/api";
+const clientDbUrl = `${API_URL}/clientdb/`;
+const chartsUrl = `${API_URL}/charts/`;
+
+// Получение баз данных пользователя
+export const fetchUserDatabases = async (token) => {
+  try {
+    const response = await axios.get(clientDbUrl, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user databases:", error);
+    throw new Error("Failed to fetch user databases.");
+  }
+};
+
+// Выполнение SQL-запроса и получение результатов
+export const runQuery = async (token, requestData) => {
+  try {
+    const response = await axios.post(chartsUrl, requestData, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to execute query:", error);
+    throw error; // Пробрасываем ошибку дальше для обработки в компоненте
+  }
+};

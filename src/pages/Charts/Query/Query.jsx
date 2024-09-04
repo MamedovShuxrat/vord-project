@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import queryStyles from "./query.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { updateTabContent } from "../../../core/store/chartsSlice";
+import {
+  updateTabContent,
+  loadUserDatabases,
+  executeQuery
+} from "../../../core/store/chartsSlice";
 import { Select, Spin, message } from "antd";
-import axios from "axios";
 
 const { Option } = Select;
 
-// Предопределенный список расширений
 const EXTENSIONS = [
   { id: 1, extension: false, name: "json api" },
   { id: 3, extension: "xlsx", name: "excel xlsx" },
@@ -18,12 +20,12 @@ const EXTENSIONS = [
 
 const Query = ({ tabId }) => {
   const dispatch = useDispatch();
-  const [databases, setDatabases] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { databases, queryResult, loading } = useSelector(
+    (state) => state.charts
+  );
   const [selectedDatabase, setSelectedDatabase] = useState(null);
   const [selectedExtensionId, setSelectedExtensionId] = useState(null);
   const [showSQL, setShowSQL] = useState(true);
-  const [result, setResult] = useState("");
 
   const accessToken = JSON.parse(localStorage.getItem("userToken"));
   const userData = JSON.parse(localStorage.getItem("userData"));
@@ -40,55 +42,17 @@ const Query = ({ tabId }) => {
   }, [tabContent]);
 
   useEffect(() => {
-    if (!userId) {
-      console.warn("User ID is not available. Skipping fetch.");
-      return;
+    if (userId) {
+      dispatch(loadUserDatabases(accessToken));
     }
-
-    const fetchDatabases = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          "http://varddev.tech:8000/api/clientdb/",
-          {
-            headers: {
-              Authorization: `Token ${accessToken}`,
-              "Content-Type": "application/json"
-            }
-          }
-        );
-
-        const userDatabases = response.data.filter(
-          (db) => db.user_id === userId
-        );
-
-        setDatabases(
-          userDatabases.map((db) => ({ id: db.id, name: db.connection_name }))
-        );
-      } catch (error) {
-        console.error("Failed to fetch databases:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDatabases();
-  }, [accessToken, userId]);
+  }, [dispatch, accessToken, userId]);
 
   const handleEditorChange = (value) => {
     setLocalQueryText(value || "");
     dispatch(updateTabContent({ tabId, content: value || "" }));
   };
 
-  const handleDatabaseChange = (value) => {
-    setSelectedDatabase(value);
-  };
-
-  const handleExtensionChange = (value) => {
-    setSelectedExtensionId(value);
-  };
-
-  const handleRun = async () => {
+  const handleRun = () => {
     if (!selectedDatabase || !localQueryText || selectedExtensionId === null) {
       message.error(
         "Выберите базу данных, введите запрос и выберите расширение."
@@ -102,27 +66,8 @@ const Query = ({ tabId }) => {
       extension: selectedExtensionId
     };
 
-    try {
-      const response = await axios.post(
-        "http://varddev.tech:8000/api/charts/",
-        requestData,
-        {
-          headers: {
-            Authorization: `Token ${accessToken}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      console.log("Ответ от сервера:", response.data);
-      setResult(response.data.result);
-      setShowSQL(false);
-    } catch (error) {
-      console.error("Не удалось выполнить запрос:", error);
-      if (error.response) {
-        console.error("Данные ответа:", error.response.data);
-      }
-    }
+    dispatch(executeQuery({ token: accessToken, requestData }));
+    setShowSQL(false);
   };
 
   return (
@@ -135,21 +80,25 @@ const Query = ({ tabId }) => {
           <Select
             className={queryStyles.databaseSelect}
             value={selectedDatabase}
-            onChange={handleDatabaseChange}
+            onChange={(value) => setSelectedDatabase(value)}
             placeholder="Select a database"
             style={{ width: 200 }}
             loading={loading}
           >
-            {databases.map((db) => (
-              <Option key={db.id} value={db.id}>
-                {db.name}
-              </Option>
-            ))}
+            {databases && databases.length > 0 ? (
+              databases.map((db) => (
+                <Option key={db.id} value={db.id}>
+                  {db.connection_name}
+                </Option>
+              ))
+            ) : (
+              <Option disabled>No databases available</Option>
+            )}
           </Select>
           <Select
             className={queryStyles.extensionSelect}
             value={selectedExtensionId}
-            onChange={handleExtensionChange}
+            onChange={(value) => setSelectedExtensionId(value)}
             placeholder="Select an extension"
             style={{ width: 150, marginLeft: 10 }}
           >
@@ -191,7 +140,7 @@ const Query = ({ tabId }) => {
           />
         ) : (
           <div className={queryStyles.resultContainer}>
-            {loading ? <Spin /> : <pre>{result}</pre>}
+            {loading ? <Spin /> : <pre>{queryResult}</pre>}
           </div>
         )}
       </div>
