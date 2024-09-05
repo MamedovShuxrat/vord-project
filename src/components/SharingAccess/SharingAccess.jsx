@@ -35,10 +35,10 @@ const SharingAccess = () => {
   if (ownerData) {
     try {
       const owner = JSON.parse(ownerData);
-      if (owner && owner.pk) {
-        ownerId = owner.pk;
+      if (owner && owner.id) {
+        ownerId = owner.id;
       } else {
-        console.error("User data is missing the 'pk' property.");
+        console.error("User data is missing the 'id' property.");
       }
     } catch (error) {
       console.error("Failed to parse user data:", error);
@@ -208,7 +208,7 @@ const SharingAccess = () => {
                   <img
                     width={20}
                     height={20}
-                    src={user.avatarSrc ? user.avatarSrc : userAvatarImg}
+                    src={user.avatar ? user.avatar : userAvatarImg}
                     alt={`${user.username}'s avatar`}
                   />
                 </div>

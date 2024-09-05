@@ -73,7 +73,7 @@ const Header = () => {
                   <img
                     width={15}
                     height={18}
-                    src={userAvatarImg}
+                    src={user.avatar ? user.avatar : userAvatarImg}
                     alt="user avatar"
                   />
                 </div>

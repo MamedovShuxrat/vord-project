@@ -10,7 +10,6 @@ const ProfilePage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const [username, setUsername] = useState(user?.username || "");
-  const [useremail, setUseremail] = useState(user?.email || "");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [avatar, setAvatar] = useState(user?.avatarUrl || profileImg);
@@ -21,9 +20,6 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user?.name) {
       setUsername(user.name);
-    }
-    if (user?.email) {
-      setUseremail(user.email);
     }
     if (user?.avatar) {
       setAvatar(user.avatar);
@@ -59,9 +55,7 @@ const ProfilePage = () => {
     setUsername(e.target.value)
   };
 
-  const handleEmailChange = (e) => {
-    setUseremail(e.target.value)
-  }
+
   console.log(avatar);
 
   return (
@@ -102,15 +96,6 @@ const ProfilePage = () => {
                 placeholder="User name"
                 value={username}
                 onChange={handleUsernameChange}
-                className={styles.inputField}
-              />
-            </div>
-            <div className={styles.usernameSection}>
-              <input
-                type="text"
-                placeholder="User email"
-                value={useremail}
-                onChange={handleEmailChange}
                 className={styles.inputField}
               />
             </div>
