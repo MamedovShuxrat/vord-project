@@ -8,6 +8,7 @@ import {
   executeQuery
 } from "../../../core/store/chartsSlice";
 import { Select, Spin, message } from "antd";
+import { runQuery, fetchQueryResult, updateQueryData } from "../api/index";
 
 const { Option } = Select;
 
@@ -20,12 +21,12 @@ const EXTENSIONS = [
 
 const Query = ({ tabId }) => {
   const dispatch = useDispatch();
-  const { databases, queryResult, loading } = useSelector(
-    (state) => state.charts
-  );
+  const { databases = [], loading } = useSelector((state) => state.charts);
   const [selectedDatabase, setSelectedDatabase] = useState(null);
   const [selectedExtensionId, setSelectedExtensionId] = useState(null);
   const [showSQL, setShowSQL] = useState(true);
+  const [chartId, setChartId] = useState(null);
+  const [resultData, setResultData] = useState(null); // Состояние для результата
 
   const accessToken = JSON.parse(localStorage.getItem("userToken"));
   const userData = JSON.parse(localStorage.getItem("userData"));
@@ -47,12 +48,10 @@ const Query = ({ tabId }) => {
     }
   }, [dispatch, accessToken, userId]);
 
-  const handleEditorChange = (value) => {
-    setLocalQueryText(value || "");
-    dispatch(updateTabContent({ tabId, content: value || "" }));
-  };
+  // Функция для выполнения запроса
+  const handleRunOrUpdate = async () => {
+    console.log("handleRunOrUpdate triggered");
 
-  const handleRun = () => {
     if (!selectedDatabase || !localQueryText || selectedExtensionId === null) {
       message.error(
         "Выберите базу данных, введите запрос и выберите расширение."
@@ -66,16 +65,70 @@ const Query = ({ tabId }) => {
       extension: selectedExtensionId
     };
 
-    dispatch(executeQuery({ token: accessToken, requestData }));
-    setShowSQL(false);
+    console.log("Request data prepared:", requestData);
+
+    try {
+      let response;
+      if (chartId) {
+        console.log("Updating existing chart with ID:", chartId);
+        response = await updateQueryData(accessToken, chartId, requestData);
+        console.log("Data updated successfully:", response);
+        message.success("Data updated successfully.");
+      } else {
+        console.log("Running new query");
+        response = await runQuery(accessToken, requestData);
+        console.log("Query run successfully, response:", response);
+        setChartId(response.id);
+        message.success("Data loaded successfully.");
+      }
+
+      setShowSQL(false);
+
+      // Получаем данные из clientdata
+      console.log(
+        "Fetching query result from clientdata:",
+        response.clientdata
+      );
+      const resultResponse = await fetchQueryResult(
+        accessToken,
+        response.clientdata
+      );
+      console.log("Query result fetched successfully:", resultResponse);
+      console.log("Check resultResponse:", resultResponse);
+      console.log(
+        "Check resultResponse.data.result:",
+        resultResponse?.data?.result
+      );
+
+      if (!resultResponse || !resultResponse[0]) {
+        console.error("No data in result response.");
+        setResultData([]);
+      } else if (!resultResponse[0].data || !resultResponse[0].data.result) {
+        console.error("No result field in data:", resultResponse[0].data);
+        setResultData([]);
+      } else {
+        console.log("Result data found:", resultResponse[0].data.result);
+        setResultData(resultResponse[0].data.result);
+      }
+
+      console.log("Result data set:", resultResponse?.data?.result);
+    } catch (error) {
+      console.error("Failed to load or update data:", error);
+      message.error("Failed to load or update data.");
+    }
+  };
+
+  const handleEditorChange = (value) => {
+    setLocalQueryText(value || "");
+    dispatch(updateTabContent({ tabId, content: value || "" }));
   };
 
   return (
     <div className={queryStyles.queryContainer}>
       <div className={queryStyles.tabsActions}>
         <div className={queryStyles.actionsBlock}>
-          <button className={queryStyles.runButton} onClick={handleRun}>
-            Run
+          <button className={queryStyles.runButton} onClick={handleRunOrUpdate}>
+            {chartId ? "Update" : "Run"}
           </button>
           <Select
             className={queryStyles.databaseSelect}
@@ -85,15 +138,11 @@ const Query = ({ tabId }) => {
             style={{ width: 200 }}
             loading={loading}
           >
-            {databases && databases.length > 0 ? (
-              databases.map((db) => (
-                <Option key={db.id} value={db.id}>
-                  {db.connection_name}
-                </Option>
-              ))
-            ) : (
-              <Option disabled>No databases available</Option>
-            )}
+            {databases.map((db) => (
+              <Option key={db.id} value={db.id}>
+                {db.connection_name}
+              </Option>
+            ))}
           </Select>
           <Select
             className={queryStyles.extensionSelect}
@@ -142,12 +191,16 @@ const Query = ({ tabId }) => {
           <div className={queryStyles.resultContainer}>
             {loading ? (
               <Spin />
+            ) : resultData && Array.isArray(resultData) ? (
+              resultData.length > 0 ? (
+                resultData.map((item, index) => (
+                  <pre key={index}>{JSON.stringify(item, null, 2)}</pre>
+                ))
+              ) : (
+                "No results found."
+              )
             ) : (
-              <pre>
-                {queryResult
-                  ? JSON.stringify(queryResult, null, 2)
-                  : "No results"}
-              </pre>
+              "No results"
             )}
           </div>
         )}

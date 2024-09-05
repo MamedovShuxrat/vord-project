@@ -1,9 +1,9 @@
-// src/api/index.js
 import axios from "axios";
 
 const API_URL = "http://varddev.tech:8000/api";
 const clientDbUrl = `${API_URL}/clientdb/`;
 const chartsUrl = `${API_URL}/charts/`;
+const clientDataUrl = `${API_URL}/clientdata/`;
 
 // Получение баз данных пользователя
 export const fetchUserDatabases = async (token) => {
@@ -40,7 +40,7 @@ export const runQuery = async (token, requestData) => {
 // Функция для получения результата из clientdata
 export const fetchQueryResult = async (token, clientdataId) => {
   try {
-    const response = await axios.get(`${API_URL}/clientdata/${clientdataId}/`, {
+    const response = await axios.get(`${clientDataUrl}${clientdataId}/`, {
       headers: {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json"
@@ -50,5 +50,21 @@ export const fetchQueryResult = async (token, clientdataId) => {
   } catch (error) {
     console.error("Failed to fetch query result:", error);
     throw new Error("Failed to fetch query result.");
+  }
+};
+
+// Функция для обновления данных запроса на сервере
+export const updateQueryData = async (token, chartId, requestData) => {
+  try {
+    const response = await axios.put(`${chartsUrl}${chartId}/`, requestData, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update query data:", error);
+    throw error;
   }
 };
