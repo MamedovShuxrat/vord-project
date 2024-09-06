@@ -1,0 +1,60 @@
+.sectionWrapper {
+  background-image: url("../../assets/images/common/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  width: 100%;
+  min-height: calc(100vh - 77px);
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.searchBlock {
+  border-radius: 4px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  background: inherit;
+  padding: 10px 0;
+  min-width: 240px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.faqContainer {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.question {
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.answerWrapper {
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.answer {
+  white-space: normal;
+  word-wrap: break-word;
+  padding: 10px 0;
+  text-align: left;
+}
+
