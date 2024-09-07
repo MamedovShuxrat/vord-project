@@ -9,12 +9,12 @@ import {
   removeFile,
   removeFolder,
   updateFileName
-} from "../../core/store/foldersSlice";
+} from "../../../core/store/foldersSlice";
 import { v4 as uuid } from "uuid";
-import arrowRightSvg from "../../assets/images/icons/common/arrow-right.svg";
-import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
-import folderIcon from "../../assets/images/icons/common/folder.svg";
-import fileIcon from "../../assets/images/icons/common/file.svg";
+import arrowRightSvg from "../../../assets/images/icons/common/arrow-right.svg";
+import dotsSvg from "../../../assets/images/icons/common/dots_three.svg";
+import folderIcon from "../../../assets/images/icons/common/folder.svg";
+import fileIcon from "../../../assets/images/icons/common/file.svg";
 import styles from "./filesView.module.scss";
 import MenuForFolder from "./menu/MenuForFolder";
 import MenuForFiles from "./menu/MenuForFiles";

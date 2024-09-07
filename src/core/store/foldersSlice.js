@@ -1,10 +1,8 @@
 // src/core/store/foldersSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { v4 as uuid } from "uuid";
-
-// Пути к иконкам папок и файлов
-const folderIcon = "/assets/images/icons/common/folder.svg";
-const fileIcon = "/assets/images/icons/common/file.svg";
+import folderIcon from "../../assets/images/icons/common/folder.svg";
+import fileIcon from "../../assets/images/icons/common/file.svg";
 
 // Функция для загрузки состояния из localStorage
 const loadStateFromLocalStorage = () => {
@@ -32,25 +30,7 @@ const saveStateToLocalStorage = (state) => {
 
 // Инициализация начального состояния из localStorage или дефолтное значение
 const initialState = loadStateFromLocalStorage() || {
-  folders: [
-    {
-      id: uuid(),
-      name: "Untitled",
-      icon: folderIcon, // Путь к иконке папки
-      isOpen: false,
-      subfolders: [
-        {
-          id: uuid(),
-          name: "Untitled",
-          icon: folderIcon, // Путь к иконке папки
-          isOpen: false,
-          subfolders: [],
-          files: []
-        }
-      ],
-      files: []
-    }
-  ],
+  folders: [],
   openTabs: [],
   activeTab: null
 };
@@ -206,6 +186,24 @@ const foldersSlice = createSlice({
       state.openTabs = [];
       state.activeTab = null;
       saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+    },
+
+    resetFolders: (state) => {
+      state.folders = [
+        {
+          id: uuid(),
+          name: "Untitled",
+          icon: folderIcon,
+          isOpen: false,
+          subfolders: [],
+          files: []
+        }
+      ];
+      state.openTabs = [];
+      state.activeTab = null;
+
+      // Очистка состояния из localStorage
+      localStorage.removeItem("foldersState");
     }
   }
 });
@@ -220,7 +218,8 @@ export const {
   setActiveTab,
   openTab,
   closeTab,
-  closeAllTabs
+  closeAllTabs,
+  resetFolders
 } = foldersSlice.actions;
 
 export default foldersSlice.reducer;

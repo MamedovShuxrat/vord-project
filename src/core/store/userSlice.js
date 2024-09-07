@@ -7,6 +7,7 @@ import {
   logoutUser
 } from "../../api/api";
 import { setConnections } from "./connectionsSlice";
+import { resetFolders } from "./foldersSlice";
 import { toast } from "react-hot-toast";
 
 export const register = createAsyncThunk(
@@ -48,7 +49,7 @@ export const login = createAsyncThunk(
 
 export const performLogout = createAsyncThunk(
   "user/logout",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { getState, rejectWithValue, dispatch }) => {
     const token = getState().user.token;
     console.log("Attempting to logout with token:", token);
 
@@ -66,6 +67,7 @@ export const performLogout = createAsyncThunk(
       localStorage.removeItem("userToken");
       localStorage.removeItem("connections");
 
+      dispatch(resetFolders()); // Сбрасываем папки
       console.log("localStorage after clearing:", localStorage);
 
       return null; // возвращаем null, чтобы явно указать, что пользователь вышел из системы

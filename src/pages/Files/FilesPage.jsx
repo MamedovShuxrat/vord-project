@@ -10,8 +10,8 @@ import {
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/ui/Chat";
-import FileView from "../../components/FilesView/FilesView";
-import MenuForView from "../../components/FilesView/menu/MenuForView";
+import FileView from "../../pages/Files/FilesView/FilesView";
+import MenuForView from "../../pages/Files/FilesView/menu/MenuForView";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
 import dotsSvg from "../../assets/images/icons/common/dots_three.svg";
