@@ -310,7 +310,7 @@
 
   &__grid {
     display: flex;
-    margin-top: 20px;
+    margin-top: 100px;
     gap: 24px;
   }
   &__fileItem {
@@ -319,5 +319,12 @@
   &__actions {
     display: flex;
     gap: 20px;
+  }
+}
+
+.folder {
+  &__titleWithMenu {
+    display: flex;
+    gap: 12px;
   }
 }

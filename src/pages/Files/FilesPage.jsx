@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addFolder,
@@ -23,9 +23,23 @@ const FilesPage = () => {
     x: 0,
     y: 0
   });
-  const [folderToRename, setFolderToRename] = useState(null);
-  const [renameModalVisible, setRenameModalVisible] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
+  const [folderToRename, setFolderToRename] = useState(null); // Папка для переименования
+  const [renameModalVisible, setRenameModalVisible] = useState(false); // Для модального окна
+  const [newFolderName, setNewFolderName] = useState(""); // Новое имя папки
+  const menuRef = useRef(null); // Реф для контекстного меню
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuVisible(false); // Закрыть меню, если клик произошел вне его
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef]);
 
   // Рекурсивная функция для поиска текущей папки
   const findCurrentFolder = (folderList, folderId) => {
@@ -78,31 +92,32 @@ const FilesPage = () => {
       ? folders
       : findCurrentFolder(folders, currentFolderId)?.subfolders || [];
 
+  // Callback function for handling file uploads
   const handleFileUpload = (file) => {
     console.log("File uploaded:", file);
-    return false;
+    return false; // Prevent default upload behavior
   };
 
   // Контекстное меню для папок
   const handleContextMenuClick = (action) => {
     if (action === "renameFolder") {
-      setRenameModalVisible(true);
-      setNewFolderName(breadcrumb[breadcrumb.length - 1].name);
+      setRenameModalVisible(true); // Открыть модальное окно для переименования
+      setNewFolderName(breadcrumb[breadcrumb.length - 1].name); // Установить текущее имя папки в инпут
       setFolderToRename(breadcrumb[breadcrumb.length - 1].id);
     } else if (action === "deleteFolder") {
       const folderId = breadcrumb[breadcrumb.length - 1].id;
       dispatch(removeFolder({ folderId }));
-      setBreadcrumb(breadcrumb.slice(0, -1));
+      setBreadcrumb(breadcrumb.slice(0, -1)); // Возврат к предыдущему уровню
       setCurrentFolderId(breadcrumb[breadcrumb.length - 2]?.id || null);
     }
-    setMenuVisible(false);
+    setMenuVisible(false); // Скрыть меню после выбора действия
   };
 
   const handleMenuClick = (event) => {
-    event.stopPropagation();
+    event.stopPropagation(); // Чтобы не было конфликтов кликов
     const rect = event.target.getBoundingClientRect();
     setContextMenuPosition({ x: rect.right, y: rect.top });
-    setMenuVisible(true);
+    setMenuVisible(true); // Показать меню
   };
 
   const handleRename = () => {
@@ -116,8 +131,8 @@ const FilesPage = () => {
         )
       );
     }
-    setRenameModalVisible(false);
-    setFolderToRename(null);
+    setRenameModalVisible(false); // Закрыть модальное окно
+    setFolderToRename(null); // Сбросить текущую папку для переименования
   };
 
   return (
@@ -156,7 +171,7 @@ const FilesPage = () => {
         {currentFolderId === null ? (
           <h1 className={commonStyles.folderTitle}>Files</h1>
         ) : (
-          <div className={commonStyles.folderTitleWithMenu}>
+          <div className={commonStyles.folder__titleWithMenu}>
             <h1 className={commonStyles.folderTitle}>
               {breadcrumb[breadcrumb.length - 1].name}
             </h1>
@@ -171,6 +186,7 @@ const FilesPage = () => {
       {/* Контекстное меню для папки */}
       {menuVisible && (
         <div
+          ref={menuRef} // Добавляем ref для меню
           className={commonStyles.contextMenuContainer}
           style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
         >
