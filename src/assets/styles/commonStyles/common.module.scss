@@ -311,10 +311,13 @@
   &__grid {
     display: flex;
     margin-top: 100px;
-    gap: 24px;
+    gap: 36px;
   }
   &__fileItem {
     width: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
   &__actions {
     display: flex;

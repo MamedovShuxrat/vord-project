@@ -33,6 +33,23 @@ export const addFolderToAPI = async (folderName, parentId = null, userId) => {
   }
 };
 
+// Удаление папки
+export const deleteFolderFromAPI = async (folderId, token) => {
+  try {
+    const response = await axios.delete(`${foldersList}${folderId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    toast.success("Folder deleted successfully");
+    return response.data;
+  } catch (error) {
+    toast.error("Error deleting folder");
+    throw new Error(error);
+  }
+};
+
 //Добавление файла
 
 //Загрузка папок на веб
