@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTabContent } from "../../../core/store/chartsSlice";
-import DataClean from "../../DataClean/DataClean";
+import DataClean from "../ui/DataClean/DataClean";
 
 const CleanData = ({ tabId }) => {
   const dispatch = useDispatch();

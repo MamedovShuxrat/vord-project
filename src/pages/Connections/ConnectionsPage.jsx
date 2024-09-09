@@ -13,6 +13,7 @@ import { useDotsMenu } from "../../components/utils/useDotsMenu";
 import useTabNavigation from "../../components/utils/useTabNavigation";
 import { renderImageOrIcon } from "../../components/utils/renderImageOrIcon";
 import useSearch from "../../components/utils/useSearch";
+import RenameDeleteMenu from "../Connections/MenuForFolderConnections/MenuForFolderConnections"; // Подключаем компонент меню
 
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
@@ -42,6 +43,8 @@ const ConnectionsPage = () => {
 
   const [activeTab, setActiveTab] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(null); // Состояние для отображения меню
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // Позиция меню
 
   const {
     dotsChange,
@@ -115,6 +118,16 @@ const ConnectionsPage = () => {
     }
   };
 
+  const handleMenuClick = (e, itemId, itemName) => {
+    const { top, left, height } = e.currentTarget.getBoundingClientRect();
+    setMenuPosition({ top: top + height, left });
+    setMenuVisible(menuVisible === itemId ? null : itemId);
+  };
+
+  const handleCloseMenu = () => {
+    setMenuVisible(null);
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div>
@@ -152,7 +165,9 @@ const ConnectionsPage = () => {
                     </span>
                     <button
                       className={commonStyles.tabsDots}
-                      onClick={() => handleDotsChange(item.id)}
+                      onClick={(e) =>
+                        handleMenuClick(e, item.id, item.connection_name)
+                      }
                     >
                       <img
                         style={{
@@ -163,26 +178,23 @@ const ConnectionsPage = () => {
                         src={dotsSvg}
                         alt={`${item.connection_name}_pic`}
                       />
-                      {dotsChange[item.id] && (
-                        <div
-                          ref={wrapperRef}
-                          className={commonStyles.dotsChangeWrapper}
-                        >
-                          <span
-                            onClick={() => handleRenameSQLTabs(item.id)}
-                            className={commonStyles.dotsChangeRename}
-                          >
-                            Rename
-                          </span>
-                          <span
-                            onClick={() => handleDeleteConnection(item.id)} // Используем новый обработчик удаления
-                            className={commonStyles.dotsChangeDelete}
-                          >
-                            Delete
-                          </span>
-                        </div>
-                      )}
                     </button>
+                    {menuVisible === item.id && (
+                      <div
+                        ref={wrapperRef}
+                        className={commonStyles.menuWrapper}
+                        style={{
+                          top: menuPosition.top,
+                          left: menuPosition.left
+                        }}
+                      >
+                        <RenameDeleteMenu
+                          itemId={item.id}
+                          currentName={item.connection_name}
+                          onCloseMenu={handleCloseMenu}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
             </div>

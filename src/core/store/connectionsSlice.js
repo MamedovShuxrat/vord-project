@@ -86,6 +86,34 @@ export const removeUserConnection = createAsyncThunk(
   }
 );
 
+// Thunk for updating connection on the server
+export const updateConnectionOnServer = createAsyncThunk(
+  "connectionTabs/updateConnectionOnServer",
+  async ({ id, newName }, { rejectWithValue }) => {
+    const token = JSON.parse(localStorage.getItem("userToken"));
+    if (!token) {
+      return rejectWithValue("No valid token found");
+    }
+
+    try {
+      const response = await axios.patch(
+        `${CONNECTION}${id}/`, // Предполагается, что API поддерживает PATCH для обновления соединения
+        { connection_name: newName },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-type": "application/json"
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating connection:", error);
+      return rejectWithValue(error.message || "Failed to update connection.");
+    }
+  }
+);
+
 const connectionTabsSlice = createSlice({
   name: "connectionTabs",
   initialState: {
@@ -117,8 +145,7 @@ const connectionTabsSlice = createSlice({
       const { id, newName } = action.payload;
       const connection = state.connections.find((conn) => conn.id === id);
       if (connection) {
-        connection.MySQL = newName;
-        localStorage.setItem("connections", JSON.stringify(state.connections));
+        connection.connection_name = newName; // Убедитесь, что имя обновляется здесь
       }
     },
     deleteConnection: (state, action) => {
@@ -159,6 +186,19 @@ const connectionTabsSlice = createSlice({
       .addCase(fetchUserDatabases.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(updateConnectionOnServer.fulfilled, (state, action) => {
+        const { id, connection_name } = action.payload;
+        const connection = state.connections.find((conn) => conn.id === id);
+        if (connection) {
+          connection.connection_name = connection_name; // Обновляем состояние с данными с сервера
+          toast.success("Connection renamed successfully.");
+        }
+      })
+      .addCase(updateConnectionOnServer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        toast.error(action.payload);
       })
       .addCase(removeUserConnection.fulfilled, (state, action) => {
         state.connections = state.connections.filter(

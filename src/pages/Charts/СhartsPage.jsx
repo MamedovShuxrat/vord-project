@@ -1,14 +1,14 @@
-// src/pages/Charts/ChartsPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import SearchBlock from "../../components/SearchBlock/SearchBlock";
 import Chat from "../../components/Chat/ui/Chat";
 import Query from "./Query/Query";
-import Chart from "../../components/Charts/ui/Chart";
-import CleanData from "../../components/Charts/ui/CleanData";
+import Chart from "../../pages/Charts/ui/Chart";
+import CleanData from "../../pages/Charts/ui/CleanData";
 import MenuForFileCharts from "./menu/MenuForFileCharts";
 import MenuForQueryCharts from "./menu/MenuForQueryCharts";
+import MenuForView from "../../components/FilesView/menu/MenuForView";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
@@ -37,10 +37,7 @@ const ChartsPage = () => {
   const openedFiles = useSelector((state) => state.charts.openedFiles);
   const { searchTerm, setSearchTerm } = useSearch();
   const [menuVisible, setMenuVisible] = useState(null);
-  const [menuPosition, setMenuPosition] = useState({
-    top: 0,
-    left: 0
-  });
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [menuType, setMenuType] = useState(null);
   const [renamingTab, setRenamingTab] = useState(null);
   const [newTabName, setNewTabName] = useState("");
@@ -81,7 +78,7 @@ const ChartsPage = () => {
       isOpen: true,
       subfolder: [
         { id: uuid(), name: "Chart: 1", type: "chart" },
-        { id: uuid(), name: "Clean Data: 1", type: "clean Data" }
+        { id: uuid(), name: "Clean Data: 1", type: "cleanData" }
       ],
       queryText
     };
@@ -92,24 +89,28 @@ const ChartsPage = () => {
   };
 
   const closeRelatedTabs = (id) => {
-    // Находим все вкладки, связанные с папкой или файлом
     const relatedFiles = openedFiles.filter((file) => {
       const folder = findFolderByFileId(file.id);
       return file.id === id || (folder && folder.id === id);
     });
 
-    // Закрываем найденные вкладки
     relatedFiles.forEach((file) => {
       dispatch(closeFile(file.id));
     });
 
-    // Закрываем активную вкладку, если она связана с удаляемым элементом
     if (
       activeTab === id ||
       relatedFiles.some((file) => file.id === activeTab)
     ) {
-      dispatch(setActiveTab(null)); // Или переключить на другую доступную вкладку
+      dispatch(setActiveTab(null));
     }
+  };
+
+  // Новая функция для закрытия всех вкладок (и папок, и файлов)
+  const closeAllTabs = () => {
+    foldersTab.forEach((folder) => dispatch(closeFile(folder.id)));
+    openedFiles.forEach((file) => dispatch(closeFile(file.id)));
+    dispatch(setActiveTab(null));
   };
 
   const handleContextMenuClick = (action, id) => {
@@ -118,7 +119,7 @@ const ChartsPage = () => {
         duplicateTab(id);
       } else if (action === "delete") {
         dispatch(removeFolder(id));
-        closeRelatedTabs(id); // Закрываем связанные вкладки
+        closeRelatedTabs(id);
       } else if (action === "rename") {
         setRenamingTab(id);
         setNewTabName(foldersTab.find((tab) => tab.id === id).name);
@@ -129,7 +130,6 @@ const ChartsPage = () => {
       } else if (action === "delete") {
         const folder = findFolderByFileId(id);
         if (folder) {
-          // Проверяем наличие папки перед удалением файла
           dispatch(
             removeFileFromFolder({
               folderId: folder.id,
@@ -137,9 +137,19 @@ const ChartsPage = () => {
             })
           );
         }
-        closeRelatedTabs(id); // Закрываем связанные вкладки
+        closeRelatedTabs(id);
       } else if (action === "rename") {
         startRenamingFile(id);
+      }
+    } else if (menuType === "view") {
+      // Логика для меню "view"
+      if (action === "closeAllTabs") {
+        closeAllTabs();
+      } else if (action === "closeSelectedTab") {
+        if (activeTab) {
+          dispatch(closeFile(activeTab));
+          dispatch(setActiveTab(null));
+        }
       }
     }
     setMenuVisible(null);
@@ -364,13 +374,12 @@ const ChartsPage = () => {
                   </span>
                   <button
                     className={commonStyles.tabsTopDots}
-                    onClick={(e) => handleMenuClick(e, folder.id, "folder")}
+                    onClick={(e) => handleMenuClick(e, folder.id, "view")}
                   >
                     <img src={dotsSvg} alt={`query_pic`} />
                   </button>
                 </div>
               ))}
-              {/* Открытые вкладки для файлов */}
               {openedFiles.map((file) => (
                 <div
                   key={file.id}
@@ -386,7 +395,7 @@ const ChartsPage = () => {
                   </span>
                   <button
                     className={commonStyles.tabsTopDots}
-                    onClick={(e) => handleMenuClick(e, file.id, "file")}
+                    onClick={(e) => handleMenuClick(e, file.id, "view")}
                   >
                     <img src={dotsSvg} alt={`file_pic`} />
                   </button>
@@ -413,7 +422,6 @@ const ChartsPage = () => {
                 </div>
               )
           )}
-          {/* Отображение контента файлов */}
           {openedFiles.map(
             (file) =>
               activeTab === file.id && (
@@ -427,8 +435,8 @@ const ChartsPage = () => {
       </div>
       {menuVisible && (
         <div
-          className={commonStyles.menuWrapper}
           ref={menuRef}
+          className={commonStyles.menuWrapper}
           style={{
             position: "fixed",
             top: `${menuPosition.top}px`,
@@ -442,8 +450,14 @@ const ChartsPage = () => {
                 handleContextMenuClick(action, menuVisible)
               }
             />
-          ) : (
+          ) : menuType === "file" ? (
             <MenuForFileCharts
+              handleContextMenuClick={(action) =>
+                handleContextMenuClick(action, menuVisible)
+              }
+            />
+          ) : (
+            <MenuForView
               handleContextMenuClick={(action) =>
                 handleContextMenuClick(action, menuVisible)
               }
