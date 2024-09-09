@@ -1,8 +1,22 @@
 // src/core/store/foldersSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuid } from "uuid";
+import { fetchFolders } from "../../pages/Files/api/index";
 import folderIcon from "../../assets/images/icons/common/folder.svg";
 import fileIcon from "../../assets/images/icons/common/file.svg";
+
+// Асинхронный экшен для загрузки папок
+export const loadFoldersFromAPI = createAsyncThunk(
+  "folders/loadFolders",
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await fetchFolders(token);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 // Функция для загрузки состояния из localStorage
 const loadStateFromLocalStorage = () => {
@@ -45,8 +59,11 @@ const foldersSlice = createSlice({
       const findAndAddFolder = (folders) => {
         return folders.map((f) => {
           if (f.id === parentId) {
+            if (!Array.isArray(f.subfolders)) {
+              f.subfolders = [];
+            }
             f.subfolders.push(folder);
-          } else if (f.subfolders.length > 0) {
+          } else if (Array.isArray(f.subfolders) && f.subfolders.length > 0) {
             f.subfolders = findAndAddFolder(f.subfolders);
           }
           return f;
@@ -173,6 +190,16 @@ const foldersSlice = createSlice({
 
       localStorage.removeItem("foldersState");
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadFoldersFromAPI.fulfilled, (state, action) => {
+        state.folders = action.payload;
+        saveStateToLocalStorage(state);
+      })
+      .addCase(loadFoldersFromAPI.rejected, (state, action) => {
+        console.error("Ошибка загрузки папок:", action.payload);
+      });
   }
 });
 

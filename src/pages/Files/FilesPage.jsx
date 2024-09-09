@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 import {
   addFolder,
   removeFolder,
-  updateFolderName
+  updateFolderName,
+  loadFoldersFromAPI
 } from "../../core/store/foldersSlice";
 import { v4 as uuid } from "uuid";
 import { Upload, Button, Modal, Input } from "antd";
@@ -12,10 +14,13 @@ import folderIcon from "../../assets/images/icons/common/folder.svg";
 import fileIcon from "../../assets/images/icons/common/file.svg";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import MenuForFolder from "../Files/FilesView/menu/MenuForFolder";
+import { addFolderToAPI } from "../Files/api/index";
 
 const FilesPage = () => {
   const dispatch = useDispatch();
   const folders = useSelector((state) => state.folders.folders);
+  const userId = useSelector((state) => state.user.user?.id);
+  const token = useSelector((state) => state.user.token);
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [breadcrumb, setBreadcrumb] = useState([{ id: null, name: "Files" }]);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -23,17 +28,23 @@ const FilesPage = () => {
     x: 0,
     y: 0
   });
-  const [folderToRename, setFolderToRename] = useState(null); // Папка для переименования
-  const [renameModalVisible, setRenameModalVisible] = useState(false); // Для модального окна
-  const [newFolderModalVisible, setNewFolderModalVisible] = useState(false); // Для модального окна создания папки
-  const [folderNameInput, setFolderNameInput] = useState(""); // Имя для новой папки
-  const [newFolderName, setNewFolderName] = useState(""); // Новое имя папки
-  const menuRef = useRef(null); // Реф для контекстного меню
+  const [folderToRename, setFolderToRename] = useState(null);
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [newFolderModalVisible, setNewFolderModalVisible] = useState(false);
+  const [folderNameInput, setFolderNameInput] = useState("");
+  const [newFolderName, setNewFolderName] = useState("");
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(loadFoldersFromAPI(token));
+    }
+  }, [dispatch, token]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuVisible(false); // Закрыть меню, если клик произошел вне его
+        setMenuVisible(false);
       }
     };
 
@@ -49,7 +60,7 @@ const FilesPage = () => {
       if (folder.id === folderId) {
         return folder;
       }
-      if (folder.subfolders.length > 0) {
+      if (folder.subfolders && folder.subfolders.length > 0) {
         const found = findCurrentFolder(folder.subfolders, folderId);
         if (found) {
           return found;
@@ -74,26 +85,50 @@ const FilesPage = () => {
     setNewFolderModalVisible(true);
   };
 
-  const handleCreateNewFolder = () => {
-    const newFolder = {
-      id: uuid(),
-      name: folderNameInput,
-      icon: folderIcon,
-      subfolders: [],
-      files: []
-    };
+  const handleCreateNewFolder = async () => {
+    try {
+      // Создание папки через API
+      const parentId = currentFolderId ? currentFolderId : null;
+      const newFolder = await addFolderToAPI(folderNameInput, parentId, userId);
 
-    if (currentFolderId === null) {
-      dispatch(addFolder({ parentId: null, folder: newFolder }));
-    } else {
-      const currentFolder = findCurrentFolder(folders, currentFolderId);
-      if (currentFolder) {
-        dispatch(addFolder({ parentId: currentFolder.id, folder: newFolder }));
+      // Проверим, что папка создана
+      if (!newFolder) {
+        throw new Error("Ошибка при создании папки");
       }
-    }
 
-    setNewFolderModalVisible(false);
-    setFolderNameInput("");
+      // Убедимся, что subfolders всегда массив
+      newFolder.subfolders = newFolder.subfolders || [];
+
+      // Добавляем папку в Redux store
+      if (currentFolderId === null) {
+        // Добавление папки в корень
+        dispatch(addFolder({ parentId: null, folder: newFolder }));
+      } else {
+        const currentFolder = findCurrentFolder(folders, currentFolderId);
+
+        // Проверяем, существует ли текущая папка и имеет ли она массив subfolders
+        if (currentFolder && Array.isArray(currentFolder.subfolders)) {
+          dispatch(
+            addFolder({ parentId: currentFolder.id, folder: newFolder })
+          );
+        } else {
+          console.error("Текущая папка не найдена или структура некорректна");
+        }
+      }
+
+      // Закрытие модального окна
+      setNewFolderModalVisible(false);
+
+      // Сброс инпута
+      setFolderNameInput("");
+
+      // Вызов тостера
+      toast.success("Folder created successfully!");
+    } catch (error) {
+      // Обработка ошибки и отображение тостера
+      console.error("Error creating folder:", error);
+      toast.error("Error creating folder.");
+    }
   };
 
   const currentFolder =
@@ -101,32 +136,31 @@ const FilesPage = () => {
       ? folders
       : findCurrentFolder(folders, currentFolderId)?.subfolders || [];
 
-  // Callback function for handling file uploads
   const handleFileUpload = (file) => {
     console.log("File uploaded:", file);
-    return false; // Prevent default upload behavior
+    return false;
   };
 
   // Контекстное меню для папок
   const handleContextMenuClick = (action) => {
     if (action === "renameFolder") {
-      setRenameModalVisible(true); // Открыть модальное окно для переименования
-      setNewFolderName(breadcrumb[breadcrumb.length - 1].name); // Установить текущее имя папки в инпут
+      setRenameModalVisible(true);
+      setNewFolderName(breadcrumb[breadcrumb.length - 1].name);
       setFolderToRename(breadcrumb[breadcrumb.length - 1].id);
     } else if (action === "deleteFolder") {
       const folderId = breadcrumb[breadcrumb.length - 1].id;
       dispatch(removeFolder({ folderId }));
-      setBreadcrumb(breadcrumb.slice(0, -1)); // Возврат к предыдущему уровню
+      setBreadcrumb(breadcrumb.slice(0, -1));
       setCurrentFolderId(breadcrumb[breadcrumb.length - 2]?.id || null);
     }
-    setMenuVisible(false); // Скрыть меню после выбора действия
+    setMenuVisible(false);
   };
 
   const handleMenuClick = (event) => {
-    event.stopPropagation(); // Чтобы не было конфликтов кликов
+    event.stopPropagation();
     const rect = event.target.getBoundingClientRect();
     setContextMenuPosition({ x: rect.right, y: rect.top });
-    setMenuVisible(true); // Показать меню
+    setMenuVisible(true);
   };
 
   const handleRename = () => {
@@ -206,7 +240,7 @@ const FilesPage = () => {
       {/* Модальное окно для переименования папки */}
       <Modal
         title="Rename Folder"
-        visible={renameModalVisible}
+        open={renameModalVisible}
         onOk={handleRename}
         onCancel={() => setRenameModalVisible(false)}
       >
@@ -220,7 +254,7 @@ const FilesPage = () => {
       {/* Модальное окно для создания новой папки */}
       <Modal
         title="Create New Folder"
-        visible={newFolderModalVisible}
+        open={newFolderModalVisible}
         onOk={handleCreateNewFolder}
         onCancel={() => setNewFolderModalVisible(false)}
       >
@@ -239,7 +273,7 @@ const FilesPage = () => {
             className={commonStyles.files__fileItem}
             onClick={() => handleFolderClick(item)}
           >
-            <img src={item.icon || fileIcon} alt={item.name} />
+            <img src={item.icon || folderIcon} alt={item.name} />
             <div className={commonStyles.fileName}>{item.name}</div>
           </div>
         ))}
