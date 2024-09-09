@@ -2,6 +2,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuid } from "uuid";
 import { fetchFolders } from "../../pages/Files/api/index";
+import { createFolderTree } from "../helpers/createFoldersTree";
 import folderIcon from "../../assets/images/icons/common/folder.svg";
 import fileIcon from "../../assets/images/icons/common/file.svg";
 
@@ -11,7 +12,7 @@ export const loadFoldersFromAPI = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       const response = await fetchFolders(token);
-      return response;
+      return createFolderTree(response); // Преобразуем плоский список в дерево
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -59,12 +60,9 @@ const foldersSlice = createSlice({
       const findAndAddFolder = (folders) => {
         return folders.map((f) => {
           if (f.id === parentId) {
-            if (!Array.isArray(f.subfolders)) {
-              f.subfolders = [];
-            }
-            f.subfolders.push(folder);
-          } else if (Array.isArray(f.subfolders) && f.subfolders.length > 0) {
-            f.subfolders = findAndAddFolder(f.subfolders);
+            f.subfolders.push(folder); // Добавляем папку к подкаталогам
+          } else if (f.subfolders.length > 0) {
+            f.subfolders = findAndAddFolder(f.subfolders); // Рекурсивно ищем родителя
           }
           return f;
         });

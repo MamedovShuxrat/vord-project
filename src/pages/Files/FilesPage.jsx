@@ -7,7 +7,6 @@ import {
   updateFolderName,
   loadFoldersFromAPI
 } from "../../core/store/foldersSlice";
-import { v4 as uuid } from "uuid";
 import { Upload, Button, Modal, Input } from "antd";
 import { UploadOutlined, MoreOutlined } from "@ant-design/icons";
 import folderIcon from "../../assets/images/icons/common/folder.svg";
@@ -68,6 +67,17 @@ const FilesPage = () => {
       }
     }
     return null;
+  };
+
+  const renderFolders = (folders) => {
+    return folders.map((folder) => (
+      <div key={folder.id}>
+        <div onClick={() => handleFolderClick(folder)}>
+          <img src={folderIcon} alt={folder.name} />
+          <span>{folder.name}</span>
+        </div>
+      </div>
+    ));
   };
 
   const handleFolderClick = (folder) => {
@@ -136,10 +146,10 @@ const FilesPage = () => {
       ? folders
       : findCurrentFolder(folders, currentFolderId)?.subfolders || [];
 
-  const handleFileUpload = (file) => {
-    console.log("File uploaded:", file);
-    return false;
-  };
+  // const handleFileUpload = (file) => {
+  //   console.log("File uploaded:", file);
+  //   return false;
+  // };
 
   // Контекстное меню для папок
   const handleContextMenuClick = (action) => {
@@ -202,8 +212,8 @@ const FilesPage = () => {
           >
             + Add Folder
           </button>
-
-          <Upload beforeUpload={handleFileUpload} showUploadList={false}>
+          {/* <Upload beforeUpload={handleFileUpload} showUploadList={false}> */}
+          <Upload showUploadList={false}>
             <Button icon={<UploadOutlined />}>Upload File</Button>
           </Upload>
         </div>
@@ -267,16 +277,7 @@ const FilesPage = () => {
 
       {/* Отображение содержимого текущей папки */}
       <div className={commonStyles.files__grid}>
-        {currentFolder.map((item) => (
-          <div
-            key={item.id}
-            className={commonStyles.files__fileItem}
-            onClick={() => handleFolderClick(item)}
-          >
-            <img src={item.icon || folderIcon} alt={item.name} />
-            <div className={commonStyles.fileName}>{item.name}</div>
-          </div>
-        ))}
+        {renderFolders(currentFolder)}
       </div>
     </div>
   );
