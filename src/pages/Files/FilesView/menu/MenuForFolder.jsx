@@ -1,4 +1,3 @@
-// src/components/FilesView/menu/MenuForFolder.jsx
 import React from "react";
 import PropTypes from "prop-types";
 import styles from "../filesView.module.scss";
@@ -8,16 +7,11 @@ const MenuForFolder = ({ handleContextMenuClick }) => {
     <div className={styles.contextMenu}>
       <button
         className={styles.contextMenu__row}
-        onClick={() => handleContextMenuClick("addFolder")}
+        onClick={() => handleContextMenuClick("renameFolder")}
       >
-        Add Folder
+        Rename Folder
       </button>
-      <button
-        className={styles.contextMenu__row}
-        onClick={() => handleContextMenuClick("addFile")}
-      >
-        Add File
-      </button>
+
       <button
         className={styles.contextMenu__row}
         onClick={() => handleContextMenuClick("deleteFolder")}
