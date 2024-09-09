@@ -25,6 +25,8 @@ const FilesPage = () => {
   });
   const [folderToRename, setFolderToRename] = useState(null); // Папка для переименования
   const [renameModalVisible, setRenameModalVisible] = useState(false); // Для модального окна
+  const [newFolderModalVisible, setNewFolderModalVisible] = useState(false); // Для модального окна создания папки
+  const [folderNameInput, setFolderNameInput] = useState(""); // Имя для новой папки
   const [newFolderName, setNewFolderName] = useState(""); // Новое имя папки
   const menuRef = useRef(null); // Реф для контекстного меню
 
@@ -69,9 +71,13 @@ const FilesPage = () => {
   };
 
   const addNewFolder = () => {
+    setNewFolderModalVisible(true);
+  };
+
+  const handleCreateNewFolder = () => {
     const newFolder = {
       id: uuid(),
-      name: "New Folder",
+      name: folderNameInput,
       icon: folderIcon,
       subfolders: [],
       files: []
@@ -85,6 +91,9 @@ const FilesPage = () => {
         dispatch(addFolder({ parentId: currentFolder.id, folder: newFolder }));
       }
     }
+
+    setNewFolderModalVisible(false);
+    setFolderNameInput("");
   };
 
   const currentFolder =
@@ -131,8 +140,8 @@ const FilesPage = () => {
         )
       );
     }
-    setRenameModalVisible(false); // Закрыть модальное окно
-    setFolderToRename(null); // Сбросить текущую папку для переименования
+    setRenameModalVisible(false);
+    setFolderToRename(null);
   };
 
   return (
@@ -205,6 +214,20 @@ const FilesPage = () => {
           value={newFolderName}
           onChange={(e) => setNewFolderName(e.target.value)}
           placeholder="Enter new folder name"
+        />
+      </Modal>
+
+      {/* Модальное окно для создания новой папки */}
+      <Modal
+        title="Create New Folder"
+        visible={newFolderModalVisible}
+        onOk={handleCreateNewFolder}
+        onCancel={() => setNewFolderModalVisible(false)}
+      >
+        <Input
+          value={folderNameInput}
+          onChange={(e) => setFolderNameInput(e.target.value)}
+          placeholder="Enter folder name"
         />
       </Modal>
 
