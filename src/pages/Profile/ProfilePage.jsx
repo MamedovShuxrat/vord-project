@@ -12,7 +12,7 @@ const ProfilePage = () => {
   const [username, setUsername] = useState(user?.username || "");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [avatar, setAvatar] = useState(user?.avatarUrl || profileImg);
+  const [avatar, setAvatar] = useState(user?.avatar64 || profileImg);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAvatarChanged, setIsAvatarChanged] = useState(false);
   const fileInputRef = useRef(null);
@@ -21,11 +21,10 @@ const ProfilePage = () => {
     if (user?.name) {
       setUsername(user.name);
     }
-    if (user?.avatar) {
-      setAvatar(user.avatar);
+    if (user?.avatar64) {
+      setAvatar(user.avatar64);
     }
   }, [user]);
-  console.log(user);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -39,6 +38,16 @@ const ProfilePage = () => {
       reader.readAsDataURL(file);
     }
   };
+  const getAvatarSrc = (avatar64) => {
+    if (avatar64 && avatar64.startsWith('data:image/')) {
+      return avatar64;
+    }
+    if (avatar64) {
+      return `data:image/png;base64,${avatar64}`;
+    }
+    return profileImg;
+  };
+
 
   const handleSaveAvatar = async () => {
     if (selectedFile) {
@@ -56,7 +65,6 @@ const ProfilePage = () => {
   };
 
 
-  console.log(avatar);
 
   return (
     <div className={commonStyles.sectionWrapper}>
@@ -65,7 +73,7 @@ const ProfilePage = () => {
         <form  >
           <div className={styles.avatarSection}>
             <div className={styles.avatarContainer}>
-              <img src={avatar} alt="Avatar" className={styles.avatarImage} />
+              <img src={getAvatarSrc(avatar)} alt="Avatar" className={styles.avatarImage} />
               <input
                 type="file"
                 ref={fileInputRef}

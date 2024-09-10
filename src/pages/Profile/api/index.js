@@ -9,7 +9,7 @@ const putNewUserAvatar = `${API_URL}/users/`;
 
 export const uploadAvatar = async (file, setAvatar, dispatch,) => {
     const userData = JSON.parse(localStorage.getItem("userData"));
-    const userID = userData ? userData.pk : null;
+    const userID = userData ? userData.id : null;
     if (!userID) {
         console.error("User ID not found");
         return;
@@ -31,15 +31,15 @@ export const uploadAvatar = async (file, setAvatar, dispatch,) => {
             }
         );
 
-        const newAvatarUrl = response.data.avatar;
-
+        const newAvatarUrl = response.data.avatar64;;
         dispatch(setUser({
             ...response.data,
-            avatar: newAvatarUrl
+            avatar64: newAvatarUrl
         }));
         setAvatar(newAvatarUrl);
-        fetchUserData(token)
+        await fetchUserData(token);
     } catch (error) {
         console.error("Error uploading avatar:", error);
     }
 };
+

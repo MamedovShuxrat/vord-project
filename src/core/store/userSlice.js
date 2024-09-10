@@ -39,7 +39,6 @@ export const login = createAsyncThunk(
       // Загрузите соединения пользователя после успешного входа
       const connections = await fetchUserConnections(token);
       dispatch(setConnections(connections)); // Сохраняем данные в Redux Store и в localStorage
-
       return { token, user };
     } catch (error) {
       return rejectWithValue(error.message || "Login failed");

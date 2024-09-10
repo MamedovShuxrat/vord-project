@@ -58,6 +58,7 @@ export const handleSendData = async (email, role, setIsConfirmed) => {
 	}
 };
 
+
 export const fetchInvitedUsers = async (ownerId) => {
 	try {
 		const response = await toast.promise(
