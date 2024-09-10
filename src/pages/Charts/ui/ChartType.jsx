@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Table, Select, Input, Row, Col } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, Select, Input, Row, Col, Button, message } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { createVisualization } from "../../../core/store/chartvisualizationSlice";
 
 const { Option } = Select;
 
@@ -29,19 +31,44 @@ const imageFormats = [
 ];
 
 const ChartType = () => {
-  // Состояния для хранения значений полей ввода
+  const savedChartId = localStorage.getItem('lastChartId');
+  const dispatch = useDispatch();
+  const token = localStorage.getItem('userToken');
+
+  const [chartId, setChartId] = useState(savedChartId || null);
   const [formData, setFormData] = useState({
     title: "",
     xData: "",
     yData: "",
-    xLabel: "",
-    yLabel: "",
     plotType: null,
     color: null,
     imageFormat: null
   });
+  const [savedPlot, setSavedPlot] = useState(null); // Хранение plot после сохранения
+  const [availableColumns, setAvailableColumns] = useState([]);
 
-  // Функция для обработки изменения в полях ввода
+  const visualizations = useSelector((state) => state.charts.visualizations);
+
+  useEffect(() => {
+    if (!chartId) {
+      message.error("No chartId found in localStorage.");
+      return;
+    }
+
+    const storedColumns = JSON.parse(localStorage.getItem("lastChartColumns")) || [];
+
+    if (storedColumns.length > 0) {
+      setAvailableColumns(storedColumns);
+    } else {
+      const columnsFromRedux = visualizations?.[chartId]?.columnNames || [];
+      if (columnsFromRedux.length > 0) {
+        setAvailableColumns(columnsFromRedux);
+      } else {
+        message.error("No available columns for this chart.");
+      }
+    }
+  }, [chartId, visualizations]);
+
   const handleChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -49,7 +76,54 @@ const ChartType = () => {
     }));
   };
 
-  // Определение колонок для таблицы
+  const handleSaveVisualization = () => {
+    if (!chartId || !formData.xData || !formData.yData || !formData.plotType) {
+      message.error("Please fill in all required fields.");
+      return;
+    }
+
+    const visualizationData = {
+      chart: chartId,
+      title: formData.title,
+      x_data: formData.xData,
+      y_data: formData.yData,
+      x_label: formData.xData,
+      y_label: formData.yData,
+      plot_type: formData.plotType,
+      color: formData.color,
+      image_format: formData.imageFormat,
+      plot: null
+    };
+
+    dispatch(createVisualization({ chartId, visualizationData, token }))
+      .then((result) => {
+        if (result.error) {
+          message.error(result.error.message || "Failed to save visualization.");
+        } else {
+          if (result.payload.plot) {
+            // Удаляем префикс b'' перед отображением изображения
+            const cleanPlot = result.payload.plot.replace(/^b'|'$/g, '');
+            setSavedPlot(cleanPlot);
+            message.success("Visualization saved successfully!");
+          }
+        }
+      });
+  };
+
+
+  if (savedPlot) {
+    return (
+      <div>
+        <h3>Visualization</h3>
+        <img src={`data:image/png;base64,${savedPlot}`} alt="Visualization" />
+        <Button onClick={() => setSavedPlot(null)} style={{ marginTop: "20px" }}>
+          Back to form
+        </Button>
+      </div>
+    );
+  }
+
+
   const columns = [
     {
       title: "Field",
@@ -65,7 +139,6 @@ const ChartType = () => {
     }
   ];
 
-  // Данные для первой таблицы (первая колонка)
   const dataFirstColumn = [
     {
       key: "1",
@@ -79,50 +152,45 @@ const ChartType = () => {
     },
     {
       key: "2",
-      field: "X data",
+      field: "X data (auto label)",
       input: (
-        <Input
+        <Select
+          placeholder="Select X Data"
           value={formData.xData}
-          onChange={(e) => handleChange("xData", e.target.value)}
-        />
+          onChange={(value) => handleChange("xData", value)}
+          style={{ width: "100%" }}
+        >
+          {availableColumns.map((column) => (
+            <Option key={column} value={column}>
+              {column}
+            </Option>
+          ))}
+        </Select>
       )
     },
     {
       key: "3",
-      field: "Y data",
+      field: "Y data (auto label)",
       input: (
-        <Input
+        <Select
+          placeholder="Select Y Data"
           value={formData.yData}
-          onChange={(e) => handleChange("yData", e.target.value)}
-        />
-      )
-    },
-    {
-      key: "4",
-      field: "X label",
-      input: (
-        <Input
-          value={formData.xLabel}
-          onChange={(e) => handleChange("xLabel", e.target.value)}
-        />
+          onChange={(value) => handleChange("yData", value)}
+          style={{ width: "100%" }}
+        >
+          {availableColumns.map((column) => (
+            <Option key={column} value={column}>
+              {column}
+            </Option>
+          ))}
+        </Select>
       )
     }
   ];
 
-  // Данные для второй таблицы (вторая колонка)
   const dataSecondColumn = [
     {
-      key: "5",
-      field: "Y label",
-      input: (
-        <Input
-          value={formData.yLabel}
-          onChange={(e) => handleChange("yLabel", e.target.value)}
-        />
-      )
-    },
-    {
-      key: "6",
+      key: "4",
       field: "Plot type",
       input: (
         <Select
@@ -140,7 +208,7 @@ const ChartType = () => {
       )
     },
     {
-      key: "7",
+      key: "5",
       field: "Color",
       input: (
         <Select
@@ -158,7 +226,7 @@ const ChartType = () => {
       )
     },
     {
-      key: "8",
+      key: "6",
       field: "Image format",
       input: (
         <Select
@@ -178,28 +246,33 @@ const ChartType = () => {
   ];
 
   return (
-    <Row gutter={16}>
-      {/* Первая колонка */}
-      <Col span={12}>
-        <Table
-          columns={columns}
-          dataSource={dataFirstColumn}
-          pagination={false}
-          bordered
-          style={{ width: "350px" }}
-        />
-      </Col>
-      {/* Вторая колонка */}
-      <Col span={12}>
-        <Table
-          columns={columns}
-          dataSource={dataSecondColumn}
-          pagination={false}
-          bordered
-          style={{ width: "350px" }}
-        />
-      </Col>
-    </Row>
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Table
+            columns={columns}
+            dataSource={dataFirstColumn}
+            pagination={false}
+            bordered
+            style={{ width: "100%" }}
+          />
+        </Col>
+        <Col span={12}>
+          <Table
+            columns={columns}
+            dataSource={dataSecondColumn}
+            pagination={false}
+            bordered
+            style={{ width: "100%" }}
+          />
+        </Col>
+      </Row>
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <Button type="primary" onClick={handleSaveVisualization}>
+          Save Visualization
+        </Button>
+      </div>
+    </div>
   );
 };
 

@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import queryStyles from "./query.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateTabContent,
-  loadUserDatabases,
-  executeQuery
-} from "../../../core/store/chartsSlice";
+import { updateTabContent } from "../../../core/store/chartsSlice";
 import { Select, Spin, message } from "antd";
 import { runQuery, fetchQueryResult, updateQueryData } from "../api/index";
+import { addVisualization } from "../../../core/store/chartvisualizationSlice";
+import { v4 as uuid } from "uuid";
 
 const { Option } = Select;
 
@@ -16,26 +14,22 @@ const EXTENSIONS = [
   { id: 1, extension: false, name: "json api" },
   { id: 3, extension: "xlsx", name: "excel xlsx" },
   { id: 5, extension: "csv", name: "csv" },
-  { id: 6, extension: "json", name: "json" }
 ];
 
-const Query = ({ tabId }) => {
+const Query = ({ tabId, databases, loading }) => {
   const dispatch = useDispatch();
-  const { databases = [], loading } = useSelector((state) => state.charts);
   const [selectedDatabase, setSelectedDatabase] = useState(null);
   const [selectedExtensionId, setSelectedExtensionId] = useState(null);
   const [showSQL, setShowSQL] = useState(true);
-  const [chartId, setChartId] = useState(null);
-  const [resultData, setResultData] = useState(null); // Состояние для результата
+  const [chartUuid, setChartUuid] = useState(null);
+  const [resultData, setResultData] = useState(null);
+  const [isFetching, setIsFetching] = useState(false); // состояние для отображения спиннера
 
   const accessToken = JSON.parse(localStorage.getItem("userToken"));
-  const userData = JSON.parse(localStorage.getItem("userData"));
-  const userId = userData ? userData.pk : null;
 
   const tabContent = useSelector(
     (state) => state.charts.tabContents?.[tabId] || ""
   );
-
   const [localQueryText, setLocalQueryText] = useState(tabContent);
 
   useEffect(() => {
@@ -43,79 +37,75 @@ const Query = ({ tabId }) => {
   }, [tabContent]);
 
   useEffect(() => {
-    if (userId) {
-      dispatch(loadUserDatabases(accessToken));
+    if (resultData && resultData.length > 0) {
+      setShowSQL(false); // Автоматически переключаемся на вкладку с результатами
     }
-  }, [dispatch, accessToken, userId]);
+  }, [resultData]);
 
-  // Функция для выполнения запроса
   const handleRunOrUpdate = async () => {
-    console.log("handleRunOrUpdate triggered");
-
     if (!selectedDatabase || !localQueryText || selectedExtensionId === null) {
-      message.error(
-        "Выберите базу данных, введите запрос и выберите расширение."
-      );
+      message.error("Choose database, enter SQL query and choose extension.");
       return;
     }
 
     const requestData = {
       clientdb_id: selectedDatabase,
       str_query: localQueryText,
-      extension: selectedExtensionId
+      extension: selectedExtensionId,
     };
 
-    console.log("Request data prepared:", requestData);
-
     try {
+      setIsFetching(true); // Устанавливаем isFetching в true при начале запроса
+
       let response;
-      if (chartId) {
-        console.log("Updating existing chart with ID:", chartId);
-        response = await updateQueryData(accessToken, chartId, requestData);
-        console.log("Data updated successfully:", response);
+
+      if (chartUuid) {
+        response = await updateQueryData(accessToken, chartUuid, requestData);
         message.success("Data updated successfully.");
       } else {
-        console.log("Running new query");
         response = await runQuery(accessToken, requestData);
-        console.log("Query run successfully, response:", response);
-        setChartId(response.id);
+        setChartUuid(response.uuid);
         message.success("Data loaded successfully.");
       }
 
-      setShowSQL(false);
-
-      // Получаем данные из clientdata
-      console.log(
-        "Fetching query result from clientdata:",
-        response.clientdata
-      );
-      const resultResponse = await fetchQueryResult(
-        accessToken,
-        response.clientdata
-      );
-      console.log("Query result fetched successfully:", resultResponse);
-      console.log("Check resultResponse:", resultResponse);
-      console.log(
-        "Check resultResponse.data.result:",
-        resultResponse?.data?.result
-      );
-
-      if (!resultResponse || !resultResponse[0]) {
-        console.error("No data in result response.");
-        setResultData([]);
-      } else if (!resultResponse[0].data || !resultResponse[0].data.result) {
-        console.error("No result field in data:", resultResponse[0].data);
-        setResultData([]);
-      } else {
-        console.log("Result data found:", resultResponse[0].data.result);
-        setResultData(resultResponse[0].data.result);
+      const clientDataId = response?.clientdata?.id;
+      if (!clientDataId) {
+        throw new Error("Client data ID is missing.");
       }
+      localStorage.setItem('lastChartId', clientDataId);
 
-      console.log("Result data set:", resultResponse?.data?.result);
+      const resultResponse = await fetchQueryResult(accessToken, clientDataId);
+      const clientData = resultResponse?.data || [];
+
+
+      if (clientData.length === 0) {
+        setResultData([]);
+        message.error("No data found in clientdata.");
+      } else {
+        setResultData(clientData);
+        const columnNames = Object.keys(clientData[0]);
+
+        // Сохраняем chartUuid и columnNames в localStorage
+
+        localStorage.setItem('lastChartColumns', JSON.stringify(columnNames));
+
+        // Дополнительно диспатчим сохранение столбцов для визуализации
+        dispatch(addVisualization({
+          chartUuid: response.uuid,
+          visualization: { columnNames }
+        }));
+      }
     } catch (error) {
-      console.error("Failed to load or update data:", error);
-      message.error("Failed to load or update data.");
+      message.error(`Failed to load or update data: ${error.message}`);
+    } finally {
+      setIsFetching(false); // Снимаем флаг загрузки после завершения запроса
     }
+  };
+
+
+  const handleUpdateClick = () => {
+    setShowSQL(true);
+    setLocalQueryText(tabContent);
   };
 
   const handleEditorChange = (value) => {
@@ -127,8 +117,11 @@ const Query = ({ tabId }) => {
     <div className={queryStyles.queryContainer}>
       <div className={queryStyles.tabsActions}>
         <div className={queryStyles.actionsBlock}>
-          <button className={queryStyles.runButton} onClick={handleRunOrUpdate}>
-            {chartId ? "Update" : "Run"}
+          <button
+            className={queryStyles.runButton}
+            onClick={showSQL ? handleRunOrUpdate : handleUpdateClick}
+          >
+            {showSQL ? "Run" : "Update"}
           </button>
           <Select
             className={queryStyles.databaseSelect}
@@ -138,12 +131,13 @@ const Query = ({ tabId }) => {
             style={{ width: 200 }}
             loading={loading}
           >
-            {databases.map((db) => (
+            {(databases || []).map((db) => (
               <Option key={db.id} value={db.id}>
                 {db.connection_name}
               </Option>
             ))}
           </Select>
+
           <Select
             className={queryStyles.extensionSelect}
             value={selectedExtensionId}
@@ -189,18 +183,52 @@ const Query = ({ tabId }) => {
           />
         ) : (
           <div className={queryStyles.resultContainer}>
-            {loading ? (
-              <Spin />
+            {isFetching ? (
+              // Показываем спиннер в самом окне результатов
+              <Spin tip="Loading..." style={{ display: "block", margin: "0 auto" }} />
             ) : resultData && Array.isArray(resultData) ? (
               resultData.length > 0 ? (
-                resultData.map((item, index) => (
-                  <pre key={index}>{JSON.stringify(item, null, 2)}</pre>
-                ))
+                // В зависимости от выбранного расширения показываем разные форматы данных
+                selectedExtensionId === 1 ? (
+                  // JSON API - показываем как JSON
+                  <pre style={{ whiteSpace: "pre-wrap" }}>
+          {JSON.stringify(resultData, null, 2)}
+        </pre>
+                ) : selectedExtensionId === 3 ? (
+                  // Excel XLSX - показываем в виде таблицы
+                  <table>
+                    <thead>
+                    <tr>
+                      {Object.keys(resultData[0]).map((column) => (
+                        <th key={column}>{column}</th>
+                      ))}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {resultData.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {Object.values(row).map((value, colIndex) => (
+                          <td key={colIndex}>{value}</td>
+                        ))}
+                      </tr>
+                    ))}
+                    </tbody>
+                  </table>
+                ) : selectedExtensionId === 5 ? (
+                  // CSV - выводим как CSV строку
+                  <pre style={{ whiteSpace: "pre-wrap" }}>
+          {resultData
+            .map((row) => Object.values(row).join(", "))
+            .join("\n")}
+        </pre>
+                ) : (
+                  "No valid extension selected."
+                )
               ) : (
                 "No results found."
               )
             ) : (
-              "No results"
+              <div>Проверка данных: {JSON.stringify(resultData)}</div>
             )}
           </div>
         )}
