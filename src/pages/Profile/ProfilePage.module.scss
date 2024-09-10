@@ -23,6 +23,8 @@
 .avatarContainer {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
 }
 
 .avatarImage {
@@ -38,10 +40,10 @@
     margin-bottom: 15px;
     box-shadow: inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     background: rgb(255, 255, 255);
+    border: 1px solid transparent;
 
     position: relative;
     border-radius: 3px;
-    border: none;
     color: rgb(135, 132, 146);
     font-size: 15px;
     font-weight: 400;
@@ -51,7 +53,6 @@
 
 
     &:focus {
-        transform: translateY(10px);
         border: 1px solid rgb(87, 170, 228);
     }
 
@@ -73,7 +74,6 @@
     color: #fff;
     border: none;
     cursor: pointer;
-    align-self: flex-end;
     padding: 10px 20px;
     border-radius: 9px;
     font-size: 15px;

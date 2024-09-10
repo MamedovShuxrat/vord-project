@@ -1,11 +1,22 @@
 import RandomColorIcon from "../ui/CreateDynamicSvgIcon/RandomColorIcon";
 
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  if (color === '#FFFFFF') {
+    return getRandomColor();
+  }
+  return color;
+};
+
 export const renderImageOrIcon = (item) => {
   const isSvg = typeof item.img === "string" && item.img.includes(".svg");
 
-  // Приведение типов для ширины и высоты
-  const width = parseInt(item.w, 10) || 20; // Используем значение по умолчанию 20, если width не задан
-  const height = parseInt(item.h, 10) || 20; // Используем значение по умолчанию 20, если height не задан
+  const width = parseInt(item.w, 10) || 20;
+  const height = parseInt(item.h, 10) || 20;
 
   if (isSvg) {
     return (
@@ -19,7 +30,7 @@ export const renderImageOrIcon = (item) => {
   } else {
     return (
       <RandomColorIcon
-        color={item.img || "#000000"}
+        color={getRandomColor()}
         width={width}
         height={height}
       />

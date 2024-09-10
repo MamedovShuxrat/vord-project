@@ -66,7 +66,9 @@ export const fetchUserData = async (token) => {
         "Content-type": "application/json"
       }
     });
+    localStorage.setItem("userData", JSON.stringify(response.data));
     return response.data;
+
   } catch (error) {
     console.error("Error fetching user data:", error);
     throw new Error("Failed to fetch user data");

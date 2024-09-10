@@ -28,6 +28,13 @@ const Header = () => {
     }
   }, [user]);
 
+  const getAvatarSrc = (avatar64) => {
+    if (avatar64) {
+      return `data:image/png;base64,${avatar64}`;
+    }
+    return userAvatarImg;
+  };
+
   const handleLogout = async () => {
     try {
       // Явно вызвать промис и дождаться завершения
@@ -70,9 +77,7 @@ const Header = () => {
               <div className={HeaderStyles.user}>
                 <div className={HeaderStyles.userAvatar}>
                   <img
-                    width={15}
-                    height={18}
-                    src={userAvatarImg}
+                    src={user && user.avatar64 ? getAvatarSrc(user.avatar64) : userAvatarImg}
                     alt="user avatar"
                   />
                 </div>

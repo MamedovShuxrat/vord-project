@@ -17,6 +17,7 @@ export const register = createAsyncThunk(
       const [token, userData] = data;
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(userData));
+
       return { token, user: userData };
     } catch (error) {
       return rejectWithValue(error.message || "Registration failed");
@@ -38,7 +39,6 @@ export const login = createAsyncThunk(
       // Загрузите соединения пользователя после успешного входа
       const connections = await fetchUserConnections(token);
       dispatch(setConnections(connections)); // Сохраняем данные в Redux Store и в localStorage
-
       return { token, user };
     } catch (error) {
       return rejectWithValue(error.message || "Login failed");
