@@ -37,7 +37,7 @@ const FilesPage = () => {
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false);
   const [folderNameInput, setFolderNameInput] = useState("");
   const [newFolderName, setNewFolderName] = useState("");
-  const [fileList, setFileList] = useState([]);
+  const [filesByFolder, setFilesByFolder] = useState({});
 
   const menuRef = useRef(null);
 
@@ -64,8 +64,12 @@ const FilesPage = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const filesData = await fetchFilesForFolder(currentFolderId, token);
-        setFileList(filesData); // Обновляем список файлов
+        const folderId = currentFolderId === null ? "" : currentFolderId;
+        const filesData = await fetchFilesForFolder(folderId, token);
+        setFilesByFolder((prevFiles) => ({
+          ...prevFiles,
+          [folderId]: filesData
+        })); // Сохраняем файлы для текущей папки в состоянии
       } catch (error) {
         console.error("Error fetching files:", error);
       }
@@ -89,8 +93,14 @@ const FilesPage = () => {
     ));
   };
 
-  // Рендер файлов
-  const renderFiles = (files) => {
+  // Рендер файлов для текущей папки
+  const renderFiles = (currentFolderId) => {
+    const files = filesByFolder[currentFolderId] || [];
+
+    if (files.length === 0) {
+      return <div>No files available</div>;
+    }
+
     return files.map((file) => (
       <div key={file.id} className={commonStyles.files__fileItem}>
         <img
@@ -98,7 +108,9 @@ const FilesPage = () => {
           alt={file.name}
           className={commonStyles.files__icon}
         />
-        <span>{file.name}</span>
+        <a href={file.download_link} target="_blank" rel="noopener noreferrer">
+          {file.name}
+        </a>
       </div>
     ));
   };
@@ -154,10 +166,13 @@ const FilesPage = () => {
       const fileData = { file, name: file.name };
       const uploadedFile = await addFileToAPI(
         fileData,
-        currentFolderId,
+        currentFolderId, // Передаем ID текущей папки
         userId
       );
-      setFileList([...fileList, uploadedFile]); // Обновляем список файлов
+      setFilesByFolder((prevFiles) => ({
+        ...prevFiles,
+        [currentFolderId]: [...(prevFiles[currentFolderId] || []), uploadedFile] // Обновляем файлы для текущей папки
+      }));
       toast.success("File uploaded successfully");
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -245,7 +260,8 @@ const FilesPage = () => {
       </Modal>
       <div className={commonStyles.files__grid}>
         {renderFolders(currentFolder)} {/* Отображение папок */}
-        {renderFiles(fileList)} {/* Отображение файлов */}
+        {renderFiles(currentFolderId)}{" "}
+        {/* Отображение файлов только для текущей папки */}
       </div>
     </div>
   );

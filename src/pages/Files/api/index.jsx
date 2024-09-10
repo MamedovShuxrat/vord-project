@@ -101,16 +101,18 @@ export const addFileToAPI = async (fileData, folderId, userId) => {
 };
 
 // Загрузка файлов для указанной папки на веб
-export const fetchFilesForFolder = async (folderId, token) => {
+export const fetchFilesForFolder = async (folderId) => {
   try {
-    const response = await axios.get(`${filesList}?folder=${folderId}`, {
+    const folderPath = folderId ? `${folderId}/` : ""; // Если folderId null, используем пустую строку
+    const response = await axios.get(`${foldersList}${folderPath}`, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token ${access}`,
         "Content-Type": "application/json"
       }
     });
-    return response.data;
+    return response.data.children_files; // Возвращаем файлы для этой папки
   } catch (error) {
+    console.error("Error fetching files:", error);
     toast.error("Error fetching files");
     throw new Error(error);
   }
