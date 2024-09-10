@@ -50,8 +50,6 @@ export const deleteFolderFromAPI = async (folderId, token) => {
   }
 };
 
-//Добавление файла
-
 //Загрузка папок на веб
 export const fetchFolders = async (token) => {
   try {
@@ -68,6 +66,74 @@ export const fetchFolders = async (token) => {
   }
 };
 
-//Загрузка файлов на веб
+// Добавление файла
+export const addFileToAPI = async (fileData, folderId, userId) => {
+  const formData = new FormData();
+  formData.append("file", fileData.file); // Файл
+  formData.append("name", fileData.name); // Имя файла
+  formData.append("folder", folderId !== null ? folderId : ""); // ID папки или пустая строка для корня
+  formData.append("user_id", userId); // ID пользователя
 
-//Скачивание файлов
+  try {
+    const response = await toast.promise(
+      axios.post(`${filesList}`, formData, {
+        headers: {
+          Authorization: `Token ${access}`, // Токен авторизации
+          "Content-Type": "multipart/form-data" // Тип контента
+        }
+      }),
+      {
+        loading: "Uploading file...",
+        success: "File uploaded successfully!",
+        error: "Failed to upload file. Please try again."
+      }
+    );
+
+    // Возвращаем данные файла, включая название и ID
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error uploading file:",
+      error.response?.data || error.message
+    );
+    throw new Error(error);
+  }
+};
+
+// Загрузка файлов для указанной папки на веб
+export const fetchFilesForFolder = async (folderId, token) => {
+  try {
+    const response = await axios.get(`${filesList}?folder=${folderId}`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    toast.error("Error fetching files");
+    throw new Error(error);
+  }
+};
+
+// Удаление файла
+export const deleteFileFromAPI = async (fileId, token) => {
+  try {
+    const response = await axios.delete(`${filesList}${fileId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    toast.success("File deleted successfully");
+    return response.data;
+  } catch (error) {
+    toast.error("Error deleting file");
+    throw new Error(error);
+  }
+};
+
+// Скачивание файлов
+export const downloadFileFromAPI = (downloadLink) => {
+  window.open(downloadLink, "_blank");
+};

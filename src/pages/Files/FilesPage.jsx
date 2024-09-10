@@ -13,7 +13,12 @@ import folderIcon from "../../assets/images/icons/common/folder.svg";
 import fileIcon from "../../assets/images/icons/common/file.svg";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import MenuForFolder from "../Files/FilesView/menu/MenuForFolder";
-import { addFolderToAPI, deleteFolderFromAPI } from "../Files/api/index";
+import {
+  addFolderToAPI,
+  addFileToAPI,
+  fetchFilesForFolder,
+  deleteFolderFromAPI
+} from "../Files/api/index";
 
 const FilesPage = () => {
   const dispatch = useDispatch();
@@ -32,6 +37,8 @@ const FilesPage = () => {
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false);
   const [folderNameInput, setFolderNameInput] = useState("");
   const [newFolderName, setNewFolderName] = useState("");
+  const [fileList, setFileList] = useState([]);
+
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -53,22 +60,21 @@ const FilesPage = () => {
     };
   }, [menuRef]);
 
-  // Рекурсивная функция для поиска текущей папки
-  const findCurrentFolder = (folderList, folderId) => {
-    for (const folder of folderList) {
-      if (folder.id === folderId) {
-        return folder;
+  // Загрузка файлов для текущей папки
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const filesData = await fetchFilesForFolder(currentFolderId, token);
+        setFileList(filesData); // Обновляем список файлов
+      } catch (error) {
+        console.error("Error fetching files:", error);
       }
-      if (folder.subfolders && folder.subfolders.length > 0) {
-        const found = findCurrentFolder(folder.subfolders, folderId);
-        if (found) {
-          return found;
-        }
-      }
-    }
-    return null;
-  };
+    };
 
+    fetchFiles();
+  }, [currentFolderId, token]);
+
+  // Рендер папок
   const renderFolders = (folders) => {
     return folders.map((folder) => (
       <div key={folder.id}>
@@ -76,13 +82,23 @@ const FilesPage = () => {
           className={commonStyles.files__fileItem}
           onClick={() => handleFolderClick(folder)}
         >
-          <img
-            // className={commonStyles.files__actions}
-            src={folderIcon}
-            alt={folder.name}
-          />
+          <img src={folderIcon} alt={folder.name} />
           <span style={{ textAlign: "center" }}>{folder.name}</span>
         </div>
+      </div>
+    ));
+  };
+
+  // Рендер файлов
+  const renderFiles = (files) => {
+    return files.map((file) => (
+      <div key={file.id} className={commonStyles.files__fileItem}>
+        <img
+          src={fileIcon}
+          alt={file.name}
+          className={commonStyles.files__icon}
+        />
+        <span>{file.name}</span>
       </div>
     ));
   };
@@ -104,7 +120,6 @@ const FilesPage = () => {
 
   const handleCreateNewFolder = async () => {
     try {
-      // Создание папки через API
       const parentId = currentFolderId ? currentFolderId : null;
       const newFolder = await addFolderToAPI(folderNameInput, parentId, userId);
 
@@ -113,19 +128,14 @@ const FilesPage = () => {
       }
 
       newFolder.subfolders = newFolder.subfolders || [];
-
-      // Добавляем папку в Redux store
       if (currentFolderId === null) {
         dispatch(addFolder({ parentId: null, folder: newFolder }));
       } else {
-        const currentFolder = findCurrentFolder(folders, currentFolderId);
-
-        if (currentFolder && Array.isArray(currentFolder.subfolders)) {
+        const currentFolder = folders.find((f) => f.id === currentFolderId);
+        if (currentFolder && currentFolder.subfolders) {
           dispatch(
             addFolder({ parentId: currentFolder.id, folder: newFolder })
           );
-        } else {
-          console.error("Текущая папка не найдена или структура некорректна");
         }
       }
 
@@ -139,61 +149,26 @@ const FilesPage = () => {
     }
   };
 
+  const handleUpload = async ({ file }) => {
+    try {
+      const fileData = { file, name: file.name };
+      const uploadedFile = await addFileToAPI(
+        fileData,
+        currentFolderId,
+        userId
+      );
+      setFileList([...fileList, uploadedFile]); // Обновляем список файлов
+      toast.success("File uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Error uploading file");
+    }
+  };
+
   const currentFolder =
     currentFolderId === null
       ? folders
-      : findCurrentFolder(folders, currentFolderId)?.subfolders || [];
-
-  // const handleFileUpload = (file) => {
-  //   console.log("File uploaded:", file);
-  //   return false;
-  // };
-
-  // Контекстное меню для папок
-  const handleContextMenuClick = async (action) => {
-    if (action === "renameFolder") {
-      setRenameModalVisible(true);
-      setNewFolderName(breadcrumb[breadcrumb.length - 1].name);
-      setFolderToRename(breadcrumb[breadcrumb.length - 1].id);
-    } else if (action === "deleteFolder") {
-      const folderId = breadcrumb[breadcrumb.length - 1].id;
-
-      try {
-        // Удаление папки на сервере
-        await deleteFolderFromAPI(folderId, token);
-
-        // Удаление папки из Redux store
-        dispatch(removeFolder({ folderId }));
-        setBreadcrumb(breadcrumb.slice(0, -1));
-        setCurrentFolderId(breadcrumb[breadcrumb.length - 2]?.id || null);
-      } catch (error) {
-        console.error("Error deleting folder:", error);
-      }
-    }
-    setMenuVisible(false);
-  };
-
-  const handleMenuClick = (event) => {
-    event.stopPropagation();
-    const rect = event.target.getBoundingClientRect();
-    setContextMenuPosition({ x: rect.right, y: rect.top });
-    setMenuVisible(true);
-  };
-
-  const handleRename = () => {
-    if (folderToRename) {
-      dispatch(
-        updateFolderName({ folderId: folderToRename, newName: newFolderName })
-      );
-      setBreadcrumb((prevBreadcrumb) =>
-        prevBreadcrumb.map((item) =>
-          item.id === folderToRename ? { ...item, name: newFolderName } : item
-        )
-      );
-    }
-    setRenameModalVisible(false);
-    setFolderToRename(null);
-  };
+      : folders.find((f) => f.id === currentFolderId)?.subfolders || [];
 
   return (
     <div className={commonStyles.files__page}>
@@ -219,8 +194,7 @@ const FilesPage = () => {
           >
             + Add Folder
           </button>
-          {/* <Upload beforeUpload={handleFileUpload} showUploadList={false}> */}
-          <Upload showUploadList={false}>
+          <Upload customRequest={handleUpload} showUploadList={false}>
             <Button icon={<UploadOutlined />}>Upload File</Button>
           </Upload>
         </div>
@@ -235,24 +209,20 @@ const FilesPage = () => {
             </h1>
             <MoreOutlined
               className={commonStyles.folderMenuIcon}
-              onClick={handleMenuClick}
+              onClick={() => setMenuVisible(true)}
             />
           </div>
         )}
       </div>
       {menuVisible && (
-        <div
-          ref={menuRef}
-          className={commonStyles.contextMenuContainer}
-          style={{ top: contextMenuPosition.y, left: contextMenuPosition.x }}
-        >
-          <MenuForFolder handleContextMenuClick={handleContextMenuClick} />
+        <div ref={menuRef} className={commonStyles.contextMenuContainer}>
+          <MenuForFolder handleContextMenuClick={() => {}} />
         </div>
       )}
       <Modal
         title="Rename Folder"
         open={renameModalVisible}
-        onOk={handleRename}
+        onOk={() => setRenameModalVisible(false)}
         onCancel={() => setRenameModalVisible(false)}
       >
         <Input
@@ -274,7 +244,8 @@ const FilesPage = () => {
         />
       </Modal>
       <div className={commonStyles.files__grid}>
-        {renderFolders(currentFolder)}
+        {renderFolders(currentFolder)} {/* Отображение папок */}
+        {renderFiles(fileList)} {/* Отображение файлов */}
       </div>
     </div>
   );
