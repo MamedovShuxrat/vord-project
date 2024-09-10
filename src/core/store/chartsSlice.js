@@ -35,8 +35,9 @@ const initialState = loadStateFromLocalStorage() || {
   activeTab: null,
   openedFiles: [],
   tabContents: {},
-  databases: [], // Для хранения баз данных
-  queryResult: "", // Для хранения результата запроса
+  databases: [],
+  queryResult: "",
+  visualizations: [],
   loading: false,
   error: null
 };
@@ -195,7 +196,39 @@ const chartsSlice = createSlice({
       }
       state.tabContents[tabId] = content;
       saveStateToLocalStorage(state);
+    },
+    addVisualization: (state, action) => {
+      const { chartId, visualization } = action.payload;
+      // Добавляем новую визуализацию к соответствующему чарту
+      state.visualizations.push({
+        chartId,
+        ...visualization
+      });
+      saveStateToLocalStorage(state);
+    },
+    removeVisualization: (state, action) => {
+      const { visualizationId } = action.payload;
+      // Удаляем визуализацию по её ID
+      state.visualizations = state.visualizations.filter(
+        (vis) => vis.id !== visualizationId
+      );
+      saveStateToLocalStorage(state);
+    },
+    updateFileWithChartId: (state, action) => {
+      const { fileId, chartId } = action.payload;
+      const file = state.openedFiles.find((file) => file.id === fileId);
+      if (file) {
+        file.chartId = chartId;
+      }
     }
+  },
+  updateChartId: (state, action) => {
+    const { tempChartId, realChartId } = action.payload;
+    state.foldersTab = state.foldersTab.map((folder) =>
+      folder.subfolder.map((file) =>
+        file.tempChartId === tempChartId ? { ...file, chartId: realChartId } : file
+      )
+    );
   },
   extraReducers: (builder) => {
     builder
@@ -238,7 +271,11 @@ export const {
   setActiveTab,
   openFile,
   closeFile,
-  updateTabContent
+  updateTabContent,
+  addVisualization,
+  removeVisualization,
+  updateFileWithChartId,
+  updateChartId
 } = chartsSlice.actions;
 
 export default chartsSlice.reducer;

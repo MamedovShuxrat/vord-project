@@ -45,6 +45,25 @@ const ChartsPage = () => {
   const [newFileName, setNewFileName] = useState("");
   const menuRef = useRef(null);
   const tabsContainerRef = useRef(null);
+  const [databases, setDatabases] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    console.log("Trying to access localStorage for connections");
+    const storedConnections = localStorage.getItem("connections");
+    console.log("Raw connections data from localStorage:", storedConnections);
+
+    if (storedConnections) {
+      const parsedConnections = JSON.parse(storedConnections);
+      console.log("Parsed connections from localStorage:", parsedConnections);
+      setDatabases(parsedConnections); // Сохраняем базы данных в состояние
+    } else {
+      console.warn("No connections found in localStorage.");
+    }
+    setLoading(false); // Завершаем загрузку
+  }, []);
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -70,23 +89,27 @@ const ChartsPage = () => {
   };
 
   const addNewTab = (name, queryText = "") => {
-    const newTabId = uuid();
+    const tempChartId = uuid(); // Временный ID
+    const newTabId = uuid(); // ID для вкладки
+
     const newTab = {
-      id: uuid(),
+      id: newTabId,
       name: name || `Query: Без названия ${foldersTab.length + 1}`,
       icon: folder,
       isOpen: true,
       subfolder: [
-        { id: uuid(), name: "Chart: 1", type: "chart" },
+        { id: uuid(), name: "Chart: 1", type: "chart", tempChartId }, // Временный ID чарта
         { id: uuid(), name: "Clean Data: 1", type: "cleanData" }
       ],
       queryText
     };
+
     dispatch(addFolder(newTab));
     dispatch(setActiveTab(newTabId));
 
     dispatch(updateTabContent({ tabId: newTabId, content: queryText }));
   };
+
 
   const closeRelatedTabs = (id) => {
     const relatedFiles = openedFiles.filter((file) => {
@@ -418,7 +441,7 @@ const ChartsPage = () => {
             (folder) =>
               activeTab === folder.id && (
                 <div key={folder.id}>
-                  <Query tabId={folder.id} />
+                  <Query tabId={folder.id} databases={databases} loading={loading} chartId={folder.id} />
                 </div>
               )
           )}
@@ -426,11 +449,14 @@ const ChartsPage = () => {
             (file) =>
               activeTab === file.id && (
                 <div key={file.id}>
-                  {file.type === "chart" && <Chart tabId={file.id} />}
+                  {file.type === "chart" && (
+                    <Chart tabId={file.id} chartId={file.tempChartId || file.chartId} />
+                  )}
                   {file.type === "cleanData" && <CleanData tabId={file.id} />}
                 </div>
               )
           )}
+
         </div>
       </div>
       {menuVisible && (
