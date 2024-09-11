@@ -8,7 +8,7 @@ import Chart from "../../pages/Charts/ui/Chart";
 import CleanData from "../../pages/Charts/ui/CleanData";
 import MenuForFileCharts from "./menu/MenuForFileCharts";
 import MenuForQueryCharts from "./menu/MenuForQueryCharts";
-import MenuForView from "../../components/FilesView/menu/MenuForView";
+import MenuForView from "../../pages/Files/FilesView/menu/MenuForView";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import useSearch from "../../components/utils/useSearch";
 import arrowSvg from "../../assets/images/icons/common/arrow.svg";
@@ -64,7 +64,6 @@ const ChartsPage = () => {
     setLoading(false); // Завершаем загрузку
   }, []);
 
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -109,7 +108,6 @@ const ChartsPage = () => {
 
     dispatch(updateTabContent({ tabId: newTabId, content: queryText }));
   };
-
 
   const closeRelatedTabs = (id) => {
     const relatedFiles = openedFiles.filter((file) => {
@@ -441,7 +439,12 @@ const ChartsPage = () => {
             (folder) =>
               activeTab === folder.id && (
                 <div key={folder.id}>
-                  <Query tabId={folder.id} databases={databases} loading={loading} chartId={folder.id} />
+                  <Query
+                    tabId={folder.id}
+                    databases={databases}
+                    loading={loading}
+                    chartId={folder.id}
+                  />
                 </div>
               )
           )}
@@ -450,13 +453,15 @@ const ChartsPage = () => {
               activeTab === file.id && (
                 <div key={file.id}>
                   {file.type === "chart" && (
-                    <Chart tabId={file.id} chartId={file.tempChartId || file.chartId} />
+                    <Chart
+                      tabId={file.id}
+                      chartId={file.tempChartId || file.chartId}
+                    />
                   )}
                   {file.type === "cleanData" && <CleanData tabId={file.id} />}
                 </div>
               )
           )}
-
         </div>
       </div>
       {menuVisible && (
