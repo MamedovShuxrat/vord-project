@@ -126,19 +126,35 @@ export const addFileToAPI = async (fileData, folderId, userId) => {
 // Загрузка файлов для указанной папки на веб
 export const fetchFilesForFolder = async (folderId) => {
   try {
-    // Если folderId === null, не добавляем папку в путь
-    const folderPath = folderId ? `${folderId}/` : ""; // Для корневой папки (folderId === null) путь пустой
-    const response = await axios.get(`${foldersList}${folderPath}`, {
+    const response = await axios.get(`${filesList}`, {
       headers: {
         Authorization: `Token ${access}`,
         "Content-Type": "application/json"
       }
     });
-    console.log("Файлы для папки:", folderId, response.data.children_files); // Лог для проверки файлов
-    return response.data.children_files; // Возвращаем файлы для этой папки
+
+    // Проверяем, получили ли мы список файлов
+    if (response.data) {
+      if (folderId === null || folderId === "") {
+        // Если folderId === null, выбираем файлы для корневой папки
+        const rootFiles = response.data.filter((file) => file.folder === null);
+        console.log("Файлы для корневой папки:", rootFiles);
+        return rootFiles;
+      } else {
+        // Для других папок фильтруем файлы по folderId
+        const folderFiles = response.data.filter(
+          (file) => file.folder === folderId
+        );
+        console.log("Файлы для папки с ID:", folderId, folderFiles);
+        return folderFiles;
+      }
+    } else {
+      console.log("Нет данных о файлах в ответе сервера");
+      return [];
+    }
   } catch (error) {
-    console.error("Error fetching files:", error);
-    toast.error("Error fetching files");
+    console.error("Ошибка при загрузке файлов:", error);
+    toast.error("Ошибка при загрузке файлов");
     throw new Error(error);
   }
 };

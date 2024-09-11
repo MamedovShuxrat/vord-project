@@ -61,13 +61,12 @@ const FilesPage = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        // Если `currentFolderId` равно null, используем пустую строку для корневой папки
         const folderId = currentFolderId === null ? "" : currentFolderId;
         const filesData = await fetchFilesForFolder(folderId, token);
-        console.log("Файлы для папки:", folderId, filesData); // Логируем данные для проверки
+        console.log("Файлы для папки:", folderId, filesData);
         setFilesByFolder((prevFiles) => ({
           ...prevFiles,
-          [folderId]: filesData // Сохраняем файлы для корневой папки
+          [folderId]: filesData // Сохраняем файлы для папки
         }));
       } catch (error) {
         console.error("Error fetching files:", error);
@@ -140,15 +139,14 @@ const FilesPage = () => {
 
   // Рендер файлов для текущей папки
   const renderFiles = (currentFolderId) => {
-    // Убедись, что folderId корректен (пустая строка для корневой папки)
     const folderId = currentFolderId === null ? "" : currentFolderId;
     const files = filesByFolder[folderId] || [];
 
     if (files.length === 0) {
       console.log("Нет файлов для рендеринга в папке:", folderId);
-      // return (
-      //   <div>Нет файлов для рендеринга в папке: {folderId || "Корневая"}</div>
-      // );
+      return (
+        <div>Нет файлов для рендеринга в папке: {folderId || "Корневая"}</div>
+      );
     }
 
     return files.map((file) => (
