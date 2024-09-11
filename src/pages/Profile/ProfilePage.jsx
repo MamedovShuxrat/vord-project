@@ -3,13 +3,14 @@ import styles from "./ProfilePage.module.scss";
 import Chat from "../../components/Chat/ui/Chat";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadAvatar } from "./api";
+import { uploadAvatar, updateUsername } from "./api";
 import profileImg from "../../assets/images/common/illustration.jpg";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const [username, setUsername] = useState(user?.username || "");
+  const [initialUsername, setInitialUsername] = useState(user?.username || "")
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [avatar, setAvatar] = useState(user?.avatar64 || profileImg);
@@ -20,6 +21,7 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user?.name) {
       setUsername(user.name);
+      setInitialUsername(user.name)
     }
     if (user?.avatar64) {
       setAvatar(user.avatar64);
@@ -65,7 +67,16 @@ const ProfilePage = () => {
   };
 
 
-
+  const handleSaveUsername = async () => {
+    if (username !== initialUsername) {
+      try {
+        await updateUsername(username, dispatch); // Обновляем имя пользователя на сервере
+        setInitialUsername(username); // Обновляем первоначальное имя после успешного сохранения
+      } catch (error) {
+        console.error("Error updating username:", error);
+      }
+    }
+  };
   return (
     <div className={commonStyles.sectionWrapper}>
       <div className={styles.profilePage}>
@@ -98,6 +109,15 @@ const ProfilePage = () => {
                 </button>
               )}
             </div>
+            {/* <div className={styles.usernameSection}>
+              <input
+                type="text"
+                placeholder="User name"
+                value={username}
+                onChange={handleUsernameChange}
+                className={styles.inputField}
+              />
+            </div> */}
             <div className={styles.usernameSection}>
               <input
                 type="text"
@@ -106,6 +126,16 @@ const ProfilePage = () => {
                 onChange={handleUsernameChange}
                 className={styles.inputField}
               />
+              {/* Кнопка сохранения имени, если оно изменилось */}
+              {username !== initialUsername && (
+                <button
+                  type="button"
+                  onClick={handleSaveUsername}
+                  className={styles.changeButton}
+                >
+                  Save Username
+                </button>
+              )}
             </div>
             <div className={styles.passwordSection}>
               <input
