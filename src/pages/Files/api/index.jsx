@@ -92,8 +92,8 @@ export const fetchFolders = async (token) => {
 // Добавление файла
 export const addFileToAPI = async (fileData, folderId, userId) => {
   const formData = new FormData();
-  formData.append("file", fileData.file); // Файл
-  formData.append("name", fileData.name); // Имя файла
+  formData.append("link", fileData.file); // Файл
+  // formData.append("name", fileData.name); // Имя файла
   formData.append("folder", folderId !== null ? folderId : ""); // ID папки или пустая строка для корня
   formData.append("user_id", userId); // ID пользователя
 
