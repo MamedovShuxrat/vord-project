@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import rename from "../../../assets/images/icons/common/rename.svg";
-import path from "../../../assets/images/icons/common/path.svg";
-import download from "../../../assets/images/icons/common/download.svg";
-import move from "../../../assets/images/icons/common/move.svg";
-import duplicate from "../../../assets/images/icons/common/duplicate.svg";
-import open from "../../../assets/images/icons/common/open.svg";
+import rename from "../../../../assets/images/icons/common/rename.svg";
+import path from "../../../../assets/images/icons/common/path.svg";
+import download from "../../../../assets/images/icons/common/download.svg";
+import move from "../../../../assets/images/icons/common/move.svg";
+import duplicate from "../../../../assets/images/icons/common/duplicate.svg";
+import open from "../../../../assets/images/icons/common/open.svg";
 import styles from "../filesView.module.scss";
 
 const MenuForFiles = ({ handleContextMenuClick }) => {
