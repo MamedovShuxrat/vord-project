@@ -77,8 +77,8 @@ const Header = () => {
               <div className={HeaderStyles.user}>
                 <div className={HeaderStyles.userAvatar}>
                   <img
-                    width={user && user.avatar64 ? 30 : 20}
-                    height={user && user.avatar64 ? 30 : 20}
+                    width={user && user.avatar64 ? 32 : 20}
+                    height={user && user.avatar64 ? 32 : 20}
                     src={user && user.avatar64 ? getAvatarSrc(user.avatar64) : userAvatarImg}
                     alt="user avatar"
                   />

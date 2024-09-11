@@ -3,8 +3,9 @@ import styles from "./ProfilePage.module.scss";
 import Chat from "../../components/Chat/ui/Chat";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadAvatar, updateUsername } from "./api";
+import { uploadAvatar, updateUsername, changePassword } from "./api";
 import profileImg from "../../assets/images/common/illustration.jpg";
+import { toast } from "react-hot-toast";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -12,7 +13,9 @@ const ProfilePage = () => {
   const [username, setUsername] = useState(user?.username || "");
   const [initialUsername, setInitialUsername] = useState(user?.username || "")
   const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [newPassword1, setNewPassword1] = useState("");
+  const [newPassword2, setNewPassword2] = useState("");
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [avatar, setAvatar] = useState(user?.avatar64 || profileImg);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAvatarChanged, setIsAvatarChanged] = useState(false);
@@ -27,6 +30,33 @@ const ProfilePage = () => {
       setAvatar(user.avatar64);
     }
   }, [user]);
+
+  useEffect(() => {
+    setPasswordsMatch(newPassword1 === newPassword2 && newPassword1 !== "" && newPassword2 !== "");
+  }, [newPassword1, newPassword2]);
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    if (!oldPassword || !newPassword1 || !newPassword2) {
+      toast.error("Please fill in all password fields.");
+      return;
+    }
+
+    if (!passwordsMatch) {
+      toast.error("New passwords do not match.");
+      return;
+    }
+
+    try {
+      await changePassword(oldPassword, newPassword1, newPassword2,);
+      setOldPassword("");
+      setNewPassword1("");
+      setNewPassword2("");
+    } catch (error) {
+      console.error("Error changing password:", error);
+    }
+  };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -70,8 +100,7 @@ const ProfilePage = () => {
   const handleSaveUsername = async () => {
     if (username !== initialUsername) {
       try {
-        await updateUsername(username, dispatch); // Обновляем имя пользователя на сервере
-        setInitialUsername(username); // Обновляем первоначальное имя после успешного сохранения
+        await updateUsername(username, dispatch);
       } catch (error) {
         console.error("Error updating username:", error);
       }
@@ -109,15 +138,6 @@ const ProfilePage = () => {
                 </button>
               )}
             </div>
-            {/* <div className={styles.usernameSection}>
-              <input
-                type="text"
-                placeholder="User name"
-                value={username}
-                onChange={handleUsernameChange}
-                className={styles.inputField}
-              />
-            </div> */}
             <div className={styles.usernameSection}>
               <input
                 type="text"
@@ -126,7 +146,6 @@ const ProfilePage = () => {
                 onChange={handleUsernameChange}
                 className={styles.inputField}
               />
-              {/* Кнопка сохранения имени, если оно изменилось */}
               {username !== initialUsername && (
                 <button
                   type="button"
@@ -148,14 +167,23 @@ const ProfilePage = () => {
               <input
                 type="password"
                 placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                value={newPassword1}
+                onChange={(e) => setNewPassword1(e.target.value)}
+                className={styles.inputField}
+              />
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                value={newPassword2}
+                onChange={(e) => setNewPassword2(e.target.value)}
                 className={styles.inputField}
               />
             </div>
-            <button type="submit" className={styles.changeButton}>
-              Save Changes
-            </button>
+            {passwordsMatch && (
+              <button onClick={handlePasswordChange} type="submit" className={styles.changeButton}>
+                Save New password
+              </button>
+            )}
           </div>
         </form>
       </div>

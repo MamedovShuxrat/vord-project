@@ -65,7 +65,7 @@
     }
 
     &:focus::placeholder {
-        transform: translateY(200%);
+        transform: translateX(-200%);
     }
 }
 

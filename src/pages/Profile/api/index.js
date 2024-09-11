@@ -6,6 +6,7 @@ import { fetchUserData } from "../../../api";
 const API_URL = process.env.REACT_APP_API_URL;
 const token = JSON.parse(localStorage.getItem("userToken"));
 const putNewUserAvatar = `${API_URL}/users/`;
+const changePasswordApi = `${API_URL}/password/change/`;
 
 const userData = JSON.parse(localStorage.getItem("userData"));
 const userID = userData ? userData.id : null;
@@ -74,3 +75,34 @@ export const updateUsername = async (newUserName, dispatch,) => {
     }
 };
 
+
+export const changePassword = async (oldPassword, newPassword1, newPassword2,) => {
+    try {
+        const response = await toast.promise(
+            axios.post(
+                changePasswordApi,
+                {
+                    old_password: oldPassword,
+                    new_password1: newPassword1,
+                    new_password2: newPassword2
+                },
+                {
+                    headers: {
+                        Authorization: `Token ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            ),
+            {
+                loading: 'Changing password...',
+                success: 'Password changed successfully!',
+                error: 'Failed to change password. Please try again.',
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw error;
+    }
+};
