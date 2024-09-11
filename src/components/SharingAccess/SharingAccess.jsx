@@ -133,7 +133,15 @@ const SharingAccess = () => {
     }
 
   };
-
+  const getAvatarSrc = (avatar64) => {
+    if (avatar64 && avatar64.startsWith('data:image/')) {
+      return avatar64;
+    }
+    if (avatar64) {
+      return `data:image/png;base64,${avatar64}`;
+    }
+    return userAvatarImg;
+  };
   return (
     <div className={styles.access}>
       <h3 className={styles.accessTitle}>
@@ -206,9 +214,9 @@ const SharingAccess = () => {
               <div key={user.id} className={styles.userItem}>
                 <div className={styles.userBg}>
                   <img
-                    width={20}
-                    height={20}
-                    src={user.avatar ? user.avatar : userAvatarImg}
+                    width={user.avatar64 ? 30 : 20}
+                    height={user.avatar64 ? 30 : 20}
+                    src={user.avatar64 ? getAvatarSrc(user.avatar64) : userAvatarImg}
                     alt={`${user.username}'s avatar`}
                   />
                 </div>
