@@ -1,10 +1,23 @@
 // src/core/store/foldersSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuid } from "uuid";
+import { fetchFolders } from "../../pages/Files/api/index";
+import { createFolderTree } from "../helpers/createFoldersTree";
+import folderIcon from "../../assets/images/icons/common/folder.svg";
+import fileIcon from "../../assets/images/icons/common/file.svg";
 
-// Пути к иконкам папок и файлов
-const folderIcon = "/assets/images/icons/common/folder.svg";
-const fileIcon = "/assets/images/icons/common/file.svg";
+// Асинхронный экшен для загрузки папок
+export const loadFoldersFromAPI = createAsyncThunk(
+  "folders/loadFolders",
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await fetchFolders(token);
+      return createFolderTree(response); // Преобразуем плоский список в дерево
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 // Функция для загрузки состояния из localStorage
 const loadStateFromLocalStorage = () => {
@@ -32,25 +45,7 @@ const saveStateToLocalStorage = (state) => {
 
 // Инициализация начального состояния из localStorage или дефолтное значение
 const initialState = loadStateFromLocalStorage() || {
-  folders: [
-    {
-      id: uuid(),
-      name: "Untitled",
-      icon: folderIcon, // Путь к иконке папки
-      isOpen: false,
-      subfolders: [
-        {
-          id: uuid(),
-          name: "Untitled",
-          icon: folderIcon, // Путь к иконке папки
-          isOpen: false,
-          subfolders: [],
-          files: []
-        }
-      ],
-      files: []
-    }
-  ],
+  folders: [],
   openTabs: [],
   activeTab: null
 };
@@ -65,9 +60,9 @@ const foldersSlice = createSlice({
       const findAndAddFolder = (folders) => {
         return folders.map((f) => {
           if (f.id === parentId) {
-            f.subfolders.push(folder);
+            f.subfolders.push(folder); // Добавляем папку к подкаталогам
           } else if (f.subfolders.length > 0) {
-            f.subfolders = findAndAddFolder(f.subfolders);
+            f.subfolders = findAndAddFolder(f.subfolders); // Рекурсивно ищем родителя
           }
           return f;
         });
@@ -79,46 +74,27 @@ const foldersSlice = createSlice({
         state.folders = findAndAddFolder(state.folders);
       }
 
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+      saveStateToLocalStorage(state);
     },
 
-    addFile: (state, action) => {
-      const { parentId, file } = action.payload;
+    // addFile: (state, action) => {
+    //   const { parentId, file } = action.payload;
 
-      const findAndAddFile = (folders) => {
-        return folders.map((f) => {
-          if (f.id === parentId) {
-            f.files.push(file);
-          } else if (f.subfolders.length > 0) {
-            f.subfolders = findAndAddFile(f.subfolders);
-          }
-          return f;
-        });
-      };
+    //   const findAndAddFile = (folders) => {
+    //     return folders.map((f) => {
+    //       if (f.id === parentId) {
+    //         f.files.push(file);
+    //       } else if (f.subfolders.length > 0) {
+    //         f.subfolders = findAndAddFile(f.subfolders);
+    //       }
+    //       return f;
+    //     });
+    //   };
 
-      state.folders = findAndAddFile(state.folders);
+    //   state.folders = findAndAddFile(state.folders);
 
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
-    },
-
-    toggleFolderOpen: (state, action) => {
-      const { folderId } = action.payload;
-
-      const findAndToggleFolder = (folders) => {
-        return folders.map((f) => {
-          if (f.id === folderId) {
-            f.isOpen = !f.isOpen;
-          } else if (f.subfolders.length > 0) {
-            f.subfolders = findAndToggleFolder(f.subfolders);
-          }
-          return f;
-        });
-      };
-
-      state.folders = findAndToggleFolder(state.folders);
-
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
-    },
+    //   saveStateToLocalStorage(state);
+    // },
 
     removeFolder: (state, action) => {
       const { folderId } = action.payload;
@@ -136,7 +112,7 @@ const foldersSlice = createSlice({
 
       state.folders = findAndRemoveFolder(state.folders);
 
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+      saveStateToLocalStorage(state);
     },
 
     removeFile: (state, action) => {
@@ -154,7 +130,7 @@ const foldersSlice = createSlice({
 
       state.folders = findAndRemoveFile(state.folders);
 
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+      saveStateToLocalStorage(state);
     },
 
     updateFileName: (state, action) => {
@@ -174,53 +150,64 @@ const foldersSlice = createSlice({
 
       state.folders = findAndUpdateFile(state.folders);
 
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+      saveStateToLocalStorage(state);
     },
 
-    setActiveTab: (state, action) => {
-      state.activeTab = action.payload;
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+    updateFolderName: (state, action) => {
+      const { folderId, newName } = action.payload;
+
+      const findAndUpdateFolder = (folders) => {
+        return folders.map((f) => {
+          if (f.id === folderId) {
+            f.name = newName;
+          } else if (f.subfolders.length > 0) {
+            f.subfolders = findAndUpdateFolder(f.subfolders);
+          }
+          return f;
+        });
+      };
+
+      state.folders = findAndUpdateFolder(state.folders);
+
+      saveStateToLocalStorage(state);
     },
 
-    openTab: (state, action) => {
-      const { id, name, type } = action.payload;
-      if (!state.openTabs.some((tab) => tab.id === id)) {
-        state.openTabs.push({ id, name, type });
-      }
-      state.activeTab = id;
-
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
-    },
-
-    closeTab: (state, action) => {
-      const tabId = action.payload;
-      state.openTabs = state.openTabs.filter((tab) => tab.id !== tabId);
-      if (state.activeTab === tabId) {
-        state.activeTab = null;
-      }
-
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
-    },
-
-    closeAllTabs: (state) => {
+    resetFolders: (state) => {
+      state.folders = [
+        {
+          id: uuid(),
+          name: "Untitled",
+          icon: folderIcon,
+          isOpen: false,
+          subfolders: [],
+          files: []
+        }
+      ];
       state.openTabs = [];
       state.activeTab = null;
-      saveStateToLocalStorage(state); // Сохранение состояния в localStorage
+
+      localStorage.removeItem("foldersState");
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadFoldersFromAPI.fulfilled, (state, action) => {
+        state.folders = action.payload;
+        saveStateToLocalStorage(state);
+      })
+      .addCase(loadFoldersFromAPI.rejected, (state, action) => {
+        console.error("Ошибка загрузки папок:", action.payload);
+      });
   }
 });
 
 export const {
   addFolder,
-  addFile,
-  toggleFolderOpen,
   removeFolder,
   removeFile,
   updateFileName,
-  setActiveTab,
-  openTab,
-  closeTab,
-  closeAllTabs
+  updateFolderName,
+  resetFolders
 } = foldersSlice.actions;
 
 export default foldersSlice.reducer;
