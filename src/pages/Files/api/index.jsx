@@ -50,6 +50,29 @@ export const deleteFolderFromAPI = async (folderId, token) => {
   }
 };
 
+// Переименование папки
+export const updateFolderName = async (folderId, newFolderName, token) => {
+  try {
+    const response = await axios.patch(
+      `${foldersList}${folderId}/`,
+      {
+        name: newFolderName // Отправляем новое имя папки
+      },
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    toast.success("Folder renamed successfully");
+    return response.data;
+  } catch (error) {
+    toast.error("Error renaming folder");
+    throw new Error(error);
+  }
+};
+
 //Загрузка папок на веб
 export const fetchFolders = async (token) => {
   try {
@@ -103,13 +126,15 @@ export const addFileToAPI = async (fileData, folderId, userId) => {
 // Загрузка файлов для указанной папки на веб
 export const fetchFilesForFolder = async (folderId) => {
   try {
-    const folderPath = folderId ? `${folderId}/` : ""; // Если folderId null, используем пустую строку
+    // Если folderId === null, не добавляем папку в путь
+    const folderPath = folderId ? `${folderId}/` : ""; // Для корневой папки (folderId === null) путь пустой
     const response = await axios.get(`${foldersList}${folderPath}`, {
       headers: {
         Authorization: `Token ${access}`,
         "Content-Type": "application/json"
       }
     });
+    console.log("Файлы для папки:", folderId, response.data.children_files); // Лог для проверки файлов
     return response.data.children_files; // Возвращаем файлы для этой папки
   } catch (error) {
     console.error("Error fetching files:", error);

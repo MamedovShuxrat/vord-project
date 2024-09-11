@@ -17,7 +17,8 @@ import {
   addFolderToAPI,
   addFileToAPI,
   fetchFilesForFolder,
-  deleteFolderFromAPI
+  deleteFolderFromAPI,
+  updateFolderName as updateFolderAPI
 } from "../Files/api/index";
 
 const FilesPage = () => {
@@ -28,10 +29,6 @@ const FilesPage = () => {
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [breadcrumb, setBreadcrumb] = useState([{ id: null, name: "Files" }]);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({
-    x: 0,
-    y: 0
-  });
   const [folderToRename, setFolderToRename] = useState(null);
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false);
@@ -64,12 +61,14 @@ const FilesPage = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
+        // Если `currentFolderId` равно null, используем пустую строку для корневой папки
         const folderId = currentFolderId === null ? "" : currentFolderId;
         const filesData = await fetchFilesForFolder(folderId, token);
+        console.log("Файлы для папки:", folderId, filesData); // Логируем данные для проверки
         setFilesByFolder((prevFiles) => ({
           ...prevFiles,
-          [folderId]: filesData
-        })); // Сохраняем файлы для текущей папки в состоянии
+          [folderId]: filesData // Сохраняем файлы для корневой папки
+        }));
       } catch (error) {
         console.error("Error fetching files:", error);
       }
@@ -78,10 +77,56 @@ const FilesPage = () => {
     fetchFiles();
   }, [currentFolderId, token]);
 
+  // Функция для обработки действий в контекстном меню
+  const handleContextMenuClick = (action) => {
+    setMenuVisible(false); // Закрываем меню сразу после нажатия на любую кнопку
+
+    if (action === "renameFolder") {
+      setRenameModalVisible(true); // Открываем модалку для переименования
+    } else if (action === "deleteFolder") {
+      handleDeleteFolder(currentFolderId); // Удаляем текущую папку
+    }
+  };
+  // Функция удаления папки
+  const handleDeleteFolder = async (folderId) => {
+    try {
+      await deleteFolderFromAPI(folderId, token); // Удаляем папку с сервера
+      dispatch(removeFolder({ folderId })); // Удаляем папку из состояния без необходимости перезагрузки страницы
+      toast.success("Folder deleted successfully");
+
+      // Если папка удалена, и она является текущей, вернемся на уровень выше
+      if (currentFolderId === folderId) {
+        setCurrentFolderId(null); // Переходим в корневую папку после удаления
+        setBreadcrumb([{ id: null, name: "Files" }]); // Обновляем "хлебные крошки"
+      }
+    } catch (error) {
+      console.error("Error deleting folder:", error);
+      toast.error("Error deleting folder");
+    }
+  };
+
+  // Функция переименования папки
+  const handleRenameFolder = async () => {
+    try {
+      await updateFolderAPI(folderToRename.id, newFolderName, token);
+      dispatch(
+        updateFolderName({ id: folderToRename.id, name: newFolderName })
+      ); // Обновляем имя папки в состоянии
+      setRenameModalVisible(false); // Закрываем модальное окно
+      setFolderToRename(null);
+      toast.success("Folder renamed successfully");
+    } catch (error) {
+      console.error("Error renaming folder:", error);
+      toast.error("Error renaming folder");
+    }
+  };
+
   // Рендер папок
   const renderFolders = (folders) => {
     return folders.map((folder) => (
       <div key={folder.id}>
+        {" "}
+        {/* Добавляем уникальный ключ */}
         <div
           className={commonStyles.files__fileItem}
           onClick={() => handleFolderClick(folder)}
@@ -95,10 +140,15 @@ const FilesPage = () => {
 
   // Рендер файлов для текущей папки
   const renderFiles = (currentFolderId) => {
-    const files = filesByFolder[currentFolderId] || [];
+    // Убедись, что folderId корректен (пустая строка для корневой папки)
+    const folderId = currentFolderId === null ? "" : currentFolderId;
+    const files = filesByFolder[folderId] || [];
 
     if (files.length === 0) {
-      return <div>No files available</div>;
+      console.log("Нет файлов для рендеринга в папке:", folderId);
+      // return (
+      //   <div>Нет файлов для рендеринга в папке: {folderId || "Корневая"}</div>
+      // );
     }
 
     return files.map((file) => (
@@ -113,6 +163,35 @@ const FilesPage = () => {
         </a>
       </div>
     ));
+  };
+
+  // Основная проверка на наличие файлов и папок
+  const renderContent = (currentFolderId) => {
+    let subfolders = [];
+    const files = filesByFolder[currentFolderId] || [];
+
+    // Проверка для корневой папки (Files)
+    if (currentFolderId === null) {
+      // Фильтруем только папки без родителя
+      subfolders = folders.filter((folder) => folder.parent === null);
+    } else {
+      // Для других папок получаем подпапки
+      const currentFolder = folders.find((f) => f.id === currentFolderId) || {};
+      subfolders = currentFolder?.subfolders || [];
+    }
+
+    // Если нет ни файлов, ни подпапок
+    if (subfolders.length === 0 && files.length === 0) {
+      return <div>No files available</div>;
+    }
+
+    // Рендерим подпапки и файлы
+    return (
+      <>
+        {renderFolders(subfolders)}
+        {renderFiles(currentFolderId)}
+      </>
+    );
   };
 
   const handleFolderClick = (folder) => {
@@ -231,13 +310,13 @@ const FilesPage = () => {
       </div>
       {menuVisible && (
         <div ref={menuRef} className={commonStyles.contextMenuContainer}>
-          <MenuForFolder handleContextMenuClick={() => {}} />
+          <MenuForFolder handleContextMenuClick={handleContextMenuClick} />
         </div>
       )}
       <Modal
         title="Rename Folder"
         open={renameModalVisible}
-        onOk={() => setRenameModalVisible(false)}
+        onOk={handleRenameFolder}
         onCancel={() => setRenameModalVisible(false)}
       >
         <Input
@@ -259,9 +338,8 @@ const FilesPage = () => {
         />
       </Modal>
       <div className={commonStyles.files__grid}>
-        {renderFolders(currentFolder)} {/* Отображение папок */}
-        {renderFiles(currentFolderId)}{" "}
-        {/* Отображение файлов только для текущей папки */}
+        {renderContent(currentFolderId)}{" "}
+        {/* Проверяем на наличие файлов и подпапок */}
       </div>
     </div>
   );
