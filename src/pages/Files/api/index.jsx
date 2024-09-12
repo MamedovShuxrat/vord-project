@@ -1,3 +1,4 @@
+// src/pages/Files/api/index.js
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
@@ -5,11 +6,11 @@ import { toast } from "react-hot-toast";
 const API_URL = process.env.REACT_APP_API_URL;
 const access = JSON.parse(localStorage.getItem("userToken"));
 
-// Определяем эндпоинты для управления папками и файлами
+// Эндпоинты для папок и файлов
 const foldersList = `${API_URL}/folders/`;
 const filesList = `${API_URL}/files/`;
 
-//Добавление папки
+// Добавление папки
 export const addFolderToAPI = async (folderName, parentId = null, userId) => {
   try {
     const response = await axios.post(
@@ -28,6 +29,10 @@ export const addFolderToAPI = async (folderName, parentId = null, userId) => {
     );
     return response.data;
   } catch (error) {
+    console.error(
+      "Ошибка при создании папки:",
+      error.response?.data || error.message
+    );
     toast.error("Error creating folder");
     throw new Error(error);
   }
@@ -45,6 +50,10 @@ export const deleteFolderFromAPI = async (folderId, token) => {
     toast.success("Folder deleted successfully");
     return response.data;
   } catch (error) {
+    console.error(
+      "Ошибка при удалении папки:",
+      error.response?.data || error.message
+    );
     toast.error("Error deleting folder");
     throw new Error(error);
   }
@@ -56,7 +65,7 @@ export const updateFolderName = async (folderId, newFolderName, token) => {
     const response = await axios.patch(
       `${foldersList}${folderId}/`,
       {
-        name: newFolderName // Отправляем новое имя папки
+        name: newFolderName
       },
       {
         headers: {
@@ -68,12 +77,16 @@ export const updateFolderName = async (folderId, newFolderName, token) => {
     toast.success("Folder renamed successfully");
     return response.data;
   } catch (error) {
+    console.error(
+      "Ошибка при переименовании папки:",
+      error.response?.data || error.message
+    );
     toast.error("Error renaming folder");
     throw new Error(error);
   }
 };
 
-//Загрузка папок на веб
+// Загрузка папок
 export const fetchFolders = async (token) => {
   try {
     const response = await axios.get(foldersList, {
@@ -84,6 +97,10 @@ export const fetchFolders = async (token) => {
     });
     return response.data;
   } catch (error) {
+    console.error(
+      "Ошибка при загрузке папок:",
+      error.response?.data || error.message
+    );
     toast.error("Error fetching folders");
     throw new Error(error);
   }
@@ -92,38 +109,30 @@ export const fetchFolders = async (token) => {
 // Добавление файла
 export const addFileToAPI = async (fileData, folderId, userId) => {
   const formData = new FormData();
-  formData.append("link", fileData.file); // Файл
-  // formData.append("name", fileData.name); // Имя файла
-  formData.append("folder", folderId !== null ? folderId : ""); // ID папки или пустая строка для корня
-  formData.append("user_id", userId); // ID пользователя
+  formData.append("link", fileData.file);
+  formData.append("folder", folderId !== null ? folderId : "");
+  formData.append("user_id", userId);
 
   try {
-    const response = await toast.promise(
-      axios.post(`${filesList}`, formData, {
-        headers: {
-          Authorization: `Token ${access}`, // Токен авторизации
-          "Content-Type": "multipart/form-data" // Тип контента
-        }
-      }),
-      {
-        loading: "Uploading file...",
-        success: "File uploaded successfully!",
-        error: "Failed to upload file. Please try again."
+    const response = await axios.post(`${filesList}`, formData, {
+      headers: {
+        Authorization: `Token ${access}`,
+        "Content-Type": "multipart/form-data"
       }
-    );
-
-    // Возвращаем данные файла, включая название и ID
+    });
+    toast.success("File uploaded successfully!");
     return response.data;
   } catch (error) {
     console.error(
-      "Error uploading file:",
+      "Ошибка при загрузке файла:",
       error.response?.data || error.message
     );
+    toast.error("Failed to upload file. Please try again.");
     throw new Error(error);
   }
 };
 
-// Загрузка файлов для указанной папки на веб
+// Загрузка файлов для папки
 export const fetchFilesForFolder = async (folderId) => {
   try {
     const response = await axios.get(`${filesList}`, {
@@ -133,27 +142,25 @@ export const fetchFilesForFolder = async (folderId) => {
       }
     });
 
-    // Проверяем, получили ли мы список файлов
     if (response.data) {
       if (folderId === null || folderId === "") {
-        // Если folderId === null, выбираем файлы для корневой папки
         const rootFiles = response.data.filter((file) => file.folder === null);
-        console.log("Файлы для корневой папки:", rootFiles);
         return rootFiles;
       } else {
-        // Для других папок фильтруем файлы по folderId
         const folderFiles = response.data.filter(
           (file) => file.folder === folderId
         );
-        console.log("Файлы для папки с ID:", folderId, folderFiles);
         return folderFiles;
       }
     } else {
-      console.log("Нет данных о файлах в ответе сервера");
+      console.error("Нет данных о файлах в ответе сервера");
       return [];
     }
   } catch (error) {
-    console.error("Ошибка при загрузке файлов:", error);
+    console.error(
+      "Ошибка при загрузке файлов:",
+      error.response?.data || error.message
+    );
     toast.error("Ошибка при загрузке файлов");
     throw new Error(error);
   }
@@ -171,12 +178,16 @@ export const deleteFileFromAPI = async (fileId, token) => {
     toast.success("File deleted successfully");
     return response.data;
   } catch (error) {
+    console.error(
+      "Ошибка при удалении файла:",
+      error.response?.data || error.message
+    );
     toast.error("Error deleting file");
     throw new Error(error);
   }
 };
 
-// Скачивание файлов
+// Скачивание файла
 export const downloadFileFromAPI = (downloadLink) => {
   window.open(downloadLink, "_blank");
 };

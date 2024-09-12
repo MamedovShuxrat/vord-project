@@ -4,7 +4,6 @@ import { v4 as uuid } from "uuid";
 import { fetchFolders } from "../../pages/Files/api/index";
 import { createFolderTree } from "../helpers/createFoldersTree";
 import folderIcon from "../../assets/images/icons/common/folder.svg";
-import fileIcon from "../../assets/images/icons/common/file.svg";
 
 // Асинхронный экшен для загрузки папок
 export const loadFoldersFromAPI = createAsyncThunk(
@@ -12,7 +11,7 @@ export const loadFoldersFromAPI = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       const response = await fetchFolders(token);
-      return createFolderTree(response); // Преобразуем плоский список в дерево
+      return createFolderTree(response);
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -60,9 +59,9 @@ const foldersSlice = createSlice({
       const findAndAddFolder = (folders) => {
         return folders.map((f) => {
           if (f.id === parentId) {
-            f.subfolders.push(folder); // Добавляем папку к подкаталогам
+            f.subfolders.push(folder);
           } else if (f.subfolders.length > 0) {
-            f.subfolders = findAndAddFolder(f.subfolders); // Рекурсивно ищем родителя
+            f.subfolders = findAndAddFolder(f.subfolders);
           }
           return f;
         });
@@ -76,25 +75,6 @@ const foldersSlice = createSlice({
 
       saveStateToLocalStorage(state);
     },
-
-    // addFile: (state, action) => {
-    //   const { parentId, file } = action.payload;
-
-    //   const findAndAddFile = (folders) => {
-    //     return folders.map((f) => {
-    //       if (f.id === parentId) {
-    //         f.files.push(file);
-    //       } else if (f.subfolders.length > 0) {
-    //         f.subfolders = findAndAddFile(f.subfolders);
-    //       }
-    //       return f;
-    //     });
-    //   };
-
-    //   state.folders = findAndAddFile(state.folders);
-
-    //   saveStateToLocalStorage(state);
-    // },
 
     removeFolder: (state, action) => {
       const { folderId } = action.payload;
@@ -115,60 +95,22 @@ const foldersSlice = createSlice({
       saveStateToLocalStorage(state);
     },
 
-    removeFile: (state, action) => {
-      const { fileId } = action.payload;
-
-      const findAndRemoveFile = (folders) => {
-        return folders.map((f) => {
-          f.files = f.files.filter((file) => file.id !== fileId);
-          if (f.subfolders.length > 0) {
-            f.subfolders = findAndRemoveFile(f.subfolders);
-          }
-          return f;
-        });
-      };
-
-      state.folders = findAndRemoveFile(state.folders);
-
-      saveStateToLocalStorage(state);
-    },
-
-    updateFileName: (state, action) => {
-      const { fileId, newName } = action.payload;
-
-      const findAndUpdateFile = (folders) => {
-        return folders.map((f) => {
-          f.files = f.files.map((file) =>
-            file.id === fileId ? { ...file, name: newName } : file
-          );
-          if (f.subfolders.length > 0) {
-            f.subfolders = findAndUpdateFile(f.subfolders);
-          }
-          return f;
-        });
-      };
-
-      state.folders = findAndUpdateFile(state.folders);
-
-      saveStateToLocalStorage(state);
-    },
-
     updateFolderName: (state, action) => {
       const { folderId, newName } = action.payload;
 
       const findAndUpdateFolder = (folders) => {
-        return folders.map((f) => {
-          if (f.id === folderId) {
-            f.name = newName;
-          } else if (f.subfolders.length > 0) {
-            f.subfolders = findAndUpdateFolder(f.subfolders);
+        return folders.map((folder) => {
+          if (folder.id === folderId) {
+            return { ...folder, name: newName };
           }
-          return f;
+          if (folder.subfolders.length > 0) {
+            folder.subfolders = findAndUpdateFolder(folder.subfolders);
+          }
+          return folder;
         });
       };
 
       state.folders = findAndUpdateFolder(state.folders);
-
       saveStateToLocalStorage(state);
     },
 
@@ -201,13 +143,7 @@ const foldersSlice = createSlice({
   }
 });
 
-export const {
-  addFolder,
-  removeFolder,
-  removeFile,
-  updateFileName,
-  updateFolderName,
-  resetFolders
-} = foldersSlice.actions;
+export const { addFolder, removeFolder, updateFolderName, resetFolders } =
+  foldersSlice.actions;
 
 export default foldersSlice.reducer;
