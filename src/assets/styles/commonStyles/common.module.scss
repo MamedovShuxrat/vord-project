@@ -303,8 +303,6 @@
   }
 
   &__page {
-    height: 100vh;
-    width: 100%;
     padding: 20px;
   }
 
@@ -322,6 +320,18 @@
   &__actions {
     display: flex;
     gap: 20px;
+  }
+  &__name {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+    line-height: 1.5em;
+    max-height: 4.5em;
+    white-space: normal;
+    word-wrap: break-word;
   }
 }
 

@@ -8,11 +8,17 @@ import {
   loadFoldersFromAPI
 } from "../../core/store/foldersSlice";
 import { Upload, Button, Modal, Input } from "antd";
-import { UploadOutlined, MoreOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  MoreOutlined,
+  FolderOutlined,
+  FileOutlined
+} from "@ant-design/icons";
 import folderIcon from "../../assets/images/icons/common/folder.svg";
 import fileIcon from "../../assets/images/icons/common/file.svg";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import MenuForFolder from "../Files/FilesView/menu/MenuForFolder";
+import Chat from "../../components/Chat/ui/Chat";
 import {
   addFolderToAPI,
   addFileToAPI,
@@ -165,8 +171,10 @@ const FilesPage = () => {
           className={commonStyles.files__fileItem}
           onClick={() => handleFolderClick(folder)}
         >
-          <img src={folderIcon} alt={folder.name} />
-          <span style={{ textAlign: "center" }}>{folder.name}</span>
+          <FolderOutlined
+            style={{ fontSize: "64px", color: "rgba(207, 170, 229)" }}
+          />
+          <span>{folder.name}</span>
         </div>
       </div>
     ));
@@ -178,20 +186,21 @@ const FilesPage = () => {
     const files = filesByFolder[folderId] || [];
 
     if (files.length === 0) {
-      console.log("Нет файлов для рендеринга в папке:", folderId);
-      return (
-        <div>Нет файлов для рендеринга в папке: {folderId || "Корневая"}</div>
-      );
+      return <div>No files available: {folderId || "Files"}</div>;
     }
 
     return files.map((file) => (
       <div key={file.id} className={commonStyles.files__fileItem}>
-        <img
-          src={fileIcon}
-          alt={file.name}
-          className={commonStyles.files__icon}
+        <FileOutlined
+          style={{ fontSize: "64px", color: "rgba(207, 170, 229)" }}
         />
-        <a href={file.download_link} target="_blank" rel="noopener noreferrer">
+        <a
+          href={file.download_link}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={file.name}
+          className={commonStyles.files__name}
+        >
           {file.name}
         </a>
       </div>
@@ -294,13 +303,16 @@ const FilesPage = () => {
       const fileData = { file, name: file.name };
       const uploadedFile = await addFileToAPI(
         fileData,
-        currentFolderId, // Передаем ID текущей папки
+        currentFolderId,
         userId
       );
       console.log("Файл успешно загружен:", uploadedFile);
       setFilesByFolder((prevFiles) => ({
         ...prevFiles,
-        [currentFolderId]: [...(prevFiles[currentFolderId] || []), uploadedFile] // Обновляем файлы для текущей папки
+        [currentFolderId === null ? "" : currentFolderId]: [
+          ...(prevFiles[currentFolderId === null ? "" : currentFolderId] || []),
+          uploadedFile
+        ]
       }));
       toast.success("File uploaded successfully");
     } catch (error) {
@@ -315,93 +327,97 @@ const FilesPage = () => {
       : folders.find((f) => f.id === currentFolderId)?.subfolders || [];
 
   return (
-    <div className={commonStyles.files__page}>
-      <div className={commonStyles.files__header}>
-        <div className={commonStyles.breadcrumb}>
-          {breadcrumb.map((item, index) => (
-            <span key={item.id}>
-              <span
-                className={commonStyles.breadcrumbLink}
-                onClick={() => handleBreadcrumbClick(item)}
-              >
-                {item.name}
+    <div className={commonStyles.sectionWrapper}>
+      <div className={commonStyles.files__page}>
+        <div className={commonStyles.files__header}>
+          <div className={commonStyles.breadcrumb}>
+            {breadcrumb.map((item, index) => (
+              <span key={item.id}>
+                <span
+                  className={commonStyles.breadcrumbLink}
+                  onClick={() => handleBreadcrumbClick(item)}
+                >
+                  {item.name}
+                </span>
+                {index < breadcrumb.length - 1 && " / "}
               </span>
-              {index < breadcrumb.length - 1 && " / "}
-            </span>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className={commonStyles.files__actions}>
-          <button
-            className={commonStyles.addFolderButton}
-            onClick={addNewFolder}
-          >
-            + Add Folder
-          </button>
-          <Upload customRequest={handleUpload} showUploadList={false}>
-            <Button icon={<UploadOutlined />}>Upload File</Button>
-          </Upload>
+          <div className={commonStyles.files__actions}>
+            <button
+              className={commonStyles.addFolderButton}
+              onClick={addNewFolder}
+            >
+              + Add Folder
+            </button>
+            <Upload customRequest={handleUpload} showUploadList={false}>
+              <Button icon={<UploadOutlined />}>Upload File</Button>
+            </Upload>
+          </div>
         </div>
-      </div>
-      <div className={commonStyles.folderTitleContainer}>
-        {currentFolderId === null ? (
-          <h1 className={commonStyles.folderTitle}>Files</h1>
-        ) : (
-          <div className={commonStyles.folder__titleWithMenu}>
-            <h1 className={commonStyles.folderTitle}>
-              {breadcrumb[breadcrumb.length - 1].name}
-            </h1>
-            <MoreOutlined
-              className={commonStyles.folderMenuIcon}
-              onClick={() => {
-                console.log("Открываем меню для папки:", currentFolderId);
-                setMenuVisible(true);
-              }}
+        <div className={commonStyles.folderTitleContainer}>
+          {currentFolderId === null ? (
+            <h1 className={commonStyles.folderTitle}>Files</h1>
+          ) : (
+            <div className={commonStyles.folder__titleWithMenu}>
+              <h1 className={commonStyles.folderTitle}>
+                {breadcrumb[breadcrumb.length - 1].name}
+              </h1>
+              <MoreOutlined
+                className={commonStyles.folderMenuIcon}
+                onClick={() => {
+                  console.log("Открываем меню для папки:", currentFolderId);
+                  setMenuVisible(true);
+                }}
+              />
+            </div>
+          )}
+        </div>
+        {menuVisible && (
+          <div ref={menuRef} className={commonStyles.contextMenuContainer}>
+            <MenuForFolder
+              handleContextMenuClick={
+                (action) =>
+                  handleContextMenuClick(
+                    action,
+                    folders.find((f) => f.id === currentFolderId)
+                  ) // Передаем папку, а не currentFolder
+              }
             />
           </div>
         )}
-      </div>
-      {menuVisible && (
-        <div ref={menuRef} className={commonStyles.contextMenuContainer}>
-          <MenuForFolder
-            handleContextMenuClick={
-              (action) =>
-                handleContextMenuClick(
-                  action,
-                  folders.find((f) => f.id === currentFolderId)
-                ) // Передаем папку, а не currentFolder
-            }
+        <Modal
+          title="Rename Folder"
+          open={renameModalVisible}
+          onOk={handleRenameFolder} // Переименовываем папку по нажатию кнопки "Ок"
+          onCancel={() => setRenameModalVisible(false)} // Закрываем модальное окно
+        >
+          <Input
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            placeholder="Enter new folder name"
           />
-        </div>
-      )}
-      <Modal
-        title="Rename Folder"
-        open={renameModalVisible}
-        onOk={handleRenameFolder} // Переименовываем папку по нажатию кнопки "Ок"
-        onCancel={() => setRenameModalVisible(false)} // Закрываем модальное окно
-      >
-        <Input
-          value={newFolderName}
-          onChange={(e) => setNewFolderName(e.target.value)}
-          placeholder="Enter new folder name"
-        />
-      </Modal>
+        </Modal>
 
-      <Modal
-        title="Create New Folder"
-        open={newFolderModalVisible}
-        onOk={handleCreateNewFolder}
-        onCancel={() => setNewFolderModalVisible(false)}
-      >
-        <Input
-          value={folderNameInput}
-          onChange={(e) => setFolderNameInput(e.target.value)}
-          placeholder="Enter folder name"
-        />
-      </Modal>
-      <div className={commonStyles.files__grid}>
-        {renderContent(currentFolderId)}{" "}
-        {/* Проверяем на наличие файлов и подпапок */}
+        <Modal
+          title="Create New Folder"
+          open={newFolderModalVisible}
+          onOk={handleCreateNewFolder}
+          onCancel={() => setNewFolderModalVisible(false)}
+        >
+          <Input
+            value={folderNameInput}
+            onChange={(e) => setFolderNameInput(e.target.value)}
+            placeholder="Enter folder name"
+          />
+        </Modal>
+        <div className={commonStyles.files__grid}>
+          {renderContent(currentFolderId)}{" "}
+        </div>
+      </div>
+      <div className={commonStyles.sectionChatWrapper}>
+        <Chat />
       </div>
     </div>
   );
