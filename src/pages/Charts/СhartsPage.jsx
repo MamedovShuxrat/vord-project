@@ -35,6 +35,13 @@ const ChartsPage = () => {
   const foldersTab = useSelector((state) => state.charts.foldersTab);
   const activeTab = useSelector((state) => state.charts.activeTab);
   const openedFiles = useSelector((state) => state.charts.openedFiles);
+  const connections = useSelector((state) => state.connections.connections);
+  console.log(connections);
+
+  const fetchConnections = () => {
+    return Promise.resolve(connections.map(conn => conn.connection_name));
+  };
+
   const { searchTerm, setSearchTerm } = useSearch();
   const [menuVisible, setMenuVisible] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -50,16 +57,16 @@ const ChartsPage = () => {
 
   useEffect(() => {
     setLoading(true);
-    console.log("Trying to access localStorage for connections");
+    // console.log("Trying to access localStorage for connections");
     const storedConnections = localStorage.getItem("connections");
-    console.log("Raw connections data from localStorage:", storedConnections);
+    // console.log("Raw connections data from localStorage:", storedConnections);
 
     if (storedConnections) {
       const parsedConnections = JSON.parse(storedConnections);
-      console.log("Parsed connections from localStorage:", parsedConnections);
+      // console.log("Parsed connections from localStorage:", parsedConnections);
       setDatabases(parsedConnections); // Сохраняем базы данных в состояние
     } else {
-      console.warn("No connections found in localStorage.");
+      // console.warn("No connections found in localStorage.");
     }
     setLoading(false); // Завершаем загрузку
   }, []);
@@ -265,6 +272,7 @@ const ChartsPage = () => {
             placeholder="Search Charts"
             onSearch={handleSearch}
             addNewTab={addNewTab}
+            fetchConnections={fetchConnections}
             placeholderText="Введите название нового запроса"
           />
           <div className={commonStyles.tabsWrapper}>
@@ -276,9 +284,8 @@ const ChartsPage = () => {
                 .map((folder) => (
                   <div key={folder.id} className={commonStyles.tabsItems}>
                     <div
-                      className={`${commonStyles.folderItem} ${
-                        activeTab === folder.id ? commonStyles.activeTab : ""
-                      }`}
+                      className={`${commonStyles.folderItem} ${activeTab === folder.id ? commonStyles.activeTab : ""
+                        }`}
                       onClick={() => dispatch(setActiveTab(folder.id))}
                     >
                       <div className={commonStyles.folderHeader}>
@@ -290,9 +297,8 @@ const ChartsPage = () => {
                             }}
                             className={commonStyles.FolderArrowRight}
                             style={{
-                              transform: `rotate(${
-                                folder.isOpen ? "90deg" : "0deg"
-                              })`
+                              transform: `rotate(${folder.isOpen ? "90deg" : "0deg"
+                                })`
                             }}
                             src={arrowRightSvg}
                             alt="arrow-down"
@@ -383,9 +389,8 @@ const ChartsPage = () => {
               {foldersTab.map((folder) => (
                 <div
                   key={folder.id}
-                  className={`${commonStyles.tabsTopItem} ${
-                    activeTab === folder.id ? commonStyles.active : ""
-                  }`}
+                  className={`${commonStyles.tabsTopItem} ${activeTab === folder.id ? commonStyles.active : ""
+                    }`}
                   onClick={() => dispatch(setActiveTab(folder.id))}
                 >
                   <span
@@ -404,9 +409,8 @@ const ChartsPage = () => {
               {openedFiles.map((file) => (
                 <div
                   key={file.id}
-                  className={`${commonStyles.tabsTopItem} ${
-                    activeTab === file.id ? commonStyles.active : ""
-                  }`}
+                  className={`${commonStyles.tabsTopItem} ${activeTab === file.id ? commonStyles.active : ""
+                    }`}
                   onClick={() => dispatch(setActiveTab(file.id))}
                 >
                   <span

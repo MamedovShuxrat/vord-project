@@ -20,6 +20,7 @@ const ProfilePage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAvatarChanged, setIsAvatarChanged] = useState(false);
   const fileInputRef = useRef(null);
+  console.log(user);
 
   useEffect(() => {
     if (user?.name) {
@@ -79,7 +80,6 @@ const ProfilePage = () => {
     }
     return profileImg;
   };
-
 
   const handleSaveAvatar = async () => {
     if (selectedFile) {
