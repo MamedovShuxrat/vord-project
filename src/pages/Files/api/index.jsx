@@ -11,7 +11,12 @@ const foldersList = `${API_URL}/folders/`;
 const filesList = `${API_URL}/files/`;
 
 // Добавление папки
-export const addFolderToAPI = async (folderName, parentId = null, userId) => {
+export const addFolderToAPI = async (
+  folderName,
+  parentId = null,
+  userId,
+  token
+) => {
   try {
     const response = await axios.post(
       foldersList,
@@ -22,7 +27,7 @@ export const addFolderToAPI = async (folderName, parentId = null, userId) => {
       },
       {
         headers: {
-          Authorization: `Token ${access}`,
+          Authorization: `Token ${token}`,
           "Content-Type": "application/json"
         }
       }
@@ -34,7 +39,7 @@ export const addFolderToAPI = async (folderName, parentId = null, userId) => {
       error.response?.data || error.message
     );
     toast.error("Error creating folder");
-    throw new Error(error);
+    throw error;
   }
 };
 
@@ -107,7 +112,7 @@ export const fetchFolders = async (token) => {
 };
 
 // Добавление файла
-export const addFileToAPI = async (fileData, folderId, userId) => {
+export const addFileToAPI = async (fileData, folderId, userId, token) => {
   const formData = new FormData();
   formData.append("link", fileData.file);
   formData.append("folder", folderId !== null ? folderId : "");
@@ -116,7 +121,7 @@ export const addFileToAPI = async (fileData, folderId, userId) => {
   try {
     const response = await axios.post(`${filesList}`, formData, {
       headers: {
-        Authorization: `Token ${access}`,
+        Authorization: `Token ${token}`,
         "Content-Type": "multipart/form-data"
       }
     });
@@ -128,16 +133,16 @@ export const addFileToAPI = async (fileData, folderId, userId) => {
       error.response?.data || error.message
     );
     toast.error("Failed to upload file. Please try again.");
-    throw new Error(error);
+    throw error;
   }
 };
 
 // Загрузка файлов для папки
-export const fetchFilesForFolder = async (folderId) => {
+export const fetchFilesForFolder = async (folderId, token) => {
   try {
     const response = await axios.get(`${filesList}`, {
       headers: {
-        Authorization: `Token ${access}`,
+        Authorization: `Token ${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -153,7 +158,7 @@ export const fetchFilesForFolder = async (folderId) => {
         return folderFiles;
       }
     } else {
-      console.error("Нет данных о файлах в ответе сервера");
+      console.error("No file data in server response");
       return [];
     }
   } catch (error) {
@@ -162,7 +167,7 @@ export const fetchFilesForFolder = async (folderId) => {
       error.response?.data || error.message
     );
     toast.error("Ошибка при загрузке файлов");
-    throw new Error(error);
+    throw error;
   }
 };
 

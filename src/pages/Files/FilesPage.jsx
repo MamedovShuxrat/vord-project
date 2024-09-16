@@ -17,6 +17,7 @@ import {
 } from "@ant-design/icons";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import MenuForFolder from "../Files/FilesView/menu/MenuForFolder";
+import { findFolderById } from "../../core/helpers/findFolderById";
 import Chat from "../../components/Chat/ui/Chat";
 import {
   addFolderToAPI,
@@ -185,7 +186,7 @@ const FilesPage = () => {
     if (currentFolderId === null) {
       subfolders = folders.filter((folder) => folder.parent === null);
     } else {
-      const currentFolder = folders.find((f) => f.id === currentFolderId);
+      const currentFolder = findFolderById(folders, currentFolderId);
       subfolders = currentFolder?.subfolders || [];
     }
 
@@ -203,7 +204,15 @@ const FilesPage = () => {
 
   const handleFolderClick = (folder) => {
     setCurrentFolderId(folder.id);
-    setBreadcrumb((prev) => [...prev, { id: folder.id }]);
+    setBreadcrumb((prev) => {
+      const newBreadcrumb = [...prev];
+      const index = newBreadcrumb.findIndex((item) => item.id === folder.id);
+      if (index !== -1) {
+        return newBreadcrumb.slice(0, index + 1);
+      } else {
+        return [...newBreadcrumb, { id: folder.id, name: folder.name }];
+      }
+    });
   };
 
   const handleBreadcrumbClick = (breadcrumbItem) => {
@@ -218,8 +227,16 @@ const FilesPage = () => {
 
   const handleCreateNewFolder = async () => {
     try {
-      const parentId = currentFolderId ? currentFolderId : null;
-      const newFolder = await addFolderToAPI(folderNameInput, parentId, userId);
+      const parentId =
+        currentFolderId !== null && currentFolderId !== undefined
+          ? currentFolderId
+          : null;
+      const newFolder = await addFolderToAPI(
+        folderNameInput,
+        parentId,
+        userId,
+        token
+      );
 
       if (!newFolder) {
         throw new Error("Ошибка при создании папки");
@@ -269,7 +286,7 @@ const FilesPage = () => {
               const folderName =
                 item.id === null
                   ? "Files"
-                  : folders.find((f) => f.id === item.id)?.name || "Unknown";
+                  : findFolderById(folders, item.id)?.name || "Unknown";
 
               return (
                 <span key={item.id}>
@@ -303,8 +320,7 @@ const FilesPage = () => {
           ) : (
             <div className={commonStyles.folder__titleWithMenu}>
               <h1 className={commonStyles.folderTitle}>
-                {folders.find((f) => f.id === currentFolderId)?.name ||
-                  "Unknown"}
+                {findFolderById(folders, currentFolderId)?.name || "Unknown"}
               </h1>
               <MoreOutlined
                 className={commonStyles.folderMenuIcon}
