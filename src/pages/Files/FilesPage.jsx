@@ -13,7 +13,8 @@ import {
   UploadOutlined,
   MoreOutlined,
   FolderOutlined,
-  FileOutlined
+  FileOutlined,
+  DeleteOutlined
 } from "@ant-design/icons";
 import commonStyles from "../../assets/styles/commonStyles/common.module.scss";
 import MenuForFolder from "../Files/FilesView/menu/MenuForFolder";
@@ -24,7 +25,8 @@ import {
   addFileToAPI,
   fetchFilesForFolder,
   deleteFolderFromAPI,
-  updateFolderName as updateFolderAPI
+  updateFolderName as updateFolderAPI,
+  deleteFileFromAPI
 } from "../Files/api/index";
 
 const FilesPage = () => {
@@ -158,24 +160,26 @@ const FilesPage = () => {
     const folderId = currentFolderId === null ? "" : currentFolderId;
     const files = filesByFolder[folderId] || [];
 
-    if (files.length === 0) {
-      return <div>No files available</div>;
-    }
-
     return files.map((file) => (
       <div key={file.id} className={commonStyles.files__fileItem}>
-        <FileOutlined
-          style={{ fontSize: "64px", color: "rgba(207, 170, 229)" }}
-        />
-        <a
-          href={file.download_link}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={file.name}
-          className={commonStyles.files__name}
-        >
-          {file.name}
-        </a>
+        <div className={commonStyles.fileItem__container}>
+          <FileOutlined
+            style={{ fontSize: "64px", color: "rgba(207, 170, 229)" }}
+          />
+          <a
+            href={file.download_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={file.name}
+            className={commonStyles.files__name}
+          >
+            {file.name}
+          </a>
+          <DeleteOutlined
+            className={commonStyles.deleteIcon}
+            onClick={() => handleDeleteFile(file.id)}
+          />
+        </div>
       </div>
     ));
   };
@@ -280,6 +284,27 @@ const FilesPage = () => {
     }
   };
 
+  const handleDeleteFile = async (fileId) => {
+    try {
+      await deleteFileFromAPI(fileId, token);
+
+      setFilesByFolder((prevFiles) => {
+        const folderId = currentFolderId === null ? "" : currentFolderId;
+        const updatedFiles = prevFiles[folderId]?.filter(
+          (file) => file.id !== fileId
+        );
+        return {
+          ...prevFiles,
+          [folderId]: updatedFiles
+        };
+      });
+      toast.success("File deleted successfully");
+    } catch (error) {
+      console.error("Ошибка при удалении файла:", error);
+      toast.error("Error deleting file");
+    }
+  };
+
   return (
     <div className={commonStyles.sectionWrapper}>
       <div className={commonStyles.files__page}>
@@ -305,35 +330,45 @@ const FilesPage = () => {
             })}
           </div>
 
-          <div className={commonStyles.files__actions}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "24px"
+            }}
+          >
+            <div className={commonStyles.folderTitleContainer}>
+              {currentFolderId === null ? (
+                <h1 className={commonStyles.folderTitle}>Files</h1>
+              ) : (
+                <div className={commonStyles.folder__titleWithMenu}>
+                  <h1 className={commonStyles.folderTitle}>
+                    {findFolderById(folders, currentFolderId)?.name ||
+                      "Unknown"}
+                  </h1>
+                  <MoreOutlined
+                    className={commonStyles.folderMenuIcon}
+                    onClick={() => {
+                      setMenuVisible(true);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
             <button
               className={commonStyles.addFolderButton}
               onClick={addNewFolder}
             >
               + Add Folder
             </button>
+
             <Upload customRequest={handleUpload} showUploadList={false}>
               <Button icon={<UploadOutlined />}>Upload File</Button>
             </Upload>
           </div>
         </div>
-        <div className={commonStyles.folderTitleContainer}>
-          {currentFolderId === null ? (
-            <h1 className={commonStyles.folderTitle}>Files</h1>
-          ) : (
-            <div className={commonStyles.folder__titleWithMenu}>
-              <h1 className={commonStyles.folderTitle}>
-                {findFolderById(folders, currentFolderId)?.name || "Unknown"}
-              </h1>
-              <MoreOutlined
-                className={commonStyles.folderMenuIcon}
-                onClick={() => {
-                  setMenuVisible(true);
-                }}
-              />
-            </div>
-          )}
-        </div>
+
         {menuVisible && (
           <div ref={menuRef} className={commonStyles.contextMenuContainer}>
             <MenuForFolder

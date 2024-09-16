@@ -179,15 +179,13 @@ export const deleteFileFromAPI = async (fileId, token) => {
         "Content-Type": "application/json"
       }
     });
-    toast.success("File deleted successfully");
     return response.data;
   } catch (error) {
     console.error(
       "Ошибка при удалении файла:",
       error.response?.data || error.message
     );
-    toast.error("Error deleting file");
-    throw new Error(error);
+    throw error;
   }
 };
 
