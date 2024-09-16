@@ -59,9 +59,16 @@ const foldersSlice = createSlice({
       const findAndAddFolder = (folders) => {
         return folders.map((f) => {
           if (f.id === parentId) {
-            f.subfolders.push(folder);
-          } else if (f.subfolders.length > 0) {
-            f.subfolders = findAndAddFolder(f.subfolders);
+            return {
+              ...f,
+              subfolders: [...f.subfolders, folder]
+            };
+          }
+          if (f.subfolders.length > 0) {
+            return {
+              ...f,
+              subfolders: findAndAddFolder(f.subfolders)
+            };
           }
           return f;
         });

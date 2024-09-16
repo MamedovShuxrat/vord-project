@@ -10,6 +10,23 @@ import { setConnections } from "./connectionsSlice";
 import { resetFolders } from "./foldersSlice";
 import { toast } from "react-hot-toast";
 
+// Функция для загрузки данных пользователя из localStorage
+const loadUserFromLocalStorage = () => {
+  const token = JSON.parse(localStorage.getItem("userToken"));
+  const user = JSON.parse(localStorage.getItem("userData"));
+  return { token, user };
+};
+
+// Инициализация начального состояния из localStorage
+const { token, user } = loadUserFromLocalStorage();
+
+const initialState = {
+  user: user || null,
+  token: token || null,
+  status: "idle",
+  error: null
+};
+
 export const register = createAsyncThunk(
   "user/register",
   async ({ name, email, password, confirmPassword }, { rejectWithValue }) => {
@@ -21,7 +38,7 @@ export const register = createAsyncThunk(
 
       return { token, user: userData };
     } catch (error) {
-      return rejectWithValue(error.message || "Registration failed");
+      return rejectWithValue(error.message || "Ошибка регистрации");
     }
   }
 );
@@ -33,16 +50,17 @@ export const login = createAsyncThunk(
       const data = await loginUser(email, password);
       const token = data.key;
       const user = await fetchUserData(token);
-      console.log("LoggiN with token:", token);
+
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(user));
 
-      // Загрузите соединения пользователя после успешного входа
+      // Загрузка соединений пользователя после успешного входа
       const connections = await fetchUserConnections(token);
-      dispatch(setConnections(connections)); // Сохраняем данные в Redux Store и в localStorage
+      dispatch(setConnections(connections));
+
       return { token, user };
     } catch (error) {
-      return rejectWithValue(error.message || "Login failed");
+      return rejectWithValue(error.message || "Ошибка входа");
     }
   }
 );
@@ -51,48 +69,34 @@ export const performLogout = createAsyncThunk(
   "user/logout",
   async (_, { getState, rejectWithValue, dispatch }) => {
     const token = getState().user.token;
-    console.log("Attempting to logout with token:", token);
 
     if (!token) {
-      console.log("No token found for logout");
-      return rejectWithValue("No token found for logout");
+      console.log("Токен не найден для выхода");
+      return rejectWithValue("Токен не найден для выхода");
     }
 
     try {
       await logoutUser(token);
-      console.log("Logout successful, clearing localStorage...");
 
-      // Clear localStorage
+      // Очистка localStorage
       localStorage.removeItem("userData");
       localStorage.removeItem("userToken");
       localStorage.removeItem("connections");
 
-      dispatch(resetFolders()); // Сбрасываем папки
-      console.log("localStorage after clearing:", localStorage);
+      dispatch(resetFolders()); // Сброс папок
 
-      return null; // возвращаем null, чтобы явно указать, что пользователь вышел из системы
+      return null; // Возвращаем null, чтобы явно указать, что пользователь вышел из системы
     } catch (error) {
-      console.error("Logout failed:", error);
-      toast.error("Logout failed");
-      return rejectWithValue(error.message || "Logout failed");
+      console.error("Не удалось выйти из системы:", error);
+      toast.error("Не удалось выйти из системы");
+      return rejectWithValue(error.message || "Ошибка выхода из системы");
     }
   }
 );
 
-const loadUserFromLocalStorage = () => {
-  const token = JSON.parse(localStorage.getItem("userToken"));
-  const user = JSON.parse(localStorage.getItem("userData"));
-  return { token, user };
-};
-
 const userSlice = createSlice({
   name: "user",
-  initialState: {
-    user: null,
-    token: null,
-    status: "idle",
-    error: null
-  },
+  initialState,
   reducers: {
     setUser(state, action) {
       state.user = action.payload;
@@ -103,7 +107,7 @@ const userSlice = createSlice({
     logout(state) {
       state.user = null;
       state.token = null;
-      console.log("User state after logout:", state); // Log to check state
+      console.log("Состояние пользователя после выхода:", state);
     }
   },
   extraReducers: (builder) => {
@@ -127,7 +131,7 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
-        console.log("Token after login:", state.token);
+        console.log("Токен после входа:", state.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
@@ -140,16 +144,11 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = null;
         state.token = null;
-        console.log("User state and token after logout:", state); // Log to check state
+        console.log("Состояние пользователя и токен после выхода:", state);
       })
       .addCase(performLogout.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      })
-      .addCase("user/loadFromLocalStorage", (state, action) => {
-        const { token, user } = loadUserFromLocalStorage();
-        state.token = token;
-        state.user = user;
       });
   }
 });
