@@ -77,7 +77,9 @@ const FilesPage = () => {
       }
     };
 
-    fetchFiles();
+    if (token) {
+      fetchFiles();
+    }
   }, [currentFolderId, token]);
 
   const handleContextMenuClick = (action, folder) => {
@@ -261,7 +263,8 @@ const FilesPage = () => {
       const uploadedFile = await addFileToAPI(
         fileData,
         currentFolderId,
-        userId
+        userId,
+        token
       );
       setFilesByFolder((prevFiles) => ({
         ...prevFiles,

@@ -4,7 +4,6 @@ import { toast } from "react-hot-toast";
 
 // Устанавливаем URL API
 const API_URL = process.env.REACT_APP_API_URL;
-const access = JSON.parse(localStorage.getItem("userToken"));
 
 // Эндпоинты для папок и файлов
 const foldersList = `${API_URL}/folders/`;
