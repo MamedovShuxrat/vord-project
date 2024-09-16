@@ -11,12 +11,11 @@ import Button from "../../ui/Button/Button";
 import mainLogoSvg from "../../../assets/images/icons/common/main-logo.svg";
 import googleLogoSvg from "../../../assets/images/icons/registration/google-logo.svg";
 import githubLogoSvg from "../../../assets/images/icons/registration/github-logo.svg";
+import { toast } from "react-hot-toast";
 
 const Registration = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
-  const status = useSelector((state) => state.user.status);
-  const error = useSelector((state) => state.user.error);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,12 +23,30 @@ const Registration = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+
+  const validatePassword = (password) => {
+    const passwordMinLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasMinLength = password.length >= passwordMinLength;
+    return hasUpperCase && hasMinLength;
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
       setErrorMessage("Passwords do not match.");
       return;
     }
+
+    if (!validatePassword(password)) {
+      toast.error("Password must be at least 8 characters long and contain at least one uppercase letter.");
+      setErrorMessage(
+        "Password must be at least 8 characters long and contain at least one uppercase letter."
+      );
+      return;
+    }
+
     dispatch(register({ name, email, password, confirmPassword }));
   };
 
