@@ -16,7 +16,7 @@ export const sendRoleData = async (email, access_type_id) => {
 		const response = await toast.promise(
 			axios.post(INVITE, inveteData, {
 				headers: {
-					Authorization: `Token ${token}`
+					Authorization: `Token${token}`
 				}
 			}),
 			{
@@ -65,7 +65,7 @@ export const fetchInvitedUsers = async (ownerId) => {
 
 			axios.get(`${INVITED_USERS}?user_id__id=&owner_id__id=${ownerId}`, {
 				headers: {
-					Authorization: `Token ${token}`
+					Authorization: `Token${token}`
 				}
 			}),
 			{
@@ -93,7 +93,7 @@ export const updateUserRole = async (selectedUserById, newRole, ownerId) => {
 				{
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Token ${token}`
+						Authorization: `Token${token}`
 					},
 				}
 			),

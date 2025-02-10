@@ -15,7 +15,7 @@ export const getChartList = async () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${access}`
+        Authorization: `Token${access}`
       }
     });
     return res.data;
@@ -33,7 +33,7 @@ export const getChartDetails = async (chartId) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${access}`
+        Authorization: `Token${access}`
       }
     });
     return res.data;
@@ -51,7 +51,7 @@ export const addNewChart = async (chartData) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${access}`
+        Authorization: `Token${access}`
       },
       data: chartData
     });
@@ -70,7 +70,7 @@ export const updateChart = async (chartId, chartData) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${access}`
+        Authorization: `Token${access}`
       },
       data: chartData
     });
@@ -89,7 +89,7 @@ export const deleteChart = async (chartId) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${access}`
+        Authorization: `Token${access}`
       }
     });
     return res.data;
@@ -104,7 +104,7 @@ export const runQuery = async (token, requestData) => {
   try {
     const res = await axios.post(chartsUrl, requestData, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -120,7 +120,7 @@ export const fetchQueryResult = async (token, clientdataId) => {
   try {
     const res = await axios.get(`${clientDataUrl}${clientdataId}/`, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -136,7 +136,7 @@ export const updateQueryData = async (token, chartId, requestData) => {
   try {
     const res = await axios.put(`${chartsUrl}${chartId}/`, requestData, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -152,7 +152,7 @@ export const fetchUserDatabases = async (token) => {
   try {
     const res = await axios.get(clientDbUrl, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -171,7 +171,7 @@ export const executeQuery = async (clientdb_id, str_query, extension) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${access}`
+        Authorization: `Token${access}`
       },
       data: {
         clientdb_id,

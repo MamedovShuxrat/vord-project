@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
 import {
@@ -30,13 +30,12 @@ const ConnectionsPage = () => {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.connections.status);
   const error = useSelector((state) => state.connections.error);
+  console.log('Icon component rendered');
 
   useEffect(() => {
     if (!userToken) {
-      console.log("User is not logged in, clearing connections.");
       dispatch(setConnections([]));
     } else {
-      console.log("User is logged in, fetching connections.");
       dispatch(fetchUserDatabases());
     }
   }, [dispatch, userToken]);
@@ -84,9 +83,6 @@ const ConnectionsPage = () => {
     setIsConnected(false);
   };
 
-  const handleDeleteConnection = (id) => {
-    dispatch(removeUserConnection(id)); // Вызываем новый thunk для удаления соединения
-  };
 
   const activeItemRef = useRef(null);
 
@@ -100,29 +96,31 @@ const ConnectionsPage = () => {
     }
   }, [activeTab]);
 
-  const handleFormDataChange = (id, newFormData) => {
-    console.log("Handling Form Data Change: ", newFormData);
+
+  const handleFormDataChange = useCallback((id, newFormData) => {
     dispatch(updateConnection({ id, formData: newFormData }));
-  };
+  }, [dispatch]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = useCallback(async (formData) => {
     try {
       await dispatch(submitFormData({ formData, activeTab })).unwrap();
       console.log("Data submitted successfully!");
     } catch (error) {
       console.error("Failed to submit data: ", error);
     }
-  };
+  }, [dispatch, activeTab]);
 
-  const handleMenuClick = (e, itemId, itemName) => {
+
+  const handleMenuClick = useCallback((e, itemId, itemName) => {
     const { top, left, height } = e.currentTarget.getBoundingClientRect();
     setMenuPosition({ top: top + height, left });
     setMenuVisible(menuVisible === itemId ? null : itemId);
-  };
+  }, []);
+
 
   const handleCloseMenu = () => {
     setMenuVisible(null);
@@ -155,9 +153,8 @@ const ConnectionsPage = () => {
                   <div
                     key={item.id}
                     onClick={() => onSelectTabsItem(item.id)}
-                    className={`${commonStyles.tabsItem} ${
-                      activeTab === item.id ? commonStyles.active : ""
-                    }`}
+                    className={`${commonStyles.tabsItem} ${activeTab === item.id ? commonStyles.active : ""
+                      }`}
                   >
                     {renderImageOrIcon(item)}
                     <span className={commonStyles.tabsName}>
@@ -215,9 +212,8 @@ const ConnectionsPage = () => {
                 <div
                   key={item.id}
                   onClick={() => onSelectTabsItem(item.id)}
-                  className={`${commonStyles.tabsTopItem} ${
-                    activeTab === item.id ? commonStyles.active : ""
-                  }`}
+                  className={`${commonStyles.tabsTopItem} ${activeTab === item.id ? commonStyles.active : ""
+                    }`}
                   ref={activeTab === item.id ? activeItemRef : null}
                 >
                   <span
@@ -266,3 +262,5 @@ const ConnectionsPage = () => {
 };
 
 export default ConnectionsPage;
+
+

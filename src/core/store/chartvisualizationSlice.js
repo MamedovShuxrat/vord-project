@@ -13,13 +13,13 @@ export const createVisualization = createAsyncThunk(
   "visualizations/createVisualization",
   async ({ chartId, visualizationData }, { rejectWithValue }) => {
     try {
-      const lastChartId = parseInt(chartId, 10) -1;
+      const lastChartId = parseInt(chartId, 10) - 1;
       const response = await axios.post(
         VISUALIZATIONS_URL,
         { ...visualizationData, chart: lastChartId },
         {
           headers: {
-            Authorization: `Token ${access}`,
+            Authorization: `Token${access}`,
             "Content-Type": "application/json",
           },
         }
@@ -38,7 +38,7 @@ export const fetchVisualizationsByChart = createAsyncThunk(
     try {
       const response = await axios.get(`${VISUALIZATIONS_URL}?chart=${chartId}`, {
         headers: {
-          Authorization: `Token ${access}`,
+          Authorization: `Token${access}`,
         },
       });
       return response.data;
@@ -55,7 +55,7 @@ export const deleteVisualization = createAsyncThunk(
     try {
       await axios.delete(`${VISUALIZATIONS_URL}${visualizationId}/`, {
         headers: {
-          Authorization: `Token ${access}`,
+          Authorization: `Token${access}`,
         },
       });
       return visualizationId;

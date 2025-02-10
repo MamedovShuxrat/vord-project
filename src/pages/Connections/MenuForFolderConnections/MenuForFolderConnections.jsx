@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import {
   renameConnection,
   updateConnectionOnServer,
-  deleteConnection
+  deleteConnection,
+  removeUserConnection
 } from "../../../core/store/connectionsSlice";
 import toast from "react-hot-toast";
 import commonStyles from "../../../assets/styles/commonStyles/common.module.scss";
@@ -19,10 +20,19 @@ const RenameDeleteMenu = ({ itemId, currentName, onCloseMenu }) => {
   };
 
   const handleDeleteClick = () => {
-    dispatch(deleteConnection(itemId));
-    toast.success("Connection deleted successfully!");
+    dispatch(removeUserConnection(itemId))
     onCloseMenu(); // Закрыть меню после удаления
   };
+
+  // const handleDeleteClick = useCallback(async (id) => {
+  //   try {
+  //     await dispatch(removeUserConnection(id)).unwrap(); // Добавьте этот thunk в редукс
+  //     dispatch(deleteConnection(id)); // Локальное удаление
+  //   } catch (error) {
+  //     console.error('Error deleting connection: ', error);
+  //   }
+  // }, [dispatch]);
+
 
   const handleSaveRename = () => {
     const trimmedName = newName.trim();

@@ -11,7 +11,7 @@ const sendFormData = async (formData, token) => {
   try {
     const response = await axios.post(CONNECTION, formData, {
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token${token}`
       }
     });
     return response.data;
@@ -101,7 +101,7 @@ export const updateConnectionOnServer = createAsyncThunk(
         { connection_name: newName },
         {
           headers: {
-            Authorization: `Token ${token}`,
+            Authorization: `Token${token}`,
             "Content-type": "application/json"
           }
         }
@@ -204,7 +204,7 @@ const connectionTabsSlice = createSlice({
         state.connections = state.connections.filter(
           (connection) => connection.id !== action.payload
         );
-        toast.success("Connection removed successfully.");
+        toast.success("удалил из бд");
         localStorage.setItem("connections", JSON.stringify(state.connections));
       })
       .addCase(removeUserConnection.rejected, (state, action) => {

@@ -23,7 +23,7 @@ export const uploadAvatar = async (file, setAvatar, dispatch,) => {
             axios.patch(`${putNewUserAvatar}${userID}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    Authorization: `Token ${token}`,
+                    Authorization: `Token${token}`,
                 },
             }),
             {
@@ -55,7 +55,7 @@ export const updateUsername = async (newUserName, dispatch,) => {
             axios.patch(`${putNewUserAvatar}${userID}/`, { name: newUserName }, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    Authorization: `Token ${token}`,
+                    Authorization: `Token${token}`,
                 },
             }),
             {
@@ -88,7 +88,7 @@ export const changePassword = async (oldPassword, newPassword1, newPassword2,) =
                 },
                 {
                     headers: {
-                        Authorization: `Token ${token}`,
+                        Authorization: `Token${token}`,
                         'Content-Type': 'application/json'
                     }
                 }

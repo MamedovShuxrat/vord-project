@@ -19,6 +19,7 @@ const loadUserFromLocalStorage = () => {
 
 // Инициализация начального состояния из localStorage
 const { token, user } = loadUserFromLocalStorage();
+console.log(token, 'ere');
 
 const initialState = {
   user: user || null,
@@ -35,10 +36,12 @@ export const register = createAsyncThunk(
       const [token, userData] = data;
       localStorage.setItem("userToken", JSON.stringify(token));
       localStorage.setItem("userData", JSON.stringify(userData));
+      console.log(data);
 
       return { token, user: userData };
+
     } catch (error) {
-      return rejectWithValue(error.message || "Ошибка регистрации");
+      return rejectWithValue(error.message);
     }
   }
 );

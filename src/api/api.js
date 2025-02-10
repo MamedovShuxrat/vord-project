@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 
 // Устанавливаем URL API
 const API_URL = process.env.REACT_APP_API_URL;
+console.log(API_URL);
 
 // Определяем эндпоинты для авторизации
 const authRegister = `${API_URL}/register/`;
@@ -211,7 +212,7 @@ export const getFilteredTextAnswers = async (
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Headers": "*",
-        Authorization: `Bearer ${access}`
+        Authorization: `Bearer${access}`
       },
       data: {
         question_id: question_id,

@@ -21,7 +21,7 @@ const FeedbackForm = () => {
                     { theme, description },
                     {
                         headers: {
-                            Authorization: `Token ${token}`,
+                            Authorization: `Token${token}`,
                         },
                     }
                 ),

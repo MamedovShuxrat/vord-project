@@ -26,7 +26,7 @@ export const addFolderToAPI = async (
       },
       {
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `Token${token}`,
           "Content-Type": "application/json"
         }
       }
@@ -47,7 +47,7 @@ export const deleteFolderFromAPI = async (folderId, token) => {
   try {
     const response = await axios.delete(`${foldersList}${folderId}/`, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -73,7 +73,7 @@ export const updateFolderName = async (folderId, newFolderName, token) => {
       },
       {
         headers: {
-          Authorization: `Token ${token}`,
+          Authorization: `Token${token}`,
           "Content-Type": "application/json"
         }
       }
@@ -95,7 +95,7 @@ export const fetchFolders = async (token) => {
   try {
     const response = await axios.get(foldersList, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -120,7 +120,7 @@ export const addFileToAPI = async (fileData, folderId, userId, token) => {
   try {
     const response = await axios.post(`${filesList}`, formData, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "multipart/form-data"
       }
     });
@@ -141,7 +141,7 @@ export const fetchFilesForFolder = async (folderId, token) => {
   try {
     const response = await axios.get(`${filesList}`, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });
@@ -175,7 +175,7 @@ export const deleteFileFromAPI = async (fileId, token) => {
   try {
     const response = await axios.delete(`${filesList}${fileId}/`, {
       headers: {
-        Authorization: `Token ${token}`,
+        Authorization: `Token${token}`,
         "Content-Type": "application/json"
       }
     });

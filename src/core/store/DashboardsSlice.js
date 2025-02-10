@@ -15,7 +15,7 @@ export const fetchDashboardVisualizations = createAsyncThunk(
       console.log("Sending request with token:", access);  // Проверка перед отправкой
       const response = await axios.get(`${DASHBOARDS_URL}`, {
         headers: {
-          Authorization: `Token ${access}`,
+          Authorization: `Token${access}`,
         },
       });
       console.log("API Data:", response.data);  // Лог ответа от API
